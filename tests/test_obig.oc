@@ -19,6 +19,7 @@ struct option* get_long_options() {
 void print_supplementary_help() {}
 
 void test_main(void*varg) {
+	args_t *args = varg;
 
 	#include "test_obig_components/memory.oc"
 	#include "test_obig_components/assignment.oc"

@@ -33,6 +33,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_shl_native - shift by 1", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -67,6 +68,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_shl_native - shift by 15", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -101,6 +103,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_shl_native - shift by 34", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -133,6 +136,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_shl_native - augmented assignment", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -166,6 +170,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_shl_native - extended output", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0llX\n\tActual: \t%0llX\n", expected, output);
 	}
 
@@ -200,6 +205,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_shl_native - truncated output", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0hX\n\tActual: \t%0hX\n", expected, output);
 	}
 
@@ -246,6 +252,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_shl_onative - shift by 1", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -282,6 +289,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_shl_onative - shift by 15", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -318,6 +326,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_shl_onative - shift by 34", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -352,6 +361,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_shl_onative - augmented assignment", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -387,6 +397,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_shl_onative - extended output", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0llX\n\tActual: \t%0llX\n", expected, output);
 	}
 
@@ -423,6 +434,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_shl_onative - truncated output", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0hX\n\tActual: \t%0hX\n", expected, output);
 	}
 
@@ -466,6 +478,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_shr_native - shift by 1", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -500,6 +513,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_shr_native - shift by 15", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -534,6 +548,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_shr_native - shift by 34", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -566,6 +581,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_shr_native - augmented assignment", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -599,6 +615,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_shr_native - extended output", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0llX\n\tActual: \t%0llX\n", expected, output);
 	}
 
@@ -633,6 +650,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_shr_native - truncated output", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0hX\n\tActual: \t%0hX\n", expected, output);
 	}
 
@@ -679,6 +697,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_shr_onative - shift by 1", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -715,6 +734,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_shr_onative - shift by 15", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -751,6 +771,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_shr_onative - shift by 34", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -785,6 +806,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_shr_onative - augmented assignment", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -820,6 +842,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_shr_onative - extended output", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0llX\n\tActual: \t%0llX\n", expected, output);
 	}
 
@@ -856,6 +879,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_shr_onative - truncated output", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0hX\n\tActual: \t%0hX\n", expected, output);
 	}
 

@@ -20,11 +20,11 @@ void ocTestUtilTcpOrDie(ProtocolDesc* pd, bool isServer, const char* remote_host
 			exit(1);
 		}
 	}
-}	
+}
 
 int pma(void** dst, size_t alignment, size_t size) {
 	return posix_memalign(dst, alignment, size);
-}									
+}
 
 int main(int argc,char* argv[])
 {
@@ -38,6 +38,7 @@ int main(int argc,char* argv[])
 	args_pass.argv[0] = alloca(strlen(argv[0])+1);
 	strcpy(args_pass.argv[0],argv[0]);
 	args_pass.argc = 1;
+	args_pass.status = 0;
 
 	int arg;
 	char optstring[256] = ":hc:p:";
@@ -100,5 +101,5 @@ int main(int argc,char* argv[])
 	fprintf(stderr,"Total time: %lf s\n",(double)current_timestamp()/1000000-lap);
 
 	cleanupProtocol(&pd);
-	return 0;
+	return args_pass.status;
 }

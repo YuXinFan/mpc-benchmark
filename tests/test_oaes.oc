@@ -26,8 +26,8 @@ void print_supplementary_help() {}
 GCRY_THREAD_OPTION_PTHREAD_IMPL;
 
 void test_main(void*varg) {
-
-	if (!gcry_control(GCRYCTL_INITIALIZATION_FINISHED_P)) { 
+	args_t *args = varg;
+	if (!gcry_control(GCRYCTL_INITIALIZATION_FINISHED_P)) {
 		gcry_control(GCRYCTL_SET_THREAD_CBS, &gcry_threads_pthread);
     	if(!gcry_check_version(NULL)) {
     		fprintf(stderr,"libgcrypt init failed\n");
@@ -71,6 +71,7 @@ void test_main(void*varg) {
 
 		fprintf(stderr, "Test Item: %-70s %s\n", "oaes_128 - Test Case 1", (success)?STATUS_SUCCESS:STATUS_FAILURE);
 		if (!success) {
+			args->status = 1;
 			fprintf(stderr, "\tExpected Output:\t");
 			for (int ii = 0; ii < 16; ii++) {
 				fprintf(stderr, "%02hhX", expected_output[ii]);
@@ -117,6 +118,7 @@ void test_main(void*varg) {
 
 		fprintf(stderr, "Test Item: %-70s %s\n", "oaes_128 - Test Case 2", (success)?STATUS_SUCCESS:STATUS_FAILURE);
 		if (!success) {
+			args->status = 1;
 			fprintf(stderr, "\tExpected Output:\t");
 			for (int ii = 0; ii < 16; ii++) {
 				fprintf(stderr, "%02hhX", expected_output[ii]);
@@ -142,13 +144,13 @@ void test_main(void*varg) {
 		uint8_t key_raw[16];
 		uint8_t expected_output[16*BLOCKCOUNT];
 
-		
+
 
 		for (int ii = 0; ii < 16*BLOCKCOUNT/sizeof(uint32_t); ii++) {
 			input[ii*sizeof(uint32_t)] = feedOblivInt(rand(), 1);
 			revealOblivInt(&input_raw[ii*sizeof(uint32_t)], input[ii*sizeof(uint32_t)], 0);
 		}
-		
+
 		for (int ii = 0; ii < 16/sizeof(uint32_t); ii++) {
 			key[ii*sizeof(uint32_t)] = feedOblivInt(rand(), 2);
 			revealOblivInt(&key_raw[ii*sizeof(uint32_t)], key[ii*sizeof(uint32_t)], 0);
@@ -180,6 +182,7 @@ void test_main(void*varg) {
 
 		fprintf(stderr, "Test Item: %-70s %s\n", "oaes_128_encdec - 64 random blocks", (success)?STATUS_SUCCESS:STATUS_FAILURE);
 		if (!success) {
+			args->status = 1;
 			fprintf(stderr, "\tExpected Output:\t");
 			for (int ii = 0; ii < 16*BLOCKCOUNT; ii++) {
 				fprintf(stderr, "%02hhX", expected_output[ii]);
@@ -205,13 +208,13 @@ void test_main(void*varg) {
 		uint8_t key_raw[16];
 		uint8_t expected_output[16*BLOCKCOUNT];
 
-		
+
 
 		for (int ii = 0; ii < 16*BLOCKCOUNT/sizeof(uint32_t); ii++) {
 			input[ii*sizeof(uint32_t)] = feedOblivInt(rand(), 1);
 			revealOblivInt(&input_raw[ii*sizeof(uint32_t)], input[ii*sizeof(uint32_t)], 0);
 		}
-		
+
 		for (int ii = 0; ii < 16/sizeof(uint32_t); ii++) {
 			key[ii*sizeof(uint32_t)] = feedOblivInt(rand(), 2);
 			revealOblivInt(&key_raw[ii*sizeof(uint32_t)], key[ii*sizeof(uint32_t)], 0);
@@ -243,6 +246,7 @@ void test_main(void*varg) {
 
 		fprintf(stderr, "Test Item: %-70s %s\n", "oaes_128_encdec_double - 64 random blocks", (success)?STATUS_SUCCESS:STATUS_FAILURE);
 		if (!success) {
+			args->status = 1;
 			fprintf(stderr, "\tExpected Output:\t");
 			for (int ii = 0; ii < 16*BLOCKCOUNT; ii++) {
 				fprintf(stderr, "%02hhX", expected_output[ii]);
@@ -257,7 +261,7 @@ void test_main(void*varg) {
 		}
 	}
 
-	
+
 
 	fprintf(stderr, "\n");
 

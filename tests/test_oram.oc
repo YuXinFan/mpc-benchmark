@@ -39,7 +39,7 @@ void print_supplementary_help() {
 void shuffle(size_t *array, size_t n) {
 	if (n > 1) {
 		size_t i;
-		for (i = 0; i < n - 1; i++) 
+		for (i = 0; i < n - 1; i++)
 		{
 		  size_t j = i + rand() / (RAND_MAX / (n - i) + 1);
 		  int t = array[j];
@@ -66,7 +66,9 @@ const char* getOramName(oram_type mode) {
 	}
 }
 
-void testOramType(oram_type mode, size_t elct, size_t elsz) {
+int testOramType(oram_type mode, size_t elct, size_t elsz) {
+
+  int status = 0;
 
 	{
 		uint32_t * input_raw = malloc(elct * elsz * sizeof(uint32_t));
@@ -109,6 +111,9 @@ void testOramType(oram_type mode, size_t elct, size_t elsz) {
 		free(value);
 
 		fprintf(stderr, "Test Item: %-19s %-50s %s\n", getOramName(mode), "oram_write/oram_read", (success)?STATUS_SUCCESS:STATUS_FAILURE);
+    if(!success) {
+      status = 1;
+    }
 
 	}
 
@@ -152,6 +157,9 @@ void testOramType(oram_type mode, size_t elct, size_t elsz) {
 		free(value);
 
 		fprintf(stderr, "Test Item: %-19s %-50s %s\n", getOramName(mode), "oram_write_public/oram_read_public", (success)?STATUS_SUCCESS:STATUS_FAILURE);
+    if(!success) {
+      status = 1;
+    }
 
 	}
 
@@ -208,6 +216,9 @@ void testOramType(oram_type mode, size_t elct, size_t elsz) {
 		free(value);
 
 		fprintf(stderr, "Test Item: %-19s %-50s %s\n", getOramName(mode), "2n random private/public accesses", (success)?STATUS_SUCCESS:STATUS_FAILURE);
+    if(!success) {
+      status = 1;
+    }
 
 	}
 
@@ -251,6 +262,9 @@ void testOramType(oram_type mode, size_t elct, size_t elsz) {
 		free(value);
 
 		fprintf(stderr, "Test Item: %-19s %-50s %s\n", getOramName(mode), "oram_from_array", (success)?STATUS_SUCCESS:STATUS_FAILURE);
+    if(!success) {
+      status = 1;
+    }
 
 	}
 
@@ -285,6 +299,9 @@ void testOramType(oram_type mode, size_t elct, size_t elsz) {
 		free(value);
 
 		fprintf(stderr, "Test Item: %-19s %-50s %s\n", getOramName(mode), "oram_from_shares", (success)?STATUS_SUCCESS:STATUS_FAILURE);
+    if(!success) {
+      status = 1;
+    }
 
 	}
 
@@ -319,6 +336,9 @@ void testOramType(oram_type mode, size_t elct, size_t elsz) {
 		free(value);
 
 		fprintf(stderr, "Test Item: %-19s %-50s %s\n", getOramName(mode), "oram_write - bounds checking", (success)?STATUS_SUCCESS:STATUS_FAILURE);
+    if(!success) {
+      status = 1;
+    }
 	}
 
 	{
@@ -369,9 +389,14 @@ void testOramType(oram_type mode, size_t elct, size_t elsz) {
 		free(value);
 
 		fprintf(stderr, "Test Item: %-19s %-50s %s\n", getOramName(mode), "oram_read - bounds checking", (success)?STATUS_SUCCESS:STATUS_FAILURE);
+    if(!success) {
+      status = 1;
+    }
 	}
 
 	fprintf(stderr, "\n");
+
+  return status;
 
 }
 
@@ -427,13 +452,15 @@ void test_main(void*varg) {
 		}
 	}
 
+  int status = 0;
 	if (all_orams) {
-		testOramType(ORAM_TYPE_FSSL, elct, elsz);
-		testOramType(ORAM_TYPE_FSSL_CPRG, elct, elsz);
-		testOramType(ORAM_TYPE_SQRT, elct, elsz);
-		testOramType(ORAM_TYPE_CIRCUIT, elct, elsz);
-		testOramType(ORAM_TYPE_LINEAR, elct, elsz);
+		status |= testOramType(ORAM_TYPE_FSSL, elct, elsz);
+		status |= testOramType(ORAM_TYPE_FSSL_CPRG, elct, elsz);
+		status |= testOramType(ORAM_TYPE_SQRT, elct, elsz);
+		status |= testOramType(ORAM_TYPE_CIRCUIT, elct, elsz);
+		status |= testOramType(ORAM_TYPE_LINEAR, elct, elsz);
 	} else {
-		testOramType(manual_type, elct, elsz);
+		status |= testOramType(manual_type, elct, elsz);
 	}
+  args_pass->status = status;
 }

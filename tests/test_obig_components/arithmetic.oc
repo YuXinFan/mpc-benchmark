@@ -39,6 +39,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_add", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -78,6 +79,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_add - augmented assignment x", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -116,6 +118,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_add - augmented assignment y", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -156,6 +159,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_add - overflow", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -197,6 +201,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_add - mismatched inputs (x longer than y)", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0llX\n\tActual: \t%0llX\n", expected, output);
 	}
 
@@ -238,6 +243,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_add - mismatched inputs (x shorter than y)", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0llX\n\tActual: \t%0llX\n", expected, output);
 	}
 
@@ -280,6 +286,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_add - extended output", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0llX\n\tActual: \t%0llX\n", expected, output);
 	}
 
@@ -321,6 +328,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_add - truncated output", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0llX\n\tActual: \t%0llX\n", expected, output);
 	}
 
@@ -370,6 +378,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_neg", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -402,6 +411,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_neg - augmented assignment", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -435,6 +445,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_neg - overflow", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -470,6 +481,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_neg - extended output", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0llX\n\tActual: \t%0llX\n", expected, output);
 	}
 
@@ -505,6 +517,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_neg - truncated output", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0llX\n\tActual: \t%0llX\n", expected, output);
 	}
 
@@ -558,6 +571,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_sub - x > y", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -599,6 +613,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_sub - x < y", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -638,6 +653,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_sub - augmented assignment x", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -676,6 +692,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_sub - augmented assignment y", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -716,6 +733,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_sub - mismatched inputs (x longer than y)", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0llX\n\tActual: \t%0llX\n", expected, output);
 	}
 
@@ -757,6 +775,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_sub - mismatched inputs (x shorter than y)", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0llX\n\tActual: \t%0llX\n", expected, output);
 	}
 
@@ -799,6 +818,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_sub - extended output, x > y", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0llX\n\tActual: \t%0llX\n", expected, output);
 	}
 
@@ -841,6 +861,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_sub - extended output, x < y", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0llX\n\tActual: \t%0llX\n", expected, output);
 	}
 
@@ -882,6 +903,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_sub - truncated output", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0llX\n\tActual: \t%0llX\n", expected, output);
 	}
 
@@ -936,6 +958,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_mul", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0llX\n\tActual: \t%0llX\n", expected, output);
 	}
 
@@ -976,6 +999,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_mul - augmented assignment x", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -1016,6 +1040,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_mul - augmented assignment y", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -1057,6 +1082,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_mul - odd sized inputs", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0llX\n\tActual: \t%0llX\n", expected, output);
 	}
 
@@ -1098,6 +1124,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_mul - mismatched inputs (x longer than y)", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0llX\n\tActual: \t%0llX\n", expected, output);
 	}
 
@@ -1139,6 +1166,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_mul - mismatched inputs (x shorter than y)", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0llX\n\tActual: \t%0llX\n", expected, output);
 	}
 
@@ -1180,6 +1208,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_mul - extended output", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0llX\n\tActual: \t%0llX\n", expected, output);
 	}
 
@@ -1221,6 +1250,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_mul - truncated output", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -1273,6 +1303,7 @@ fprintf(stderr, "\n");
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_mul - 100 random inputs", (success)?STATUS_SUCCESS:STATUS_FAILURE);
 	for (int ii = 0; ii < 100; ii++) {
 		if (expected[ii] != output[ii]) {
+			args->status = 1;
 			fprintf(stderr, "\tExpected:\t%0llX\n\tActual: \t%0llX\n", expected[ii], output[ii]);
 		}
 	}
@@ -1340,9 +1371,11 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_div_mod", (expected_q == output_q && expected_r == output_r && tempBool)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected_q != output_q) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected quotient:\t%08X\n\tActual quotient: \t%08X\n", expected_q, output_q);
 	}
 	if (expected_r != output_r) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected remainder:\t%08X\n\tActual remainder: \t%08X\n", expected_r, output_r);
 	}
 
@@ -1397,9 +1430,11 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_div_mod", (expected_q == output_q && expected_r == output_r && tempBool)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected_q != output_q) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected quotient:\t%08X\n\tActual quotient: \t%08X\n", expected_q, output_q);
 	}
 	if (expected_r != output_r) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected remainder:\t%08X\n\tActual remainder: \t%08X\n", expected_r, output_r);
 	}
 
@@ -1454,9 +1489,11 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_div_mod - divisor larger than dividend", (expected_q == output_q && expected_r == output_r && tempBool)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected_q != output_q) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected quotient:\t%08X\n\tActual quotient: \t%08X\n", expected_q, output_q);
 	}
 	if (expected_r != output_r) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected remainder:\t%08X\n\tActual remainder: \t%08X\n", expected_r, output_r);
 	}
 
@@ -1511,9 +1548,11 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_div_mod - unfull operands", (expected_q == output_q && expected_r == output_r && tempBool)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected_q != output_q) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected quotient:\t%08X\n\tActual quotient: \t%08X\n", expected_q, output_q);
 	}
 	if (expected_r != output_r) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected remainder:\t%08X\n\tActual remainder: \t%08X\n", expected_r, output_r);
 	}
 
@@ -1550,6 +1589,9 @@ fprintf(stderr, "\n");
 	revealOblivBool(&tempBool, success, 0);
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_div_mod - division by 0", (!tempBool)?STATUS_SUCCESS:STATUS_FAILURE);
+	if(!tempBool) {
+		args->status = 1;
+	}
 
 	obig_free(&x_test);
 	obig_free(&y_test);
@@ -1600,9 +1642,11 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_div_mod - augmented assignment", (expected_q == output_q && expected_r == output_r && tempBool)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected_q != output_q) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected quotient:\t%08X\n\tActual quotient: \t%08X\n", expected_q, output_q);
 	}
 	if (expected_r != output_r) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected remainder:\t%08X\n\tActual remainder: \t%08X\n", expected_r, output_r);
 	}
 
@@ -1655,9 +1699,11 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_div_mod - mismatched inputs (x shorter than y)", (expected_q == output_q && expected_r == output_r && tempBool)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected_q != output_q) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected quotient:\t%08X\n\tActual quotient: \t%08X\n", expected_q, output_q);
 	}
 	if (expected_r != output_r) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected remainder:\t%08X\n\tActual remainder: \t%08X\n", expected_r, output_r);
 	}
 
@@ -1712,9 +1758,11 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_div_mod - mismatched inputs (x longer than y)", (expected_q == output_q && expected_r == output_r && tempBool)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected_q != output_q) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected quotient:\t%08X\n\tActual quotient: \t%08X\n", expected_q, output_q);
 	}
 	if (expected_r != output_r) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected remainder:\t%08X\n\tActual remainder: \t%08X\n", expected_r, output_r);
 	}
 
@@ -1769,9 +1817,11 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_div_mod - extended outputs", (expected_q == output_q && expected_r == output_r && tempBool)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected_q != output_q) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected quotient:\t%0llX\n\tActual quotient: \t%0llX\n", expected_q, output_q);
 	}
 	if (expected_r != output_r) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected remainder:\t%0llX\n\tActual remainder: \t%0llX\n", expected_r, output_r);
 	}
 
@@ -1826,9 +1876,11 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_div_mod - truncated outputs", (expected_q == output_q && expected_r == output_r && tempBool)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected_q != output_q) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected quotient:\t%08X\n\tActual quotient: \t%08X\n", expected_q, output_q);
 	}
 	if (expected_r != output_r) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected remainder:\t%08X\n\tActual remainder: \t%08X\n", expected_r, output_r);
 	}
 
@@ -1892,6 +1944,7 @@ fprintf(stderr, "\n");
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_div_mod - 100 random inputs", (success)?STATUS_SUCCESS:STATUS_FAILURE);
 	for (int ii = 0; ii < 100; ii++) {
 		if (expectedq[ii] != outputq[ii] || expectedr[ii] != outputr[ii]) {
+			args->status = 1;
 			fprintf(stderr, "\tx:\t%08X\n\ty:\t%08X\n", x[ii], y[ii]);
 			fprintf(stderr, "\tExpected x:\t%08X\n\tActual x: \t%08X\n", expectedq[ii], outputq[ii]);
 			fprintf(stderr, "\tExpected y:\t%08X\n\tActual y: \t%08X\n", expectedr[ii], outputr[ii]);
@@ -1959,9 +2012,11 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_div_mod - one digit divisor", (expected_q == output_q && expected_r == output_r && tempBool)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected_q != output_q) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected quotient:\t%08X\n\tActual quotient: \t%08X\n", expected_q, output_q);
 	}
 	if (expected_r != output_r) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected remainder:\t%08X\n\tActual remainder: \t%08X\n", expected_r, output_r);
 	}
 
@@ -2016,9 +2071,11 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_div_mod - one digit divisor - divisor larger than dividend", (expected_q == output_q && expected_r == output_r && tempBool)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected_q != output_q) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected quotient:\t%08X\n\tActual quotient: \t%08X\n", expected_q, output_q);
 	}
 	if (expected_r != output_r) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected remainder:\t%08X\n\tActual remainder: \t%08X\n", expected_r, output_r);
 	}
 
@@ -2055,6 +2112,9 @@ fprintf(stderr, "\n");
 	revealOblivBool(&tempBool, success, 0);
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_div_mod - one digit divisor - division by 0", (!tempBool)?STATUS_SUCCESS:STATUS_FAILURE);
+	if(!tempBool) {
+		args->status = 1;
+	}
 
 	obig_free(&x_test);
 	obig_free(&y_test);
@@ -2105,9 +2165,11 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_div_mod - one digit divisor - augmented assignment", (expected_q == output_q && expected_r == output_r && tempBool)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected_q != output_q) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected quotient:\t%08X\n\tActual quotient: \t%08X\n", expected_q, output_q);
 	}
 	if (expected_r != output_r) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected remainder:\t%08X\n\tActual remainder: \t%08X\n", expected_r, output_r);
 	}
 
@@ -2160,9 +2222,11 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_div_mod - one digit divisor - matched inputs", (expected_q == output_q && expected_r == output_r && tempBool)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected_q != output_q) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected quotient:\t%08X\n\tActual quotient: \t%08X\n", expected_q, output_q);
 	}
 	if (expected_r != output_r) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected remainder:\t%08X\n\tActual remainder: \t%08X\n", expected_r, output_r);
 	}
 
@@ -2217,9 +2281,11 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_div_mod - one digit divisor - truncated outputs", (expected_q == output_q && expected_r == output_r && tempBool)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected_q != output_q) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected quotient:\t%08X\n\tActual quotient: \t%08X\n", expected_q, output_q);
 	}
 	if (expected_r != output_r) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected remainder:\t%08X\n\tActual remainder: \t%08X\n", expected_r, output_r);
 	}
 
@@ -2270,6 +2336,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_sqrt", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%08X\n\tActual: \t%08X\n", expected, output);
 	}
 
@@ -2304,6 +2371,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_sqrt - unfull operand", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%08X\n\tActual: \t%08X\n", expected, output);
 	}
 
@@ -2336,6 +2404,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_sqrt - augmented assignment", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%08X\n\tActual: \t%08X\n", expected, output);
 	}
 
@@ -2369,6 +2438,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_sqrt - extended output", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0llX\n\tActual: \t%0llX\n", expected, output);
 	}
 
@@ -2403,6 +2473,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_sqrt - truncated output 1", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%04X\n\tActual: \t%04X\n", expected, output);
 	}
 
@@ -2437,6 +2508,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_sqrt - truncated output 2", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%02X\n\tActual: \t%02X\n", expected, output);
 	}
 

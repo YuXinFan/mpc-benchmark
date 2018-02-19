@@ -39,6 +39,7 @@ fprintf(stderr, "\n");
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_import_onative - 100 random integers", (success)?STATUS_SUCCESS:STATUS_FAILURE);
 	for (int jj = 0; jj < 100; jj++) {
 		if ((x[jj] != output[jj])) {
+			args->status = 1;
 			fprintf(stderr, "\tExpected:\t%0llX\n\tActual: \t%0llX\n", x[jj], output[jj]);
 		}
 	}
@@ -78,10 +79,11 @@ fprintf(stderr, "\n");
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_import_onative - 100 random integers, extended output", (success)?STATUS_SUCCESS:STATUS_FAILURE);
 	for (int jj = 0; jj < 100; jj++) {
 		if ((x[jj] != output[jj])) {
+			args->status = 1;
 			fprintf(stderr, "\tExpected:\t%0llX\n\tActual: \t%0llX\n", x[jj], output[jj]);
 		}
 	}
-	
+
 }
 
 {	// obig_import_onative - random data, truncated output
@@ -118,10 +120,11 @@ fprintf(stderr, "\n");
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_import_onative - 100 random integers, truncated output", (success)?STATUS_SUCCESS:STATUS_FAILURE);
 	for (int jj = 0; jj < 100; jj++) {
 		if (((unsigned int)x[jj] != output[jj])) {
+			args->status = 1;
 			fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", x[jj], output[jj]);
 		}
 	}
-	
+
 }
 
 
@@ -158,7 +161,7 @@ fprintf(stderr, "\n");
 		xo = obig_export_onative(x_test);
 
 		revealOblivLLong(&output[jj], xo, 0);
-		
+
 		success &= x[jj] == output[jj];
 		obig_free(&x_test);
 	}
@@ -166,6 +169,7 @@ fprintf(stderr, "\n");
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_export_onative - 100 random integers", (success)?STATUS_SUCCESS:STATUS_FAILURE);
 	for (int jj = 0; jj < 100; jj++) {
 		if ((x[jj] != output[jj])) {
+			args->status = 1;
 			fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", x[jj], output[jj]);
 		}
 	}
@@ -194,7 +198,7 @@ fprintf(stderr, "\n");
 		xo = obig_export_onative(x_test);
 
 		revealOblivLLong(&output[jj], xo, 0);
-		
+
 		success &= x[jj] == output[jj];
 		obig_free(&x_test);
 	}
@@ -202,6 +206,7 @@ fprintf(stderr, "\n");
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_export_onative - 100 random integers, extended output", (success)?STATUS_SUCCESS:STATUS_FAILURE);
 	for (int jj = 0; jj < 100; jj++) {
 		if ((x[jj] != output[jj])) {
+			args->status = 1;
 			fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", x[jj], output[jj]);
 		}
 	}
@@ -230,7 +235,7 @@ fprintf(stderr, "\n");
 		xo = obig_export_onative(x_test);
 
 		revealOblivInt(&output[jj], xo, 0);
-		
+
 		success &= (unsigned int)x[jj] == output[jj];
 		obig_free(&x_test);
 	}
@@ -238,6 +243,7 @@ fprintf(stderr, "\n");
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_export_onative - 100 random integers, truncated output", (success)?STATUS_SUCCESS:STATUS_FAILURE);
 	for (int jj = 0; jj < 100; jj++) {
 		if (((unsigned int)x[jj] != output[jj])) {
+			args->status = 1;
 			fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", (unsigned int)x[jj], output[jj]);
 		}
 	}
@@ -288,6 +294,7 @@ fprintf(stderr, "\n");
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_import_onative_signed - 100 random integers", (success)?STATUS_SUCCESS:STATUS_FAILURE);
 	for (int jj = 0; jj < 100; jj++) {
 		if ((x[jj] != output[jj])) {
+			args->status = 1;
 			fprintf(stderr, "\tExpected:\t%0llX\n\tActual: \t%0llX\n", x[jj], output[jj]);
 		}
 	}
@@ -327,10 +334,11 @@ fprintf(stderr, "\n");
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_import_onative_signed - 100 random integers, extended output", (success)?STATUS_SUCCESS:STATUS_FAILURE);
 	for (int jj = 0; jj < 100; jj++) {
 		if ((x[jj] != output[jj])) {
+			args->status = 1;
 			fprintf(stderr, "\tExpected:\t%0llX\n\tActual: \t%0llX\n", x[jj], output[jj]);
 		}
 	}
-	
+
 }
 
 {	// obig_import_onative_signed - random data, truncated output
@@ -367,10 +375,11 @@ fprintf(stderr, "\n");
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_import_onative_signed - 100 random integers, truncated output", (success)?STATUS_SUCCESS:STATUS_FAILURE);
 	for (int jj = 0; jj < 100; jj++) {
 		if (((unsigned int)x[jj] != output[jj])) {
+			args->status = 1;
 			fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", x[jj], output[jj]);
 		}
 	}
-	
+
 }
 
 
@@ -407,7 +416,7 @@ fprintf(stderr, "\n");
 		xo = obig_export_onative_signed(x_test);
 
 		revealOblivLLong(&output[jj], xo, 0);
-		
+
 		success &= x[jj] == output[jj];
 		obig_free(&x_test);
 	}
@@ -415,6 +424,7 @@ fprintf(stderr, "\n");
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_export_onative_signed - 100 random integers", (success)?STATUS_SUCCESS:STATUS_FAILURE);
 	for (int jj = 0; jj < 100; jj++) {
 		if ((x[jj] != output[jj])) {
+			args->status = 1;
 			fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", x[jj], output[jj]);
 		}
 	}
@@ -443,7 +453,7 @@ fprintf(stderr, "\n");
 		xo = obig_export_onative_signed(x_test);
 
 		revealOblivLLong(&output[jj], xo, 0);
-		
+
 		success &= x[jj] == output[jj];
 		obig_free(&x_test);
 	}
@@ -451,6 +461,7 @@ fprintf(stderr, "\n");
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_export_onative_signed - 100 random integers, extended output", (success)?STATUS_SUCCESS:STATUS_FAILURE);
 	for (int jj = 0; jj < 100; jj++) {
 		if ((x[jj] != output[jj])) {
+			args->status = 1;
 			fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", x[jj], output[jj]);
 		}
 	}
@@ -479,7 +490,7 @@ fprintf(stderr, "\n");
 		xo = obig_export_onative_signed(x_test);
 
 		revealOblivInt(&output[jj], xo, 0);
-		
+
 		success &= (unsigned int)x[jj] == output[jj];
 		obig_free(&x_test);
 	}
@@ -487,6 +498,7 @@ fprintf(stderr, "\n");
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_export_onative_signed - 100 random integers, truncated output", (success)?STATUS_SUCCESS:STATUS_FAILURE);
 	for (int jj = 0; jj < 100; jj++) {
 		if (((unsigned int)x[jj] != output[jj])) {
+			args->status = 1;
 			fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", (unsigned int)x[jj], output[jj]);
 		}
 	}

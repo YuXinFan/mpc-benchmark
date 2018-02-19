@@ -117,6 +117,9 @@ void test_main(void*varg) {
 		}
 
 		fprintf(stderr, "Test Item: %-70s %s\n", "ogale_shapley - 3 couples", (success)?STATUS_SUCCESS:STATUS_FAILURE);
+		if(!success) {
+			args_pass->status = 1;
+		}
 	}
 
 	{
@@ -324,6 +327,7 @@ void test_main(void*varg) {
 
 		fprintf(stderr, "Test Item: %-70s %s\n", "oroth_peranson_preference_package_from_shares - 9p/3r - XOR with 0", (success)?STATUS_SUCCESS:STATUS_FAILURE);
 		if (!success) {
+			args_pass->status = 1;
 			if (pkg->proposer_count != 9) fprintf(stderr, "\texpected proposer_count: %d, actual proposer_count %d\n", 9, pkg->proposer_count);
 			if (pkg->reviewer_count != 3) fprintf(stderr, "\texpected reviewer_count: %d, actual reviewer_count %d\n", 3, pkg->reviewer_count);
 			if (pkg->p_preferences_bound != 3) fprintf(stderr, "\texpected p_preferences_bound: %d, actual p_preferences_bound %d\n", 3, pkg->p_preferences_bound);
@@ -585,6 +589,7 @@ void test_main(void*varg) {
 
 		fprintf(stderr, "Test Item: %-70s %s\n", "oroth_peranson_preference_package_from_shares - 9p/3r - XOR with RN", (success)?STATUS_SUCCESS:STATUS_FAILURE);
 		if (!success) {
+			args_pass->status = 1;
 			if (pkg->proposer_count != 9) fprintf(stderr, "\texpected proposer_count: %d, actual proposer_count %d\n", 9, pkg->proposer_count);
 			if (pkg->reviewer_count != 3) fprintf(stderr, "\texpected reviewer_count: %d, actual reviewer_count %d\n", 3, pkg->reviewer_count);
 			if (pkg->p_preferences_bound != 3) fprintf(stderr, "\texpected p_preferences_bound: %d, actual p_preferences_bound %d\n", 3, pkg->p_preferences_bound);
@@ -819,6 +824,7 @@ void test_main(void*varg) {
 
 		fprintf(stderr, "Test Item: %-70s %s\n", "oroth_peranson - 9p/3r (perfect match) - XOR with RN", (success)?STATUS_SUCCESS:STATUS_FAILURE);
 		if (!success) {
+			args_pass->status = 1;
 			for (int ii = 0; ii < 3; ii++) {
 				for (int jj = 0; jj < 3; jj ++) {
 					revealOblivInt(&temp, output->reviewers[ii].matches[jj], 0);
@@ -929,7 +935,7 @@ void test_main(void*varg) {
 			7, 10, 17, 18, 0, -1, -1, -1,
 			8, 2, 22, -1, -1, -1, -1, -1,
 			1, -1, -1, -1, -1, -1, -1, -1,
-			
+
 			15, -1, -1, -1, -1, -1, -1, -1,
 			6, 3, -1, -1, -1, -1, -1, -1,
 			20, 16, -1, -1, -1, -1, -1, -1,
@@ -1265,6 +1271,7 @@ void test_main(void*varg) {
 
 		fprintf(stderr, "Test Item: %-70s %s\n", "oroth_peranson - 24p/8r (scarcety of proposers) - XOR with RN", (success)?STATUS_SUCCESS:STATUS_FAILURE);
 		if (!success) {
+			args_pass->status = 1;
 			for (int ii = 0; ii < 8; ii++) {
 				for (int jj = 0; jj < 8; jj++) {
 					revealOblivInt(&temp, output->reviewers[ii].matches[jj], 0);
@@ -1319,7 +1326,7 @@ void test_main(void*varg) {
 			0, -1, -1, -1,
 			1, 0, -1, -1,
 			0, 1, 2, 3,
-			
+
 			0, 1, -1, -1,
 			2, 0, 1, -1,
 			0, 1, 2, 3,
@@ -1572,6 +1579,7 @@ void test_main(void*varg) {
 
 		fprintf(stderr, "Test Item: %-70s %s\n", "oroth_peranson - 16p/4r (scarcety of positions) - XOR with RN", (success)?STATUS_SUCCESS:STATUS_FAILURE);
 		if (!success) {
+			args_pass->status = 1;
 			for (int ii = 0; ii < 4; ii++) {
 				for (int jj = 0; jj < 4; jj++) {
 					revealOblivInt(&temp, output->reviewers[ii].matches[jj], 0);
