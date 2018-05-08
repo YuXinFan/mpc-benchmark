@@ -61,7 +61,10 @@ void floram_refresh(floram* ram) {
 }
 
 void floram_scan_callback(facb_pass * input, ProtocolDesc *pd) {
-	if (pd != NULL) ocSetCurrentProto(pd);
+	ProtocolDesc *oldpd = ocCurrentProto();
+	if (pd != NULL) {
+		ocSetCurrentProto(pd);
+	}
 
 #ifdef ORAM_PROFILE_SCHEDULING
 	printf("BEGIN STASH SCAN %lld\n", current_timestamp());
@@ -89,6 +92,9 @@ void floram_scan_callback(facb_pass * input, ProtocolDesc *pd) {
 
 	// this protocol may not do anything else for a while, but other threads could be waiting for it
 	oflush(ocCurrentProto());
+	if(pd != NULL) {
+		ocSetCurrentProto(oldpd);
+	}
 
 #ifdef ORAM_PROFILE_SCHEDULING
 	printf("END STASH SCAN %lld\n", current_timestamp());
@@ -96,7 +102,10 @@ void floram_scan_callback(facb_pass * input, ProtocolDesc *pd) {
 }
 
 void floram_scan_callback_ro(facb_pass * input, ProtocolDesc *pd) {
-	if (pd != NULL) ocSetCurrentProto(pd);
+	ProtocolDesc *oldpd = ocCurrentProto();
+	if (pd != NULL) {
+		ocSetCurrentProto(pd);
+	}
 
 #ifdef ORAM_PROFILE_SCHEDULING
 	printf("BEGIN STASH SCAN %lld\n", current_timestamp());
@@ -122,6 +131,9 @@ void floram_scan_callback_ro(facb_pass * input, ProtocolDesc *pd) {
 
 	// this protocol may not do anything else for a while, but other threads could be waiting for it
 	oflush(ocCurrentProto());
+	if(pd != NULL) {
+		ocSetCurrentProto(oldpd);
+	}
 
 #ifdef ORAM_PROFILE_SCHEDULING
 	printf("END STASH SCAN %lld\n", current_timestamp());
@@ -321,7 +333,7 @@ floram* floram_new(OcCopy* cpy, void* data, size_t n, bool cprg, bool from_share
 
 				ocToSharedCharN(ocCurrentProto(), &loadtemp_local[blockid * ram->memblocksize + subblockid*elosize], ((obliv uint8_t *)element(cpy,data,ii)), elosize);
 			}
-			
+
 			ram->wrom = scanwrom_new(ram->memblocksize, ram->blockcount);
 			scanwrom_write_xor_shares(ram->wrom, loadtemp_local, 0, ram->blockcount);
 
