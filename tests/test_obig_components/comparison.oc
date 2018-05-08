@@ -33,6 +33,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_cmp - x greater", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -67,6 +68,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_cmp - y greater", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -101,6 +103,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_cmp - operands equal", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -137,6 +140,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_cmp - mismatched inputs - x greater", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -171,6 +175,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_cmp - mismatched inputs - y greater", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 
@@ -205,6 +210,7 @@ fprintf(stderr, "\n");
 
 	fprintf(stderr, "Test Item: %-70s %s\n", "obig_cmp - mismatched inputs - operands equal", (expected == output)?STATUS_SUCCESS:STATUS_FAILURE);
 	if (expected != output) {
+		args->status = 1;
 		fprintf(stderr, "\tExpected:\t%0X\n\tActual: \t%0X\n", expected, output);
 	}
 

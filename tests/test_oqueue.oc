@@ -20,6 +20,8 @@ void print_supplementary_help() {}
 
 void test_main(void*varg) {
 
+	args_t *args = varg;
+
 	{
 
 		int testEls = 378;
@@ -49,6 +51,9 @@ void test_main(void*varg) {
 		oqueue_free(testQueue);
 
 		fprintf(stderr, "Test Item: %-70s %s\n", "oqueue - push/pop 378 ordered elements", (success)?STATUS_SUCCESS:STATUS_FAILURE);
+		if(!success) {
+			args->status = 1;
+		}
 
 	}
 
@@ -87,6 +92,9 @@ void test_main(void*varg) {
 		oqueue_free(testQueue);
 
 		fprintf(stderr, "Test Item: %-70s %s\n", "oqueue - push/pop 378 ordered elements with undersized queue", (success)?STATUS_SUCCESS:STATUS_FAILURE);
+		if(!success) {
+			args->status = 1;
+		}
 
 	}
 
@@ -116,7 +124,7 @@ void test_main(void*varg) {
 			revealOblivBool(&srnd, rnd, 0);
 
 			if (testBufferHead == testBufferTail) {
-				// queue is empty; push				
+				// queue is empty; push
 				testBuffer[testBufferTail] = srnd;
 				if (testBufferTail < 200) {
 					testBufferTail ++;
@@ -170,13 +178,16 @@ void test_main(void*varg) {
 						if (!tempBool) fprintf(stderr,"FAILURE at %d:4.1\n", ii);
 						if (temp != thisVal) fprintf(stderr,"FAILURE at %d:4.2\n", ii);
 					}
-				}	
+				}
 			}
 		}
 
 		oqueue_free(testQueue);
 
 		fprintf(stderr, "Test Item: %-70s %s\n", "oqueue - 4000 random operations on empty 200 element queue", (success)?STATUS_SUCCESS:STATUS_FAILURE);
+		if(!success) {
+			args->status = 1;
+		}
 
 	}
 
@@ -223,7 +234,7 @@ void test_main(void*varg) {
 			revealOblivBool(&srnd, rnd, 0);
 
 			if (testBufferHead == testBufferTail) {
-				// queue is empty; push				
+				// queue is empty; push
 				testBuffer[testBufferTail] = srnd;
 				if (testBufferTail < 200) {
 					testBufferTail ++;
@@ -272,13 +283,16 @@ void test_main(void*varg) {
 						revealOblivBool(&tempBool, opSuccess, 0);
 						success &= tempBool && (temp == thisVal);
 					}
-				}	
+				}
 			}
 		}
 
 		oqueue_free(testQueue);
 
 		fprintf(stderr, "Test Item: %-70s %s\n", "oqueue - 4000 random operations on full 200 element queue", (success)?STATUS_SUCCESS:STATUS_FAILURE);
+		if(!success) {
+			args->status = 1;
+		}
 
 	}
 
@@ -318,6 +332,9 @@ void test_main(void*varg) {
 		oqueue_free(testQueue);
 
 		fprintf(stderr, "Test Item: %-70s %s\n", "oqueue - oqueue_empty", (success)?STATUS_SUCCESS:STATUS_FAILURE);
+		if(!success) {
+			args->status = 1;
+		}
 
 	}
 
@@ -331,7 +348,7 @@ void test_main(void*varg) {
 
 		obliv bool testQueueFullness;
 		bool tempBool;
-		
+
 
 		for (int ii = 0; ii <testEls*2; ii ++) {
 			testQueueFullness = oqueue_full(testQueue);
@@ -348,6 +365,9 @@ void test_main(void*varg) {
 		oqueue_free(testQueue);
 
 		fprintf(stderr, "Test Item: %-70s %s\n", "oqueue - oqueue_full", (success)?STATUS_SUCCESS:STATUS_FAILURE);
+		if(!success) {
+			args->status = 1;
+		}
 
 	}
 

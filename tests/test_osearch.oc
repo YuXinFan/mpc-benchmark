@@ -100,10 +100,13 @@ void test_main(void*varg) {
 		success &= (temp == 10);
 
 		fprintf(stderr, "Test Item: %-70s %s\n", "obinary_search - 16 elements", (success)?STATUS_SUCCESS:STATUS_FAILURE);
+    if(!success) {
+      args_pass->status = 1;
+    }
 	}
 
 	{
-			
+
 		obliv uint32_t input[2048];
 		obliv uint32_t output;
 		obliv uint32_t needle;
@@ -132,6 +135,9 @@ void test_main(void*varg) {
 		success &= (temp == chosen);
 
 		fprintf(stderr, "Test Item: %-70s %s\n", "obinary_search - 2048 random elements", (success)?STATUS_SUCCESS:STATUS_FAILURE);
+    if(!success) {
+      args_pass->status = 1;
+    }
 	}
 
 

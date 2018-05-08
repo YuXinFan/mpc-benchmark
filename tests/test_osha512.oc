@@ -22,6 +22,8 @@ void print_supplementary_help() {}
 
 void test_main(void*varg) {
 
+	args_t *args = varg;
+
 	{
 		// test vectors http://csrc.nist.gov/groups/STM/cavp/secure-hashing.html
 
@@ -35,7 +37,7 @@ void test_main(void*varg) {
 		for (int ii = 0; ii < msglen; ii++) {
 			message[ii] = feedOblivChar(plaintext[ii], 1);
 		}
-		
+
 		oSHA512_CTX ctx;
 		oSHA512_Init(&ctx);
 		oSHA512_Update(&ctx, message, msglen);
@@ -51,6 +53,7 @@ void test_main(void*varg) {
 
 		fprintf(stderr, "Test Item: %-70s %s\n", "oSHA512 1", (success)?STATUS_SUCCESS:STATUS_FAILURE);
 		if(!success){
+			args->status = 1;
 			fprintf(stderr, "\tExpected Digest:\t");
 			for (int ii = 0; ii < OSHA512_DIGEST_LENGTH; ii++) {
 				fprintf(stderr, "%02hhX", digest2[ii]);
@@ -78,7 +81,7 @@ void test_main(void*varg) {
 		for (int ii = 0; ii < msglen; ii++) {
 			message[ii] = feedOblivChar(plaintext[ii], 1);
 		}
-		
+
 		oSHA512_CTX ctx;
 		oSHA512_Init(&ctx);
 		oSHA512_Update(&ctx, message, msglen);
@@ -94,6 +97,7 @@ void test_main(void*varg) {
 
 		fprintf(stderr, "Test Item: %-70s %s\n", "oSHA512 2", (success)?STATUS_SUCCESS:STATUS_FAILURE);
 		if(!success){
+			args->status = 1;
 			fprintf(stderr, "\tExpected Digest:\t");
 			for (int ii = 0; ii < OSHA512_DIGEST_LENGTH; ii++) {
 				fprintf(stderr, "%02hhX", digest2[ii]);
@@ -149,6 +153,7 @@ void test_main(void*varg) {
 
 		fprintf(stderr, "Test Item: %-70s %s\n", "oSHA512 100 random messages", (success)?STATUS_SUCCESS:STATUS_FAILURE);
 		if (!success) {
+			args->status = 1;
 			fprintf(stderr, "\tFailures:\t");
 			for (size_t jj = 0; jj < SHA_TEST_ITERS; jj ++) {
 				if (!successes[jj]) fprintf(stderr, "%d, ", jj);

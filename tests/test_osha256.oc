@@ -22,6 +22,8 @@ void print_supplementary_help() {}
 
 void test_main(void*varg) {
 
+	args_t *args = varg;
+
 	#include "test_osha256_components/sha256.oc"
 	#include "test_osha256_components/hmac.oc"
 	#include "test_osha256_components/pbkdf2.oc"
