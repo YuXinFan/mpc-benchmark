@@ -123,8 +123,12 @@ void ogale_shapley(obliv uint32_t * output, obliv uint32_t * mPrefsRaw, obliv ui
 		revealOblivInt(&prefPointer, oPrefPointer, 0);
 		ocCopy(&cpy5, thisPref, element(&cpy5, prefs, prefPointer)); 
 
+		// bool dummyAccess_;
+		// revealOblivBool(&dummyAccess_, dummyAccess, 0);
+		// if (dummyAccess_ == true) {
 		obliv if (dummyAccess == true) {
 			nextDummy = thisPref[4];
+			break;
 		} else {
 			thisWStatus[0] = thisPref[0] + 1;
 			thisWStatus[1] = thisPref[4];

@@ -24,7 +24,9 @@ obliv int obinary_search_oram(OcCopy * cpy, void* result, oram * haystack, void*
 		iimid = (iimin + iimax) / 2;
 		oram_read(temp_element, haystack, iimid);
 		cmpresult = fn(cpy, temp_element, needle);
-		obliv if (cmpresult == 0) {
+		bool cmpresult_;
+		revealOblivBool(&cmpresult_, cmpresult, 0);
+		if (cmpresult_ == 0) {
 			ocCopy(cpy, result, temp_element);
 			index = iimid;
 		} else {

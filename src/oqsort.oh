@@ -1,0 +1,11 @@
+#ifndef QSORT_OH
+#define QSORT_OH
+
+#include <obliv.oh>
+#include <copy.oh>
+
+typedef obliv char (* osort_cmp_function)(OcCopy *, void * el1, void * el2);
+
+//void oqsort(OcCopy * cpy, void * data, size_t low, size_t high, osort_cmp_function cmpFn); 
+void oqsort(obliv int* , int);
+#endif

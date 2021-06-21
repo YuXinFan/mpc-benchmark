@@ -1,0 +1,142 @@
+#include "oqsort.oh"
+#include <obliv.h>
+// void swapInt(obliv int* a,obliv int* b)
+// {
+//   obliv int t = *a^*b;
+//   *a^=t;
+//   *b^=t;
+// }
+
+// int oqsort_partition(OcCopy * cpy, void * data, size_t len, osort_cmp_function cmpFn){
+//   int i = -1;
+//   for (int j = 0; j < len-1; j++){
+//     obliv bool swapThisElement = ((obliv int *)data)[j] < ((obliv int *)data)[len-1];
+//     bool swapThisElement_;
+//     // reveal the result of comparsion
+//     revealOblivBool(&swapThisElement_, swapThisElement, 0);
+//     if (swapThisElement_) {
+//       i++;
+//     //   obliv int t = ((obliv int *)data)[i];
+//     //   ((obliv int *)data)[i] = ((obliv int *)data)[j];
+//     //   ((obliv int *)data)[j] = t;
+//     }
+//   }
+//   int p = i + 1;
+//   swapInt(&data[p], &data[len-1]);
+//   // p is the index of pivot
+//   return p;
+// }
+
+// void oqsort(OcCopy * cpy, void * data, size_t len, osort_cmp_function cmpFn){
+
+//   if (1 < len) {
+//     // p is the index of pivot
+//     int p = oqsort_partition(cpy, data, len, cmpFn);
+//     // sort first p value
+//     oqsort(cpy, data, p-1, cmpFn);
+//     // sort last n-p-1 value
+//     qsort(cpy, data+p+1, len-p-1, cmpFn);
+//   }
+// }
+// void swap(obliv int* a, obliv int* b)
+// {
+//     obliv int t = *a;
+//     *a = *b;
+//     *b = t;
+// }
+ 
+// /* This function is same in both iterative and recursive*/
+// int partition(obliv int *arr, size_t l, size_t h)
+// {
+//     obliv int x = arr[h];
+//     int i = (l - 1);
+ 
+//     for (int j = l; j <= h - 1; j++) {
+//         obliv bool leq = arr[j] <= x;
+//         bool leq_;
+//         revealOblivBool(&leq_, leq, 0);
+//         if (leq_) {
+//             i++;
+//             swap(&arr[i], &arr[j]);
+//         }
+//     }
+//     swap(&arr[i + 1], &arr[h]);
+//     return (i + 1);
+// }
+ 
+// /* A[] --> Array to be sorted,
+//    l  --> Starting index,
+//    h  --> Ending index */
+// void oqsort(OcCopy *cpy, void *arr, size_t l, size_t h, osort_cmp_function fn)
+// {
+//     // Create an auxiliary stack
+//     //int stack[h - l + 1];
+//     int stack[100000];
+//     // initialize top of stack
+//     int top = -1;
+ 
+//     // push initial values of l and h to stack
+//     stack[++top] = l;
+//     stack[++top] = h;
+ 
+//     // Keep popping from stack while is not empty
+//     while (top >= 0) {
+//         // Pop h and l
+//         h = stack[top--];
+//         l = stack[top--];
+ 
+//         // Set pivot element at its correct position
+//         // in sorted array
+//         int p = partition(arr, l, h);
+//         //int p = (l+h)/2;
+//         // If there are elements on left side of pivot,
+//         // then push left side to stack
+//         if (p - 1 > l) {
+//             stack[++top] = l;
+//             stack[++top] = p - 1;
+//         }
+ 
+//         // If there are elements on right side of pivot,
+//         // then push right side to stack
+//         if (p + 1 < h) {
+//             stack[++top] = p + 1;
+//             stack[++top] = h;
+//         }
+//     }
+// }
+void swapInt(obliv int* a,obliv int* b)
+{
+  obliv int t = 0;
+  t=*a^*b;
+  *a^=t;
+  *b^=t;
+}
+
+int partition(obliv int* arr, int n){
+  int i = -1;
+  for (int j = 0; j < n-1; j++){
+    obliv bool leq = (arr[j] <= arr[n-1]);
+    bool leq_rev;
+    // reveal the result of comparsion
+    revealOblivBool(&leq_rev, leq, 0);
+    if (leq_rev) {
+      i++;
+      swapInt(&arr[i], &arr[j]);
+    }
+  }
+  int p = i + 1;
+  swapInt(&arr[p], &arr[n-1]);
+  // p is the index of pivot
+  return p;
+}
+
+void oqsort(obliv int* arr, int n){
+  if (1 < n) {
+    // p is the index of pivot
+    int p = partition(arr, n);
+    // sort first p value
+    oqsort(arr, p);
+    // sort last n-p-1 value
+    oqsort(arr+p+1, n-p-1);
+  }
+}
