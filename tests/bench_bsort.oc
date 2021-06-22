@@ -108,7 +108,7 @@ void test_main(void*varg) {
 		}
 	}
 
-	fprintf(stdout, "# Batcher Sort (size, sample 1, sample 2, ... sample n)\n");
+	fprintf(stdout, "# Batcher Sort (size, (sample 1 microseconds, sample 1 gates, sample 1 bytes), ... , (sample n microseconds, sample n gates, sample n bytes))\n");
 	fflush(stdout);
 
 	{
@@ -131,10 +131,14 @@ void test_main(void*varg) {
             for (int jj = size/2; jj < size; jj++) {
                 input[jj] = feedOblivInt(perm[jj], 2);
             }
-			uint64_t startTime = current_timestamp();
+			int64_t runtime = current_timestamp();
+			int64_t runbytes = tcp2PBytesSent(ocCurrentProto());
+			int64_t rungates = yaoGateCount();
 			osort_batcher(&cpy1, input, size, cmpInt);
-			uint64_t runtime = current_timestamp() - startTime;
-			fprintf(stdout, ",%llu", runtime);
+			runtime = current_timestamp() - runtime;
+			rungates = yaoGateCount() - rungates;
+			runbytes = tcp2PBytesSent(ocCurrentProto()) - runbytes;
+			fprintf(stdout, ",(%llu,%llu,%llu)", runtime, rungates, runbytes);
 			fflush(stdout);
 			tally += runtime;
 

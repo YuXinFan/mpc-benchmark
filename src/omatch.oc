@@ -128,7 +128,7 @@ void ogale_shapley(obliv uint32_t * output, obliv uint32_t * mPrefsRaw, obliv ui
 		// if (dummyAccess_ == true) {
 		obliv if (dummyAccess == true) {
 			nextDummy = thisPref[4];
-			break;
+			//break;
 		} else {
 			thisWStatus[0] = thisPref[0] + 1;
 			thisWStatus[1] = thisPref[4];
