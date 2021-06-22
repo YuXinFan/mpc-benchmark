@@ -142,6 +142,9 @@ void test_main(void*varg) {
 
 	{
 		uint64_t tally = 0;
+		int64_t runbytes = 0;
+		int64_t rungates = 0;
+		int64_t runtime = 0;
 		fprintf(stdout, "%d", size);
 		fflush(stdout);
 
@@ -161,9 +164,9 @@ void test_main(void*varg) {
                 input[jj] = feedOblivInt(perm[jj], 2);
             }
             
-			int64_t runtime = current_timestamp();
-			int64_t runbytes = tcp2PBytesSent(ocCurrentProto());
-			int64_t rungates = yaoGateCount();
+			runbytes = tcp2PBytesSent(ocCurrentProto());
+			rungates = yaoGateCount();
+			runtime = current_timestamp();
 			batcherSort(input, size, sizeof(obliv int));
 			runtime = current_timestamp() - runtime;
 			rungates = yaoGateCount() - rungates;
@@ -187,7 +190,7 @@ void test_main(void*varg) {
 		free(input);
 
 		fprintf(stdout, "\n");
-		fprintf(stderr, "Batcher Sort (size:%d): %llu microseconds avg\n", size, tally/samples);
+		fprintf(stderr, "Batcher Sort (size:%d): %llu microseconds avg, %llu gates avg, %llu bytes avg\n", size, tally/samples, rungates, runbytes);
 	}
 
 }

@@ -138,12 +138,15 @@ void test_main(void*varg) {
 		}
 	}
 
-	fprintf(stdout, "# Quick Sort (size, sample 1, sample 2, ... sample n)\n");
+	fprintf(stdout, "# Quick Sort (size, (sample 1 time, gates, bytes), sample 2, ... sample n)\n");
 	fflush(stdout);
 
 	{
 		uint64_t tally = 0;
         OcCopy cpy1 = ocCopyIntN(1);
+		uint64_t runtime = 0;
+		uint64_t rungates = 0;
+		uint64_t runbytes = 0;
 		fprintf(stdout, "%d", size);
 		fflush(stdout);
 
@@ -161,25 +164,17 @@ void test_main(void*varg) {
             for (int jj = size/2; jj < size; jj++) {
                 input[jj] = feedOblivInt(perm[jj], 2);
             }
-			uint64_t startTime = current_timestamp();
+			rungates = yaoGateCount();
+			runbytes = tcp2PBytesSent(ocCurrentProto());
+			runtime = current_timestamp();
 			oqsort(input, size, cmpInt);
-            //oqsort(input, size);
-			uint64_t runtime = current_timestamp() - startTime;
-			for (int i = 0; i < size; i++) {
-				revealOblivInt(&output[i], input[i], 0);
-			}
-			
-			if (!sorted(output, size)) {
-				fprintf(stdout, "sort failed!");
-				
-			}
-			fprintf(stdout, ",%llu", runtime);
+			runtime = current_timestamp() - runtime;
+			rungates = yaoGateCount() -rungates;
+			runbytes = tcp2PBytesSent(ocCurrentProto()) - runbytes;
+			fprintf(stdout, ",(%llu, %llu, %llu)", runtime, rungates, runbytes);
 			fflush(stdout);
 			tally += runtime;
-			
-			print_array(output, size);
-
-			
+			//print_array(output, size);
 		}
 
 		free(perm);
@@ -187,7 +182,7 @@ void test_main(void*varg) {
 		free(output);
 
 		fprintf(stdout, "\n");
-		fprintf(stderr, "Batcher Sort (size:%d): %llu microseconds avg\n", size, tally/samples);
+		fprintf(stderr, "Quick Sort (size:%d): %llu microseconds avg, %llu gates avg, %llu bytes avg\n", size, tally/samples, rungates, runbytes);
 	}
 
 }

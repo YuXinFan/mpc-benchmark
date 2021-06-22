@@ -100,7 +100,9 @@ void test_main(void*varg) {
 
 	{
 		uint64_t tally = 0;
-
+		int64_t runbytes = 0;
+		int64_t rungates = 0;
+		int64_t runtime = 0;
 		fprintf(stdout, "%d", pairs);
 		fflush(stdout);
 
@@ -124,9 +126,13 @@ void test_main(void*varg) {
 				}
 			}
 
-			uint64_t startTime = current_timestamp();
+			runbytes = tcp2PBytesSent(ocCurrentProto());
+			rungates = yaoGateCount();
+			runtime = current_timestamp();
 			ogale_shapley_textbook(output, mPrefs, wPrefs, pairs);
-			uint64_t runtime = current_timestamp() - startTime;
+			runtime = current_timestamp() - runtime;
+			rungates = yaoGateCount() - rungates;
+			runbytes = tcp2PBytesSent(ocCurrentProto()) - runbytes;
 
 			fprintf(stdout, ",%llu", runtime);
 			fflush(stdout);
@@ -134,7 +140,7 @@ void test_main(void*varg) {
 
 		}
 		fprintf(stdout, "\n");
-		fprintf(stderr, "Gale Shapley (pairs:%d): %llu microseconds avg\n", pairs, tally/samples);
+		fprintf(stderr, "Gale Shapley (pairs:%d): %llu microseconds avg, %llu gates avg, %llu bytes avg\n", pairs, tally/samples, rungates, runbytes);
 
 		
 		tally = 0;
@@ -151,11 +157,14 @@ void test_main(void*varg) {
 				}
 			}
 
-			uint64_t startTime = current_timestamp();
+			runbytes = tcp2PBytesSent(ocCurrentProto());
+			rungates = yaoGateCount();
+			runtime = current_timestamp();
 			ogale_shapley_textbook_revealed(output, mPrefs, wPrefs, pairs);
-			uint64_t runtime = current_timestamp() - startTime;
-
-			fprintf(stdout, ",%llu", runtime);
+			runtime = current_timestamp() - runtime;
+			rungates = yaoGateCount() - rungates;
+			runbytes = tcp2PBytesSent(ocCurrentProto()) - runbytes;
+			fprintf(stdout, ",(%llu,%llu,%llu)", runtime, rungates, runbytes);
 			fflush(stdout);
 			tally += runtime;
 
@@ -167,7 +176,7 @@ void test_main(void*varg) {
 		free(output);
 
 		fprintf(stdout, "\n");
-		fprintf(stderr, "Gale Shapley Revealed (pairs:%d): %llu microseconds avg\n", pairs, tally/samples);
+		fprintf(stderr, "Gale Shapley Revealed (pairs:%d): %llu microseconds avg, %llu gates avg, %llu bytes avg\n", pairs, tally/samples, rungates, runbytes);
 	}
 
 }
