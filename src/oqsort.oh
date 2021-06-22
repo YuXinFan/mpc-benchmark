@@ -6,6 +6,6 @@
 
 typedef obliv char (* osort_cmp_function)(OcCopy *, void * el1, void * el2);
 
-//void oqsort(OcCopy * cpy, void * data, size_t low, size_t high, osort_cmp_function cmpFn); 
-void oqsort(obliv int* , int);
+void oqsort(OcCopy * cpy, void * data, size_t len, osort_cmp_function cmpFn); 
+//void oqsort(obliv int* , int);
 #endif

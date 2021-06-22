@@ -8,7 +8,10 @@ static void osort_batcher_swap(OcCopy * cpy, void* data, void* temp, size_t step
 	size_t ii;
 	for(ii=start; ii+step<end; ii+=step*2) {
 		obliv bool swapThisElement = cmpFn(cpy, element(cpy, data, ii), element(cpy, data, ii+step)) > 0;
-		ocSwapCondN(cpy, element(cpy, data, ii), element(cpy, data, ii+step), temp, &swapThisElement, 1);
+		//ocSwapCondN(cpy, element(cpy, data, ii), element(cpy, data, ii+step), temp, &swapThisElement, 1);
+		obliv if (swapThisElement) {
+			ocSwap(cpy, element(cpy, data, ii), element(cpy, data, ii+step), temp);
+		}
 	}
 }
 

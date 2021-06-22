@@ -133,8 +133,8 @@ void test_main(void*varg) {
             }
 
 			uint64_t startTime = current_timestamp();
-			//oqsort(&cpy1, input, 0, size-1, cmpInt);
-            oqsort(input, size);
+			oqsort(&cpy1, input, size, cmpInt);
+            //oqsort(input, size);
 			uint64_t runtime = current_timestamp() - startTime;
 			fprintf(stdout, ",%llu", runtime);
 			fflush(stdout);
