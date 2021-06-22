@@ -1,0 +1,46 @@
+#include <obliv.oh>
+#include "obsort.oh"
+// ------------------ Batcher sorting -----------------------------------------
+
+// TODO time with and without obliv functions. You can use non-obliv to build
+//   obliv versions quite easily
+void swapInt(obliv int* a,obliv int* b) obliv
+{
+  ~obliv(en) {
+    obliv int t = 0;
+    obliv if(en) t=*a^*b;
+    *a^=t;
+    *b^=t;
+  }
+}
+void cmpswapInt(void* va,void* vb,void* arg)
+{
+  obliv int *a=va,*b=vb;
+  obliv if(*a>*b) swapInt(a,b);
+}
+
+void batcherSwap(unsigned char* data,size_t n,size_t w,
+                 void (*cmpswap)(void*,void*,void*),void* arg)
+{
+  size_t i;
+  for(i=0;i+1<n;i+=2) cmpswap(data+w*i,data+w*(i+1),arg);
+}
+void batcherMerge(unsigned char* data,size_t n1,size_t n2,size_t w,
+                  void (*cmpswap)(void*,void*,void*),void* arg)
+{
+  if(n1+n2<=1) return;
+  int odd = n1%2;
+  batcherMerge(data,(n1+1)/2,(n2+!odd)/2,w*2,cmpswap,arg);
+  batcherMerge(data+w,n1/2,  (n2+odd)/2,  w*2,cmpswap,arg);
+  batcherSwap(data+w*!odd,n1+n2-!odd,w,cmpswap,arg);
+}
+
+// w is width in bits
+void batcherSort(void* data,size_t n,size_t w)
+{
+  if(n<=1) return;
+  batcherSort(data,n/2,w);
+  batcherSort((unsigned char*)data+w*(n/2),(n+1)/2,w);
+  batcherMerge(data,n/2,(n+1)/2,w,cmpswapInt,NULL);
+}
+

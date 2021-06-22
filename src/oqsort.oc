@@ -1,7 +1,7 @@
 #include "oqsort.oh"
 #include <obliv.h>
 
-static void * element(OcCopy* cpy,void * arr, int x) obliv {
+static obliv int * element(OcCopy* cpy,obliv int * arr, int x) obliv {
 	return x*cpy->eltsize+(char*)arr;
 }
 // void swapInt(obliv int* a,obliv int* b)
@@ -11,12 +11,22 @@ static void * element(OcCopy* cpy,void * arr, int x) obliv {
 //   *a^=t;
 //   *b^=t;
 // }
+void swap(obliv int* a, obliv int* b, obliv int* t) {
+  memcpy(t, a, sizeof(obliv int));
+  memcpy(b, a, sizeof(obliv int));
+  memcpy(a, t, sizeof(obliv int));
+}
 
-int partition(OcCopy * cpy, void * data, void* temp, int n, osort_cmp_function cmpFn){
+static obliv bool cmp(obliv int* a, obliv int* b) {
+  obliv bool c = *a <= *b;
+  return c;
+}
+int partition(obliv int * data, obliv int * temp, int n, osort_cmp_function cmpFn){
   int i = -1;
-  void *pi = element(cpy, data, n-1);
+  obliv int *pi = data + n -1;
   for (int j = 0; j < n-1; j++){
-    obliv bool oleq = cmpFn(cpy, element(cpy, data, j), pi) >= 0;
+    //obliv bool oleq = cmpFn(NULL, data + j, pi) >= 0;
+    obliv bool oleq = cmp(data + j, pi);
     //obliv bool leq = (arr[j] <= arr[n-1]);
     bool leq = true;
     // reveal the result of comparsion
@@ -27,9 +37,13 @@ int partition(OcCopy * cpy, void * data, void* temp, int n, osort_cmp_function c
     // }
     if (leq) {
       i = i + 1;
-      ocCopy(cpy, temp, element(cpy, data, i));
-      ocCopy(cpy, element(cpy, data, i), element(cpy, data, j));
-      ocCopy(cpy, element(cpy, data, j), temp);
+      // ocCopy(cpy, temp, element(cpy, data, i));
+      // ocCopy(cpy, element(cpy, data, i), element(cpy, data, j));
+      // ocCopy(cpy, element(cpy, data, j), temp);
+      // memcpy(temp, data+i, sizeof(obliv int));
+      // memcpy(temp, data+j, data+i, sizeof(obliv int));
+      // memcpy(temp, data+i, temp, sizeof(obliv int));
+      swap(data+i, data+j, temp);
       //ocSwap(cpy, element(cpy, data, i), element(cpy, data, j), temp);
     }
     //*(obliv int *)temp = oleq * *(obliv int *)element(cpy, data, i) + (1-oleq) * *(obliv int *)element(cpy, data, j);
@@ -38,26 +52,27 @@ int partition(OcCopy * cpy, void * data, void* temp, int n, osort_cmp_function c
     //*(obliv int *)element(cpy, data, i) = *(obliv int *)temp;
   }
   //int p = i + 1;
-  ocSwap(cpy, element(cpy, data, i+1), pi, temp);
+  swap(data+i+1, pi, temp);
+  //ocSwap(cpy, element(cpy, data, i+1), pi, temp);
   //swapInt(&arr[p], &arr[n-1]);
   // p is the index of pivot
   //return p;
   return i+1;
 }
 
-void oqsort_main(OcCopy * cpy, void * data, void * temp, int len, osort_cmp_function cmpFn){
+void oqsort_main(obliv int * data, obliv int * temp, int len, osort_cmp_function cmpFn){
   if (1 < len) {
     // p is the index of pivot
-    int p = partition(cpy, data, temp, len, cmpFn);
+    int p = partition(data, temp, len, cmpFn);
     // sort first p value
-    oqsort_main(cpy, data, temp, p, cmpFn);
+    oqsort_main(data, temp, p, cmpFn);
     // sort last n-p-1 value
-    oqsort_main(cpy, element(cpy, data,p+1), temp, len-p-1, cmpFn);
+    oqsort_main(data+p+1, temp, len-p-1, cmpFn);
   }
 }
 
-void oqsort(OcCopy * cpy, void * data, size_t end, osort_cmp_function cmpFn){
-  void* temp = calloc(1, cpy->eltsize);
-  oqsort_main(cpy, data, temp, end, cmpFn);
+void oqsort(obliv int * data, size_t end, osort_cmp_function cmpFn){
+  obliv int * temp = malloc(sizeof(obliv int));
+  oqsort_main(data, temp, end, cmpFn);
   free(temp);
 }

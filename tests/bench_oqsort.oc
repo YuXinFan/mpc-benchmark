@@ -59,6 +59,36 @@ static obliv char cmpInt(OcCopy * cpy, void * a, void * b) {
 	//return (*aa > *bb) - (*aa < *bb);
 }
 
+void rand_array(uint32_t *array, size_t n) {
+	size_t i;
+    
+	for (i = 0; i < n ; i++) 
+	{
+		size_t j = rand() % (n*2);
+		array[i] = j;
+	}
+}
+
+void print_array(uint32_t *array, size_t n) {
+	fflush(stdout);
+	size_t i;
+	fprintf(stdout, "\n");
+	for (i = 0; i < n ; i++) 
+	{
+		fprintf(stdout, "%u,", array[i]);
+	}
+	fprintf(stdout, "\n");
+}
+bool sorted(uint32_t *array, size_t n) {
+	size_t i;
+	bool sort = true;
+	for (i = 1; i < n ; i++) 
+	{
+		sort = sort && (array[i-1] <= array[i]);
+	}
+	return sort;
+}
+
 void test_main(void*varg) {
 
 	#ifdef ORAM_OVERRIDE
@@ -117,34 +147,44 @@ void test_main(void*varg) {
 		fprintf(stdout, "%d", size);
 		fflush(stdout);
 
-		uint32_t * perm = malloc(size * sizeof(uint32_t));
+		int * perm = malloc(size * sizeof(int));
 		for (int kk = 0; kk < size; kk++) {
 			perm[kk] = kk;
 		}
-		obliv uint32_t * input = calloc(size , sizeof(obliv uint32_t));
+		obliv int * input = malloc(size * sizeof(obliv int));
+		int *output =  malloc(size * sizeof(int));
 		for (int kk = 0; kk < samples; kk++) {
             shuffle(perm, size);
-			int pp = 0;
             for (int jj = 0; jj < size/2; jj++) {
                 input[jj] = feedOblivInt(perm[jj], 1);
             }
             for (int jj = size/2; jj < size; jj++) {
                 input[jj] = feedOblivInt(perm[jj], 2);
             }
-
 			uint64_t startTime = current_timestamp();
-			oqsort(&cpy1, input, size, cmpInt);
+			oqsort(input, size, cmpInt);
             //oqsort(input, size);
 			uint64_t runtime = current_timestamp() - startTime;
+			for (int i = 0; i < size; i++) {
+				revealOblivInt(&output[i], input[i], 0);
+			}
+			
+			if (!sorted(output, size)) {
+				fprintf(stdout, "sort failed!");
+				
+			}
 			fprintf(stdout, ",%llu", runtime);
 			fflush(stdout);
 			tally += runtime;
+			
+			print_array(output, size);
 
 			
 		}
 
 		free(perm);
 		free(input);
+		free(output);
 
 		fprintf(stdout, "\n");
 		fprintf(stderr, "Batcher Sort (size:%d): %llu microseconds avg\n", size, tally/samples);

@@ -1,0 +1,8 @@
+#ifndef BSORT_OH
+#define BSORT_OH
+
+#include <copy.oh>
+
+void batcherSort(void* data,size_t n,size_t w);
+
+#endif

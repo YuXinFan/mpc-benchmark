@@ -1,5 +1,5 @@
 #include <obliv.oh>
-#include "osort.oh"
+#include "obsort.oh"
 #include "oram.oh"
 #include <copy.oh>
 #include "test_generic.h"
@@ -47,6 +47,35 @@ void shuffle(uint32_t *array, size_t n) {
 	}
 }
 
+void rand_array(uint32_t *array, size_t n) {
+	size_t i;
+    
+	for (i = 0; i < n ; i++) 
+	{
+		size_t j = rand() % (n*2);
+		array[i] = j;
+	}
+}
+
+void print_array(uint32_t *array, size_t n) {
+	fflush(stdout);
+	size_t i;
+	fprintf(stdout, "\n");
+	for (i = 0; i < n ; i++) 
+	{
+		fprintf(stdout, "%u,", array[i]);
+	}
+	fprintf(stdout, "\n");
+}
+bool sorted(uint32_t *array, size_t n) {
+	size_t i;
+	bool sort = true;
+	for (i = 1; i < n ; i++) 
+	{
+		sort = sort && (array[i-1] <= array[i]);
+	}
+	return sort;
+}
 static obliv char cmpInt(OcCopy * cpy, void * a, void * b) {
 	obliv char result;
 	obliv bool cmpresult = ((obliv uint32_t *) a) > ((obliv uint32_t *) b);
@@ -64,7 +93,7 @@ void test_main(void*varg) {
 	#ifdef ORAM_OVERRIDE
 	oram_set_default_type(ORAM_OVERRIDE);
 	#endif
-
+	
 	int size = 1;
 	int samples = 1;
 
@@ -113,7 +142,6 @@ void test_main(void*varg) {
 
 	{
 		uint64_t tally = 0;
-        OcCopy cpy1 = ocCopyIntN(1);
 		fprintf(stdout, "%d", size);
 		fflush(stdout);
 
@@ -121,24 +149,34 @@ void test_main(void*varg) {
 		for (int kk = 0; kk < size; kk++) {
 			perm[kk] = kk;
 		}
-		obliv uint32_t * input = calloc(size , sizeof(obliv uint32_t));
+
+		obliv int * input = malloc(size * sizeof(obliv int));
+		int * output = malloc(size *  sizeof(int));
 		for (int kk = 0; kk < samples; kk++) {
-            shuffle(perm, size);
-			int pp = 0;
+			shuffle(perm, size);
             for (int jj = 0; jj < size/2; jj++) {
                 input[jj] = feedOblivInt(perm[jj], 1);
             }
             for (int jj = size/2; jj < size; jj++) {
                 input[jj] = feedOblivInt(perm[jj], 2);
             }
+            
 			int64_t runtime = current_timestamp();
 			int64_t runbytes = tcp2PBytesSent(ocCurrentProto());
 			int64_t rungates = yaoGateCount();
-			osort_batcher(&cpy1, input, size, cmpInt);
+			batcherSort(input, size, sizeof(obliv int));
 			runtime = current_timestamp() - runtime;
 			rungates = yaoGateCount() - rungates;
 			runbytes = tcp2PBytesSent(ocCurrentProto()) - runbytes;
 			fprintf(stdout, ",(%llu,%llu,%llu)", runtime, rungates, runbytes);
+			for (int i = 0; i < size; i++) {
+				revealOblivInt(&output[i], input[i], 0);
+			}
+			
+			if (!sorted(output, size)) {
+				fprintf(stdout, "sort failed!");
+				print_array(output, size);
+			}
 			fflush(stdout);
 			tally += runtime;
 

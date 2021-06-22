@@ -18,7 +18,7 @@ FSSL_ORAM_DEPS=fss.oo fss.o fss_cprg.oo fss_cprg.o floram_util.oo floram_util.o 
 ORAM_DEPS = $(SQRT_ORAM_DEPS:%=oram_sqrt/%)  $(CKT_ORAM_DEPS:%=oram_ckt/%) $(FSSL_ORAM_DEPS:%=oram_fssl/%) oram.oo
 OBJS=$(DEPS) $(ORAM_DEPS) obig.oo ochacha.oo ograph.oo omatch.oo omatch_textbook.oo oqueue.oo\
 		osalsa.oo oscrypt.oo osearch.oo osha256.oo osha512.oo osort.oo oaes.oo\
-		oqsort.oo
+		oqsort.oo obsort.oo
 
 TEST_PATH=tests/
 TEST_OUT_PATH=build/tests/
@@ -27,7 +27,7 @@ TEST_BINS = test_obig test_osha256 test_osha512 test_osalsa test_ochacha test_oa
 		test_oqueue test_oram test_oscrypt test_ograph test_omatch test_osearch\
 		bench_oram_write bench_oram_read bench_oram_init bench_oscrypt bench_bfs bench_bs\
 		bench_gs bench_gs_textbook bench_rp bench_oaes bench_oqueue bench_waksman\
-		bench_bsort bench_oqsort
+		bench_obsort bench_oqsort
 
 default: $(ACKLIB) tests
 
