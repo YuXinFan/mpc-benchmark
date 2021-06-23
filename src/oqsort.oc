@@ -33,7 +33,7 @@ int partition(obliv int * data, obliv int * temp, int n, osort_cmp_function cmpF
     obliv bool oleq = *(data+j) < *pi;
     bool leq;
     // reveal the result of comparsion
-    revealOblivBool(&leq, oleq, 0);
+    revealOblivBool(&leq, oleq, 2);
     if (leq) {
       i = i + 1;
       swap(data+i, data+j, temp);

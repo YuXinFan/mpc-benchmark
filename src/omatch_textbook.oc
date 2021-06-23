@@ -2,6 +2,7 @@
 #include "oram.oh"
 #include "oqueue.oh"
 #include "copy.oh"
+#include "assert.h"
 
 static void wStatusFunction(OcCopy *cpy, void * oramBlock, void * extBlock) obliv {
 	obliv if (((obliv uint32_t *) extBlock)[1] < ((obliv uint32_t *) oramBlock)[1] | ((obliv uint32_t *) oramBlock)[1] == -1) {
@@ -133,6 +134,8 @@ void ogale_shapley_textbook_revealed(obliv uint32_t * output, obliv uint32_t * m
 		oram_write(wStatus, thisWStatus, ii);
 	}
     obliv bool in_if = false;
+    bool cond = false;
+	obliv bool ocond = false;
 	for (size_t ii = 0; ii < n * n; ii++) {
 		obliv bool queue_empty = oqueue_empty(mQueue);
 		obliv if (queue_empty == 0) {
@@ -146,14 +149,27 @@ void ogale_shapley_textbook_revealed(obliv uint32_t * output, obliv uint32_t * m
 			thisWStatus[2] = thisMQueue[1];
 			oram_apply(wStatus, thisWStatus, wStatusFunction, proposedW);
 
-            in_if = true;
+			// obliv bool cond = (thisWPrefs < thisWStatus[1]) | (thisWStatus[1] == -1);
+			// obliv if (cond) {
+			// 	// write new status for this m
+			// 	thisMStatus[0] = proposedW;
+			// 	thisMStatus[1] = thisMQueue[1];
+			// 	oram_write(mStatus, thisMStatus, thisMQueue[0]);
+
+			// 	// the old m is now sad and alone
+			// 	nextMQueue[0] = thisWStatus[0];
+			// 	nextMQueue[1] = thisWStatus[2] + 1;
+			// 	oqueue_push(mQueue, nextMQueue);
+			// } else {
+			// 	thisMQueue[1] += 1;
+			// 	oqueue_push(mQueue, thisMQueue);
+			// }
+			in_if = true;
         }
-
-        obliv bool cond = (thisWPrefs < thisWStatus[1]) | (thisWStatus[1] == -1);
-        bool cond_;
-        revealOblivBool(&cond_, cond,0);
-
-		if (cond_) {
+        
+		ocond = (thisWPrefs < thisWStatus[1]) | (thisWStatus[1] == -1);
+        revealOblivBool(&cond, ocond,0);
+		if (cond) {
             obliv if (in_if) {
 				// write new status for this m
 				thisMStatus[0] = proposedW;

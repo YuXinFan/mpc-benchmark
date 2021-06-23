@@ -134,7 +134,7 @@ void test_main(void*varg) {
 			rungates = yaoGateCount() - rungates;
 			runbytes = tcp2PBytesSent(ocCurrentProto()) - runbytes;
 
-			fprintf(stdout, ",%llu", runtime);
+			fprintf(stdout, ",(%llu,%llu,%llu)", runtime, rungates, runbytes);
 			fflush(stdout);
 			tally += runtime;
 
