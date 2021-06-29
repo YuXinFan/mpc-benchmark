@@ -12,4 +12,8 @@ obliv int obinary_search(OcCopy * cpy, void * result, void * haystack, size_t ha
 
 obliv int obinary_search_oram(OcCopy * cpy, void * result, oram * haystack, void * needle, block_cmp_function fn);
 
+obliv int obinary_search_revealed(OcCopy * cpy, void * result, void * haystack, size_t haystack_length, void * needle, block_cmp_function fn);
+
+obliv int obinary_search_oram_revealed(OcCopy * cpy, void * result, oram * haystack, void * needle, block_cmp_function fn);
+
 #endif

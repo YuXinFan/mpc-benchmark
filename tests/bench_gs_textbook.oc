@@ -137,7 +137,17 @@ void test_main(void*varg) {
 			fprintf(stdout, ",(%llu,%llu,%llu)", runtime, rungates, runbytes);
 			fflush(stdout);
 			tally += runtime;
+			{
+				fprintf(stderr, "Output: ");
+				for (int i = 0; i < pairs; i++) {
+					int kk;
+					revealOblivInt(&kk, output[i], 0);
+					fprintf(stderr,"%d,", kk);
+				}
+				fprintf(stderr,"\n");
 
+			}
+			
 		}
 		fprintf(stdout, "\n");
 		fprintf(stderr, "Gale Shapley (pairs:%d): %llu microseconds avg, %llu gates avg, %llu bytes avg\n", pairs, tally/samples, rungates, runbytes);
