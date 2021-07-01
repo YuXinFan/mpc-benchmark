@@ -6,12 +6,10 @@
 //   obliv versions quite easily
 void swapInt(obliv int* a,obliv int* b) obliv
 {
-  ~obliv(en) {
     obliv int t = 0;
-    obliv if(en) t=*a^*b;
+    t=*a^*b;
     *a^=t;
     *b^=t;
-  }
 }
 void cmpswapInt(void* va,void* vb,void* arg)
 {

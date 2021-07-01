@@ -153,33 +153,33 @@ void test_main(void*varg) {
 		for (int kk = 0; kk < size; kk++) {
 			perm[kk] = kk;
 		}
-		fprintf(stdout, "\nperm malloc\n");
+		//fprintf(stdout, "\nperm malloc\n");
 		
 		obliv int * input = malloc(size * sizeof(obliv int));
 		int *output =  malloc(size * sizeof(int));
-		fprintf(stdout, "\nin out malloc\n");
+		//fprintf(stdout, "\nin out malloc\n");
 
 		for (int kk = 0; kk < samples; kk++) {
             shuffle(perm, size);
-			fprintf(stdout, "\nshuffle malloc in %d\n", kk);
+			//fprintf(stdout, "\nshuffle malloc in %d\n", kk);
 			
             for (int jj = 0; jj < size; jj++) {
                 input[jj] = feedOblivInt(perm[jj], 1);
             }
-			fprintf(stdout, "\nfeed in %d\n", 1);
+			//fprintf(stdout, "\nfeed in %d\n", 1);
 
             // for (int jj = size/2; jj < size; jj++) {
             //     input[jj] = feedOblivInt(perm[jj], 2);
             // }
-			fprintf(stdout, "\nfeed in %d\n", 2);
+			//fprintf(stdout, "\nfeed in %d\n", 2);
 
 			rungates = yaoGateCount();
 			runbytes = tcp2PBytesSent(ocCurrentProto());
 			runtime = current_timestamp();
-			fprintf(stdout, "\nbefore qsort \n");
+			//fprintf(stdout, "\nbefore qsort \n");
 
 			oqsort(input, size, cmpInt);
-			fprintf(stdout, "\nafter qsort \n");
+			//fprintf(stdout, "\nafter qsort \n");
 
 			runtime = current_timestamp() - runtime;
 			rungates = yaoGateCount() -rungates;

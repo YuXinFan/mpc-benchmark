@@ -42,7 +42,7 @@ int partition(obliv int * data, obliv int * temp, int n, osort_cmp_function cmpF
     oleq = *(data+j) < *pi;
     // reveal the result of comparsion
     //fprintf(stdout, "exec reveal %d \n", j);
-    revealOblivBool(&leq, oleq, 2);
+    revealOblivBool(&leq, oleq, 0);
     //revealOblivBool(&leq, oleq, 1);
     //fprintf(stdout, "finish reveal %d\n", j);
     //leq = ocBroadcastBool(leq, 2);
@@ -71,11 +71,11 @@ void oqsort_main(obliv int * data, obliv int * temp, int len, osort_cmp_function
 }
 
 void oqsort(obliv int * data, size_t end, osort_cmp_function cmpFn){
-  fprintf(stdout, "entry\n");
+  //fprintf(stdout, "entry\n");
   obliv int * temp = malloc(sizeof(obliv int));
-  fprintf(stdout, "temp malloc\n");
+  //fprintf(stdout, "temp malloc\n");
   oqsort_main(data, temp, end, cmpFn);
-  fprintf(stdout, "qsort main \n");
+  //fprintf(stdout, "qsort main \n");
 
   free(temp);
 }
