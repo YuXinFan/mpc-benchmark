@@ -76,10 +76,11 @@ obliv int obinary_search_oram_revealed(OcCopy * cpy, void* result, oram * haysta
 		oram_read(temp_element, haystack, iimid);
 		aa = (obliv int *)temp_element;
 		oeq = *aa == *bb;
-		revealOblivBool(&eq, oeq, 2);
+		revealOblivBool(&eq, oeq, 0);
 		if (eq) {
-			//ocCopy(cpy, result, temp_element);
+			ocCopy(cpy, result, temp_element);
 			index = iimid;
+			break;
 		}else{
 			olt = *aa < *bb;
 			obliv if (olt) {
