@@ -1,0 +1,191 @@
+#include <obliv.oh>
+
+#include "stdlib.h"
+#include "math.h"
+#include <time.h>
+
+#include "oram.oh"
+
+#include "test_generic.h"
+#include "max.oh"
+
+
+#define TEXT_HELP_SUPPLEMENTARY "\
+  -n \x1b[4mNUMBER\x1b[0m, --vertices=\x1b[4mNUMBER\x1b[0m \n\t\tsimulate \x1b[4mNUMBER\x1b[0m pairs of participants\n\n\
+  -o \x1b[4mTYPE\x1b[0m, --oram-type=\x1b[4mTYPE\x1b[0m \n\t\tforce all ORAMs to be \x1b[4mTYPE\x1b[0m ORAMs. Valid types are \033[1msqrt\033[0m, \033[1mcircuit\033[0m, and \033[1mlinear\033[0m.\n\n\
+  -i \x1b[4mNUMBER\x1b[0m, --samples=\x1b[4mNUMBER\x1b[0m \n\t\trun \x1b[4mNUMBER\x1b[0m iterations of the benchmark\n\n"
+
+#define RANGE_MAX 10000
+
+static const char TESTNAME[] = "PointContain_benchmark";
+static const char options_string[] = "n:o:i:";
+static struct option long_options[] = {
+	{"vertices", required_argument, NULL, 'n'},
+	{"oram-type", required_argument, NULL, 'o'},
+	{"samples", required_argument, NULL, 'i'},
+	{0, 0, 0, 0}
+};
+
+char* get_test_name() {
+	return TESTNAME;
+}
+
+char* get_supplementary_options_string() {
+	return options_string;
+}
+
+struct option* get_long_options() {
+	return long_options;
+}
+
+void print_supplementary_help() {
+	fprintf(stderr, TEXT_HELP_SUPPLEMENTARY);
+}
+
+void rand_array(int *array, size_t n) {
+	size_t i;
+    
+	for (i = 0; i < n ; i++) 
+	{
+		size_t j = rand() % (n*10);
+		array[i] = j;
+	}
+}
+
+void shuffle(uint32_t *array, size_t n) {
+	if (n > 1) {
+		size_t i;
+		for (i = 0; i < n - 1; i++) 
+		{
+		  size_t j = i + rand() / (RAND_MAX / (n - i) + 1);
+		  int t = array[j];
+		  array[j] = array[i];
+		  array[i] = t;
+		}
+	}
+}
+
+void test_main(void*varg) {
+
+	#ifdef ORAM_OVERRIDE
+	oram_set_default_type(ORAM_OVERRIDE);
+	#endif
+
+	int n = 1;
+	int samples = 1;
+
+	args_t * args_pass = varg;
+	int arg;
+	optind = 0; // this allows us to getopt a second time
+	while ((arg = getopt_long(args_pass->argc, args_pass->argv, options_string, long_options, NULL)) != -1) {
+		if (arg == 'n') {
+			n = atoi(optarg);
+			if (n <= 0) {
+				fprintf (stderr, "Argument for -%c must be positive.\n", arg);
+				return;
+			}
+		} else if (arg == 'o') {
+			if (strcmp(optarg,"sqrt") == 0) {
+				oram_set_default_type(ORAM_TYPE_SQRT);
+			} else if (strcmp(optarg,"circuit") == 0) {
+				oram_set_default_type(ORAM_TYPE_CIRCUIT);
+			} else if (strcmp(optarg,"linear") == 0) {
+				oram_set_default_type(ORAM_TYPE_LINEAR);
+			} else {
+				fprintf (stderr, "Invalid argument for -%c.\n", arg);
+				return;
+			}
+		} else if (arg == 'i') {
+			samples = atoi(optarg);
+			if (samples <= 0) {
+				fprintf (stderr, "Argument for -%c must be positive.\n", arg);
+				return;
+			}
+		} else if (arg == '?' || arg == ':') {
+			if (optopt == 'n' || optopt == 'o' || optopt == 'i') {
+				fprintf (stderr, "Option -%c requires an argument.\n", optopt);
+				return;
+			} else {
+				fprintf (stderr, "Option -%c not recognized.\n", optopt);
+				return;
+			}
+		} else {
+			abort();
+		}
+	}
+
+	fprintf(stdout, "# Max Three (sample 1, sample 2, ... sample n)\n");
+	fflush(stdout);
+
+	{
+		uint64_t tally = 0;
+		int64_t runbytes = 0;
+		int64_t rungates = 0;
+		int64_t runtime = 0;
+		fflush(stdout);
+        int *array = (int*)malloc(n*sizeof(int));
+        obliv int *oarr = (obliv int*)malloc(n*sizeof(obliv int));
+		for (int kk = 0; kk < samples; kk++) {
+            rand_array(array, n);
+            for(int i = 0; i < n/2; i++){
+                oarr[i] = feedOblivInt(array[i], 1);
+            }
+            for(int i = n/2; i < n; i++){
+                oarr[i] = feedOblivInt(array[i], 2);
+            }
+            obliv int ma;
+			runbytes = tcp2PBytesSent(ocCurrentProto());
+			rungates = yaoGateCount();
+			runtime = current_timestamp();
+            max(&ma, oarr, n);
+			runtime = current_timestamp() - runtime;
+			rungates = yaoGateCount() - rungates;
+			runbytes = tcp2PBytesSent(ocCurrentProto()) - runbytes;
+			tally += runtime;
+			//fprintf(stdout, ",(%llu,%llu,%llu)", runtime, rungates, runbytes);
+			fflush(stdout);
+			{	
+				int o;
+				revealOblivInt(&o, ma, 0);
+				fprintf(stdout, "%d,", o);
+			}
+			
+		}
+		fprintf(stdout, "\n");
+		fprintf(stderr, "Max N: %llu microseconds avg, %llu gates avg, %llu bytes avg\n", tally/samples, rungates, runbytes);
+
+		
+		// tally = 0;
+		// fflush(stdout);
+		// for (int kk = 0; kk < samples; kk++) {
+		// 	rand_array(array, n);
+        //     for(int i = 0; i < n/2; i++){
+        //         oarr[i] = feedOblivInt(array[i], 1);
+        //     }
+        //     for(int i = n/2; i < n; i++){
+        //         oarr[i] = feedOblivInt(array[i], 2);
+        //     }
+        //     obliv int ma;
+		// 	runbytes = tcp2PBytesSent(ocCurrentProto());
+		// 	rungates = yaoGateCount();
+		// 	runtime = current_timestamp();
+        //     max(&ma, oarr, n);
+		// 	runtime = current_timestamp() - runtime;
+		// 	rungates = yaoGateCount() - rungates;
+		// 	runbytes = tcp2PBytesSent(ocCurrentProto()) - runbytes;
+		// 	tally += runtime;
+		// 	//fprintf(stdout, ",(%llu,%llu,%llu)", runtime, rungates, runbytes);
+		// 	fflush(stdout);
+		// 	{	
+		// 		int o;
+		// 		revealOblivInt(&o, ma, 0);
+		// 		fprintf(stdout, "%d,", o);
+		// 	}
+
+		// }
+
+		// fprintf(stdout, "\n");
+		// fprintf(stderr, "Max N OPT: %llu microseconds avg, %llu gates avg, %llu bytes avg\n", tally/samples, rungates, runbytes);
+	}
+
+}

@@ -1,0 +1,9 @@
+#ifndef NAIVE_SEARCH_OH
+#define NAIVE_SEARCH_OH
+
+#include <obliv.oh>
+
+void naive_search(obliv int *idx, obliv int *val, obliv int *arr, int size);
+void naive_search_opt(obliv int *idx, obliv int *val, obliv int *arr, int size);
+
+#endif 

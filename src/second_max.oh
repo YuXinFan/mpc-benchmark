@@ -1,0 +1,8 @@
+#ifndef SECOND_MAX_OH
+#define SECOND_MAX_OH
+
+#include <obliv.oh>
+
+void second_max(obliv int *ou, obliv int *in, int n);
+void second_max_opt(obliv int *ou, obliv int *in, int n);
+#endif 

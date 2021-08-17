@@ -1,0 +1,25 @@
+#ifndef MAX_THREE_OH
+#define MAX_THREE_OH
+
+#include <obliv.oh>
+
+typedef struct Point{
+    float x;
+    float y;
+} Point;
+
+typedef struct OblivPoint{
+    obliv float x;
+    obliv float y;
+} OPoint;
+
+typedef struct OblivLine{
+    OPoint S;
+    OPoint E;
+}OLine;
+
+
+void line_insect(OPoint *p, OLine *A, OLine *B);
+void line_insect_opt(OPoint *p, OLine *A, OLine *B);
+
+#endif 

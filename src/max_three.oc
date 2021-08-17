@@ -1,0 +1,34 @@
+#include "point_contain.oh"
+// #include "oram.oh"
+// #include "oqueue.oh"
+#include "copy.oh"
+#include "assert.h"
+
+void max_three_raw(obliv int *o, obliv int *a, obliv int *b, obliv int *c){
+    *o = 0;
+    obliv max = *a;
+    obliv if (max < *b) {
+        max = *b;
+        *o = 1;
+    }
+    obliv if (max < *c) {
+        max = *c;
+        *o = 2;
+    }
+}
+
+void max_three_opt(obliv int *o, obliv int *a, obliv int *b, obliv int *c){
+    *o = 0;
+    obliv int max = *a;
+    obliv if (max < *b) {
+        max = *b;
+        *o = 1;
+    }
+    obliv bool ol = max < *c;
+    bool l;
+    revealOblivBool(&l, ol,0);
+    if (l) {
+        max = *c;
+        *o = 2;
+    }
+}

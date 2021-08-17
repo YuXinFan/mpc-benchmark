@@ -1,0 +1,49 @@
+#include "point_contain.oh"
+// #include "oram.oh"
+// #include "oqueue.oh"
+#include "copy.oh"
+#include "assert.h"
+
+// Ax+By+C=0, from (x1, y1) to (x2, y2)
+static obliv int direction(obliv float tx, obliv float ty, obliv float x1, obliv float y1, obliv float x2, obliv float y2){
+    obliv float A = y2-y1;
+    obliv float B = x1-x2;
+    obliv float C = x2*y1-x1*y2;
+    obliv float D = A*tx + B*ty + C;
+    obliv bool res = D > 0 - D < 0;
+    return res;
+}
+void point_contain_raw(obliv int *out, obliv float tx, obliv float ty, obliv float *X, obliv float*Y, int n){
+    // obliv int rand = ;
+    *out = 1;
+    obliv int first_d = direction(tx, ty, X[0], Y[0], X[1], Y[1]);
+    for (int i = 1; i < n; i++) {
+        obliv int next_d = direction(tx, ty, X[i], Y[i], X[i+1], Y[i+1]);
+        obliv bool at_edge = first_d == 0 | next_d == 0;
+        obliv if (at_edge) {
+            *out = 0;
+        }else {
+            obliv if (first_d != next_d) {
+                *out = -1;
+            }
+        }
+    }
+}
+
+void point_contain_opt(obliv int *out, obliv float tx, obliv float ty, obliv float *X, obliv float*Y, int n){
+
+    // obliv int rand = ;
+    *out = 1;
+    obliv int first_d = direction(tx, ty, X[0], Y[0], X[1], Y[1]);
+    for (int i = 1; i < n; i++) {
+        obliv int next_d = direction(tx, ty, X[i], Y[i], X[i+1], Y[i+1]);
+        obliv bool at_edge = first_d == 0 | next_d == 0;
+        obliv if (at_edge) {
+            *out = 0;
+        }else {
+            obliv if (first_d != next_d) {
+                *out = -1;
+            }
+        }
+    }
+}

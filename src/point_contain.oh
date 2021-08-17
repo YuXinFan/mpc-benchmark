@@ -1,0 +1,8 @@
+#ifndef POINT_CONTAIN_OH
+#define POINT_CONTAIN_OH
+
+#include <obliv.oh>
+
+void point_contain_raw(obliv int*, obliv float, obliv float, obliv float*, obliv float*, int n);
+void point_contain_opt(obliv int*, obliv float, obliv float, obliv float*, obliv float*, int n);
+#endif 

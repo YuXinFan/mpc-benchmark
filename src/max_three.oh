@@ -1,0 +1,9 @@
+#ifndef MAX_THREE_OH
+#define MAX_THREE_OH
+
+#include <obliv.oh>
+
+void max_three_raw(obliv int *o, obliv int *a, obliv int *b, obliv int *c);
+void max_three_opt(obliv int *o, obliv int *a, obliv int *b, obliv int *c);
+
+#endif 

@@ -1,0 +1,8 @@
+#ifndef MAX_OH
+#define MAX_OH
+
+#include <obliv.oh>
+
+void max(obliv int *ou, obliv int *in, int n);
+void max_opt(obliv int *ou, obliv int *in, int n);
+#endif 

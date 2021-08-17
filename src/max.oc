@@ -1,0 +1,51 @@
+#include "max.oh"
+
+
+void max(obliv int *ou, obliv int *in, int n){
+    if ( n == 1 ) {
+        *ou = in[0];
+    }else if ( n == 2) {
+        obliv if ( in[0] > in[1] ) {
+            *ou = in[0];
+        }else {
+            *ou = in[1];
+        }
+    }else {
+        int split = ocBroadcastInt( (rand() % n) + 1, 1);
+        obliv int left_max;
+        max(&left_max, &in[0], split);
+        obliv int right_max;
+        max(&right_max, &in[n/2], n-split);
+        obliv if ( left_max > right_max) {
+            *ou = left_max;
+        }else {
+            *ou = right_max;
+        }
+    }
+}
+
+void max_opt(obliv int *ou, obliv int *in, int n){
+    if ( n == 1 ) {
+        *ou = in[0];
+    }else if ( n == 2) {
+        obliv if ( in[0] > in[1] ) {
+            *ou = in[0];
+        }else {
+            *ou = in[1];
+        }
+    }else {
+        int split = ocBroadcastInt( (rand() % n) + 1, 1);
+        obliv int left_max;
+        max(&left_max, &in[0], n/2);
+        obliv int right_max;
+        max(&right_max, &in[n/2], n-n/2);
+        obliv bool ois_left = left_max > right_max;
+        bool is_left;
+        revealOblivBool(&is_left, ois_left, 0);
+        if ( is_left) {
+            *ou = left_max;
+        }else {
+            *ou = right_max;
+        }
+    }
+}

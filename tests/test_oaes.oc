@@ -209,7 +209,6 @@ void test_main(void*varg) {
 		uint8_t expected_output[16*BLOCKCOUNT];
 
 
-
 		for (int ii = 0; ii < 16*BLOCKCOUNT/sizeof(uint32_t); ii++) {
 			input[ii*sizeof(uint32_t)] = feedOblivInt(rand(), 1);
 			revealOblivInt(&input_raw[ii*sizeof(uint32_t)], input[ii*sizeof(uint32_t)], 0);

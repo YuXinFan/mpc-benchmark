@@ -1,0 +1,30 @@
+#include "naive_search.oh"
+
+void naive_search(obliv int *idx, obliv int *val, obliv int *arr, int arr_size){
+    *idx = -1;
+    obliv bool find = false;
+    for (int i = 0; i < arr_size; i++) {
+        obliv if (find == false) {
+            obliv if (*val == arr[i]){
+                *idx = i;
+                find = true;
+            }
+        }
+        
+    }
+}
+
+
+void naive_search_opt(obliv int *idx, obliv int *val, obliv int *arr, int arr_size){
+    *idx = -1;
+    obliv bool ofind;
+    bool find;
+    for (int i = 0; i < arr_size; i++) {
+        ofind = *val == arr[i];
+        revealOblivBool(&find, ofind, 0);
+        if (find){
+            *idx = i;
+            break;
+        }
+    }
+}

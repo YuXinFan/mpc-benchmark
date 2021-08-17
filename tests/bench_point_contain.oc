@@ -1,0 +1,366 @@
+#include <obliv.oh>
+
+#include "stdlib.h"
+#include "math.h"
+#include <time.h>
+#include "float.h"
+
+#include "oram.oh"
+
+#include "test_generic.h"
+#include "point_contain.oh"
+
+
+#define TEXT_HELP_SUPPLEMENTARY "\
+  -n \x1b[4mNUMBER\x1b[0m, --vertices=\x1b[4mNUMBER\x1b[0m \n\t\tsimulate \x1b[4mNUMBER\x1b[0m pairs of participants\n\n\
+  -o \x1b[4mTYPE\x1b[0m, --oram-type=\x1b[4mTYPE\x1b[0m \n\t\tforce all ORAMs to be \x1b[4mTYPE\x1b[0m ORAMs. Valid types are \033[1msqrt\033[0m, \033[1mcircuit\033[0m, and \033[1mlinear\033[0m.\n\n\
+  -i \x1b[4mNUMBER\x1b[0m, --samples=\x1b[4mNUMBER\x1b[0m \n\t\trun \x1b[4mNUMBER\x1b[0m iterations of the benchmark\n\n"
+
+#define RANGE_MAX 10000
+
+static const char TESTNAME[] = "PointContain_benchmark";
+static const char options_string[] = "n:o:i:";
+static struct option long_options[] = {
+	{"vertices", required_argument, NULL, 'n'},
+	{"oram-type", required_argument, NULL, 'o'},
+	{"samples", required_argument, NULL, 'i'},
+	{0, 0, 0, 0}
+};
+
+char* get_test_name() {
+	return TESTNAME;
+}
+
+char* get_supplementary_options_string() {
+	return options_string;
+}
+
+struct option* get_long_options() {
+	return long_options;
+}
+
+void print_supplementary_help() {
+	fprintf(stderr, TEXT_HELP_SUPPLEMENTARY);
+}
+
+struct Point{
+        float x;
+        float y;
+};
+typedef struct Point Point;
+
+void shuffle(uint32_t *array, size_t n) {
+	if (n > 1) {
+		size_t i;
+		for (i = 0; i < n - 1; i++) 
+		{
+		  size_t j = i + rand() / (RAND_MAX / (n - i) + 1);
+		  int t = array[j];
+		  array[j] = array[i];
+		  array[i] = t;
+		}
+	}
+}
+
+
+void float_shuffle(float* array, size_t n) {
+    if (n > 1) {
+		size_t i;
+		for (i = 0; i < n - 1; i++) 
+		{
+		  size_t j = i + rand() / (RAND_MAX / (n - i) + 1);
+		  float t = array[j];
+		  array[j] = array[i];
+		  array[i] = t;
+		}
+	}
+}
+
+int int_cmp(void *a, void *b){
+    int aa = *(int*)a;
+    int bb = *(int*)b;
+    if (aa < bb){
+        return -1;
+    }else if (aa > bb) {
+        return 1;
+    }else {
+        return 0;
+    }
+	
+}
+
+int float_cmp(void *a, void *b){
+	float aa = *(float *)a;
+	float bb = *(float *)b;
+	if (aa < bb){
+			return -1;
+	}else if (aa > bb) {
+		return 1;
+	}else {
+		return 0;
+	}
+}
+int angle_cmp(void *a, void *b){
+    Point aa = *(Point *)a;
+    Point bb = *(Point *)b;
+    double ana = atan2(aa.y,aa.x);
+    double anb = atan2(bb.y, bb.x);
+    if ( ana < anb ){
+        return -1;
+    }else if ( ana > anb ){
+        return 1;
+    }else {
+        return 0;
+    }
+}
+
+Point* gen_convex_poly(int n) {
+	// init random seed
+	srand((unsigned int)time(NULL));
+
+    // Generate two lists of random X and Y coordinates
+    float *X = malloc(n*sizeof(float));
+    float *Y = malloc(n*sizeof(float));
+    for (int i = 0; i < n; i++) {
+        X[i] = ((float)rand()/(float)(RAND_MAX)) * RANGE_MAX;
+        Y[i] = ((float)rand()/(float)(RAND_MAX)) * RANGE_MAX;
+    }
+
+    // Sort them
+    qsort(X, n, sizeof(float), float_cmp);
+    qsort(Y, n, sizeof(float), float_cmp);
+
+    // Isolate the extreme points
+    float maxX = X[n-1];
+    float minX = X[0];
+    float maxY = Y[n-1];
+    float  minY = Y[0];
+
+    // Divide the interior points into two chains & Extract the vector components
+    float *xVec = malloc(n*sizeof(float));
+    int xIdx = 0;
+
+    float lastTop = minX; float lastBot = minX;
+    for (int i = 0; i < n-1; i++) {
+        float x = X[i];
+        if (rand() & 1) {
+            xVec[xIdx] = x-lastTop;
+            lastTop = x;
+        }else {
+            xVec[xIdx] = lastBot - x;
+            lastBot = x;
+        }
+        xIdx++;
+    }
+    xVec[xIdx++] = maxX-lastTop;
+    xVec[xIdx] = lastBot - maxX;
+
+    float *yVec = malloc(n*sizeof(float));
+    int yIdx = 0;
+
+    float lastLeft = minY; float lastRight = minY;
+    for (int i = 0; i < n-1; i++) {
+        float y = Y[i];
+        if (rand() & 1) {
+            yVec[yIdx] = y-lastLeft;
+            lastLeft = y;
+        }else {
+            yVec[yIdx] = lastRight - y;
+            lastRight = y;
+        }
+        yIdx++;
+    }
+    yVec[yIdx++] = maxY-lastLeft;
+    yVec[yIdx] = lastRight - maxY;
+
+    // Randomly pair up the X- and Y-components
+    float_shuffle(yVec, n);
+
+    // Combine the paired up components into vectors
+    Point* ps = malloc( n * sizeof(Point));
+    for (int i = 0; i < n; i++) {
+        ps[i].x = X[i];
+        ps[i].y = Y[i];
+    }
+
+    // Sort the vectors by angle
+    qsort(ps, n, sizeof(Point), angle_cmp);
+
+    // Lay them end-to-end
+    double x = 0, y = 0;
+    double minPolygonX = 0;
+    double minPolygonY = 0;
+
+    Point *res = malloc( n * sizeof(struct Point));
+    for (int i = 0; i < n; i++) {
+        res[i].x = x;
+		res[i].y = y;
+        x += ps[i].x;
+        y += ps[i].y;
+
+        minPolygonX = minPolygonX < X ? minPolygonX: x;
+        minPolygonY = minPolygonY < Y ? minPolygonY: y;
+    }
+
+    // Move the polygon to the original min and max coordinates
+    double xShift = minX - minPolygonX;
+    double yShift = minY - minPolygonY;
+
+    for (int i = 0; i < n; i++) {
+        Point p = res[i];
+        res[i].x = p.x + xShift;
+        res[i].y = p.y + yShift;
+    }
+    
+    free(ps);
+    free(xVec);
+    free(yVec);
+    free(X);
+    free(Y);
+    return res;
+
+}
+void test_main(void*varg) {
+
+	#ifdef ORAM_OVERRIDE
+	oram_set_default_type(ORAM_OVERRIDE);
+	#endif
+
+	int n = 1;
+	int samples = 1;
+
+	args_t * args_pass = varg;
+	int arg;
+	optind = 0; // this allows us to getopt a second time
+	while ((arg = getopt_long(args_pass->argc, args_pass->argv, options_string, long_options, NULL)) != -1) {
+		if (arg == 'n') {
+			n = atoi(optarg);
+			if (n <= 0) {
+				fprintf (stderr, "Argument for -%c must be positive.\n", arg);
+				return;
+			}
+		} else if (arg == 'o') {
+			if (strcmp(optarg,"sqrt") == 0) {
+				oram_set_default_type(ORAM_TYPE_SQRT);
+			} else if (strcmp(optarg,"circuit") == 0) {
+				oram_set_default_type(ORAM_TYPE_CIRCUIT);
+			} else if (strcmp(optarg,"linear") == 0) {
+				oram_set_default_type(ORAM_TYPE_LINEAR);
+			} else {
+				fprintf (stderr, "Invalid argument for -%c.\n", arg);
+				return;
+			}
+		} else if (arg == 'i') {
+			samples = atoi(optarg);
+			if (samples <= 0) {
+				fprintf (stderr, "Argument for -%c must be positive.\n", arg);
+				return;
+			}
+		} else if (arg == '?' || arg == ':') {
+			if (optopt == 'n' || optopt == 'o' || optopt == 'i') {
+				fprintf (stderr, "Option -%c requires an argument.\n", optopt);
+				return;
+			} else {
+				fprintf (stderr, "Option -%c not recognized.\n", optopt);
+				return;
+			}
+		} else {
+			abort();
+		}
+	}
+
+	fprintf(stdout, "# Point Contain (vertices, sample 1, sample 2, ... sample n)\n");
+	fflush(stdout);
+
+	{
+		uint64_t tally = 0;
+		int64_t runbytes = 0;
+		int64_t rungates = 0;
+		int64_t runtime = 0;
+		fprintf(stdout, "(%d, ", n);
+		fflush(stdout);
+
+		Point* poly = gen_convex_poly(n);
+		obliv float *X = malloc(n * sizeof(obliv float));
+		obliv float *Y = malloc(n * sizeof(obliv float));
+		for (int kk = 0; kk < samples; kk++) {
+			for (int ll = 0; ll < n; ll++) {
+				X[ll] = feedOblivFloat(poly[ll].x, 1);
+				Y[ll] = feedOblivFloat(poly[ll].y, 1);
+			}
+			float tx = ((float)rand()/(float)(RAND_MAX)) * RANGE_MAX;
+			float ty = ((float)rand()/(float)(RAND_MAX)) * RANGE_MAX;
+
+			obliv float ttx = feedOblivFloat(tx ,2);
+			obliv float tty = feedOblivFloat(ty ,2);
+
+			obliv int out;
+
+			runbytes = tcp2PBytesSent(ocCurrentProto());
+			rungates = yaoGateCount();
+			runtime = current_timestamp();
+			point_contain_raw(&out, ttx, tty, X, Y, n);
+			runtime = current_timestamp() - runtime;
+			rungates = yaoGateCount() - rungates;
+			runbytes = tcp2PBytesSent(ocCurrentProto()) - runbytes;
+
+			fprintf(stdout, ",(%llu,%llu,%llu)", runtime, rungates, runbytes);
+			fflush(stdout);
+			tally += runtime;
+			{	
+				int oo;
+				revealOblivInt(&oo, out, 0);
+				fprintf(stderr, "Output: ");
+				if ( oo == -1 ){
+					fprintf(stderr, "Not contain.");
+				}else if ( oo == 1){
+					fprintf(stderr, "Contain");
+				}else {
+					fprintf(stderr, "At edge");
+				}
+				fprintf(stderr,"\n");
+
+			}
+			
+		}
+		fprintf(stdout, "\n");
+		fprintf(stderr, "Point Contain (vertices:%d): %llu microseconds avg, %llu gates avg, %llu bytes avg\n", n, tally/samples, rungates, runbytes);
+
+		
+		// tally = 0;
+		// fprintf(stdout, "%d", pairs);
+		// fflush(stdout);
+		// for (int kk = 0; kk < samples; kk++) {
+		// 	for (int ll = 0; ll < pairs; ll++) {
+		// 		shuffle(perm, pairs);
+		// 		for (int jj = 0; jj < pairs; jj++) {
+		// 			mPrefs[ll * pairs + jj] = feedOblivInt(perm[jj], 2);
+		// 		}
+		// 		for (int jj = 0; jj < pairs; jj++) {
+		// 			wPrefs[ll * pairs + jj] = feedOblivInt(perm[jj], 1);
+		// 		}
+		// 	}
+
+		// 	runbytes = tcp2PBytesSent(ocCurrentProto());
+		// 	rungates = yaoGateCount();
+		// 	runtime = current_timestamp();
+		// 	ogale_shapley_textbook_revealed(output, mPrefs, wPrefs, pairs);
+		// 	runtime = current_timestamp() - runtime;
+		// 	rungates = yaoGateCount() - rungates;
+		// 	runbytes = tcp2PBytesSent(ocCurrentProto()) - runbytes;
+		// 	fprintf(stdout, ",(%llu,%llu,%llu)", runtime, rungates, runbytes);
+		// 	fflush(stdout);
+		// 	tally += runtime;
+
+		// }
+
+		// free(perm);
+		// free(mPrefs);
+		// free(wPrefs);
+		// free(output);
+
+		// fprintf(stdout, "\n");
+		// fprintf(stderr, "Gale Shapley Revealed (pairs:%d): %llu microseconds avg, %llu gates avg, %llu bytes avg\n", pairs, tally/samples, rungates, runbytes);
+	}
+
+}

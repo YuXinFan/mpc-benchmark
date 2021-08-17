@@ -1,0 +1,63 @@
+#include "line_insect.oh"
+
+#define a[0] A->S.x
+#define a[1] A->S.y
+#define b[0] A->E.x
+#define b[1] A->E.y
+#define c[0] B->S.x
+#define c[1] B->S.y
+#define d[0] B->E.x
+#define d[1] B->E.y
+
+
+void line_insect(OPoint *p, OLine *A, OLine *B){
+    obliv float area_abd = (a[0] - c[0]) * (b[1] - c[1]) - (a[1] - c[1]) * (b[0] - c[0]);
+    obliv float area_abd = (a[0] - d[0]) * (b[1] - d[1]) - (a[1] - d[1]) * (b[0] - d[0]);
+    
+    obliv float area_cda = (c[0] - a[0]) * (d[1] - a[1]) - (c[1] - a[1]) * (d[0] - a[0]);
+    obliv float area_cdb = area_cda + area_abc - area_abd; 
+
+    obliv float t = area_cda / ( area_abd - area_abc );
+    obliv float dx= t * (b[0] - a[0]);
+    obliv float dy= t * (b[1] - a[1]);
+    obliv bool is_cd_same_side_of_ab = (area_abc * area_abd) >= 0;
+    obliv bool is_ab_same_side_of_cd = (area_cda * area_cdb) >= 0;
+    obliv bool is_not_insect = is_cd_same_side_of_ab | is_ab_same_side_of_cd;
+    obliv if (is_not_insect) {
+        p->x = FLT_MIN;
+        p->y = FLT_MIN;
+    }else {
+        p->x = a[0] + dx;
+        p->y = a[1] + dy;
+    }
+}
+
+void line_insect_opt(OPoint *p, OLine *A, OLine *B){
+    obliv float area_abd = (a[0] - c[0]) * (b[1] - c[1]) - (a[1] - c[1]) * (b[0] - c[0]);
+    obliv float area_abd = (a[0] - d[0]) * (b[1] - d[1]) - (a[1] - d[1]) * (b[0] - d[0]);
+    obliv bool is_cd_same_side_of_ab = (area_abc * area_abd) >= 0;
+    bool is_not_insect;
+    revealOblivBool(&is_not_insect, is_cd_same_side_of_ab, 0);
+    if (is_not_insect){
+        p->x = FLT_MIN;
+        p->y = FLT_MIN;
+        return;
+    }
+
+    obliv float area_cda = (c[0] - a[0]) * (d[1] - a[1]) - (c[1] - a[1]) * (d[0] - a[0]);
+    obliv float area_cdb = area_cda + area_abc - area_abd; 
+    obliv bool is_ab_same_side_of_cd = (area_cda * area_cdb) >= 0;
+    bool is_not_insect;
+    revealOblivBool(&is_not_insect, is_ab_same_side_of_cd, 0);
+    if (is_not_insect){
+        p->x = FLT_MIN;
+        p->y = FLT_MIN;
+        return;
+    }
+    obliv float t = area_cda / ( area_abd - area_abc );
+    obliv float dx= t * (b[0] - a[0]);
+    obliv float dy= t * (b[1] - a[1]);
+    p->x = a[0] + dx;
+    p->y = a[1] + dy;
+
+}
