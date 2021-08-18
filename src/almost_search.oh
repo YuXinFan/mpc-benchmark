@@ -1,0 +1,9 @@
+#ifndef ALMOST_SEARCH_OH
+#define ALMOST_SEARCH_OH
+
+#include <obliv.oh>
+
+void binary_almost_search (obliv int *idx, obliv int needle, obliv int* arr, int n);
+void binary_almost_search_opt(obliv int *idx, obliv int needle, obliv int* arr, int n);
+
+#endif

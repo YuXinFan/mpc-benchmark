@@ -1,0 +1,9 @@
+#ifndef NAIVE_PSI_OH
+#define NAIVE_PSI_OH
+
+#include <obliv.oh>
+
+void naive_psi(obliv int *intersection, obliv int *aarr, obliv int *barr, int size);
+void naive_psi_opt(obliv int *intersection, obliv int *aarr, obliv int *barr, int size);
+
+#endif 

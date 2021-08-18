@@ -1,5 +1,5 @@
-#ifndef QSORT_OH
-#define QSORT_OH
+#ifndef QUICK_SORT_OH
+#define QUICK_SORT_OH
 
 #include <obliv.oh>
 #include <copy.oh>

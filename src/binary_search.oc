@@ -1,17 +1,17 @@
-#include "osearch.oh"
+#include "binary_search.oh"
 #include <math.h>
 
-obliv int obinary_search(OcCopy * cpy, void* result, void* haystack, size_t haystack_length, void* needle, block_cmp_function fn) {
+obliv int binary_search(OcCopy * cpy, void* result, void* haystack, size_t haystack_length, void* needle, block_cmp_function fn) {
 	oram * o = oram_from_array(ORAM_TYPE_AUTO, cpy, haystack_length, haystack);
 
-	obliv int index = obinary_search_oram(cpy, result, o, needle, fn);
+	obliv int index = binary_search_oram(cpy, result, o, needle, fn);
 
 	oram_free(o);
 
 	return index;
 }
 
-obliv int obinary_search_oram(OcCopy * cpy, void* result, oram * haystack, void* needle, block_cmp_function fn) {
+obliv int binary_search_oram(OcCopy * cpy, void* result, oram * haystack, void* needle, block_cmp_function fn) {
 	int upper_bound = log2(oram_size(haystack)) + 1;
 
 	obliv int index = -1;
@@ -47,17 +47,17 @@ obliv int obinary_search_oram(OcCopy * cpy, void* result, oram * haystack, void*
 	return index;
 }
 
-obliv int obinary_search_revealed(OcCopy * cpy, void* result, void* haystack, size_t haystack_length, void* needle, block_cmp_function fn) {
+obliv int binary_search_opt(OcCopy * cpy, void* result, void* haystack, size_t haystack_length, void* needle, block_cmp_function fn) {
 	oram * o = oram_from_array(ORAM_TYPE_AUTO, cpy, haystack_length, haystack);
 
-	obliv int index = obinary_search_oram(cpy, result, o, needle, fn);
+	obliv int index = binary_search_oram_opt(cpy, result, o, needle, fn);
 
 	oram_free(o);
 
 	return index;
 }
 
-obliv int obinary_search_oram_revealed(OcCopy * cpy, void* result, oram * haystack, void* needle, block_cmp_function fn) {
+obliv int binary_search_oram_opt(OcCopy * cpy, void* result, oram * haystack, void* needle, block_cmp_function fn) {
 	int upper_bound = log2(oram_size(haystack)) + 1;
 
 	obliv int index = -1;

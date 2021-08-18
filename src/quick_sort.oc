@@ -1,58 +1,30 @@
-#include "oqsort.oh"
+#include "quick_sort.oh"
 #include <obliv.h>
 
-static obliv int * element(OcCopy* cpy,obliv int * arr, int x) obliv {
-	return x*cpy->eltsize+(char*)arr;
-}
-// void swapInt(obliv int* a,obliv int* b)
-// {
-//   obliv int t = 0;
-//   t=*a^*b;
-//   *a^=t;
-//   *b^=t;
-// }
 void swap(obliv int* a, obliv int* b, obliv int* t) {
-  // memcpy(t, a, sizeof(obliv int));
-  // memcpy(b, a, sizeof(obliv int));
-  // memcpy(a, t, sizeof(obliv int));
-  //fprintf(stdout, "do swap\n");
-  //fprintf(stdout, "data1=%llu\n", *a);
-  //fprintf(stdout, "data2=%llu\n", *b);
   *t = *a;
   *a = *b;
   *b = *t;
-  //fprintf(stdout, "data1=%llu\n", *a);
-  //fprintf(stdout, "data2=%llu\n", *b);
-  //fprintf(stdout, "done swap\n");
-
 }
 
 static obliv bool cmp(obliv int* a, obliv int* b) {
   obliv bool c = *a <= *b;
   return c;
 }
+
 int partition(obliv int * data, obliv int * temp, int n, osort_cmp_function cmpFn){
   int i = -1;
   obliv int *pi = data + n -1;
   bool leq = true;
   obliv bool oleq = false;
   for (int j = 0; j < n-1; j++){
-    //obliv bool oleq = cmpFn(NULL, data + j, pi) >= 0;
-    //obliv bool oleq = cmp(data + j, pi);
     oleq = *(data+j) < *pi;
-    // reveal the result of comparsion
-    //fprintf(stdout, "exec reveal %d \n", j);
     revealOblivBool(&leq, oleq, 0);
-    //revealOblivBool(&leq, oleq, 1);
-    //fprintf(stdout, "finish reveal %d\n", j);
-    //leq = ocBroadcastBool(leq, 2);
-
     if (leq) {
       i = i + 1;
       swap(data+i, data+j, temp);
     }
   }
-  
   swap(data+i+1, pi, temp);
 
   return i+1;

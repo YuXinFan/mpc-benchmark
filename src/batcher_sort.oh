@@ -1,5 +1,5 @@
-#ifndef BSORT_OH
-#define BSORT_OH
+#ifndef BATCHER_SORT_OH
+#define BATCHER_SORT_OH
 
 #include <copy.oh>
 

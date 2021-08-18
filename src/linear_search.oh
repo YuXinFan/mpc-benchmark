@@ -1,0 +1,9 @@
+#ifndef LINEAR_SEARCH_OH
+#define LINEAR_SEARCH_OH
+
+#include <obliv.oh>
+
+void linear_search(obliv int *idx, obliv int *val, obliv int *arr, int size);
+void linear_search_opt(obliv int *idx, obliv int *val, obliv int *arr, int size);
+
+#endif 

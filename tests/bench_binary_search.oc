@@ -1,9 +1,9 @@
 #include <obliv.oh>
-#include "osearch.oh"
+#include "binary_search.oh"
 #include "oram.oh"
 #include "test_generic.h"
 
-static const char TESTNAME[] = "obs_benchmark";
+static const char TESTNAME[] = "binary_search_benchmark";
 
 #define TEXT_HELP_SUPPLEMENTARY "\
   -e \x1b[4mNUMBER\x1b[0m, --elements=\x1b[4mNUMBER\x1b[0m \n\t\tsearch through \x1b[4mNUMBER\x1b[0m elements\n\n\
@@ -149,14 +149,14 @@ void test_main(void*varg) {
 
 		oram * o;
 
+		if (from_shares) o = oram_from_shares(ORAM_TYPE_AUTO, &cpy, elct, input);
+		else o = oram_from_array(ORAM_TYPE_AUTO, &cpy, elct, input);
+
 		int64_t runtime = -current_timestamp();
 		int64_t rungates = -yaoGateCount();
 		int64_t runbytes = -tcp2PBytesSent(ocCurrentProto());
 
-		if (from_shares) o = oram_from_shares(ORAM_TYPE_AUTO, &cpy, elct, input);
-		else o = oram_from_array(ORAM_TYPE_AUTO, &cpy, elct, input);
-
-		for (int ll = 0; ll < searchct; ll++) obinary_search_oram(&cpy, &output, o, &needles[ll], &cmpInt);
+		for (int ll = 0; ll < searchct; ll++) binary_search_oram(&cpy, &output, o, &needles[ll], &cmpInt);
 
 		runtime += current_timestamp();
 		rungates += yaoGateCount();

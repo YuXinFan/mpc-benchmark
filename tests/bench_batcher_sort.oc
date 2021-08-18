@@ -1,15 +1,15 @@
 #include <obliv.oh>
-#include "obsort.oh"
+#include "batcher_sort.oh"
 #include "oram.oh"
 #include <copy.oh>
 #include "test_generic.h"
 
 #define TEXT_HELP_SUPPLEMENTARY "\
-  -n \x1b[4mNUMBER\x1b[0m, --size=\x1b[4mNUMBER\x1b[0m \n\t\tsimulate \x1b[4mNUMBER\x1b[0m size of participants\n\n\
+  -n \x1b[4mNUMBER\x1b[0m, --size=\x1b[4mNUMBER\x1b[0m \n\t\tsimulate \x1b[4mNUMBER\x1b[0m size of inputs\n\n\
   -o \x1b[4mTYPE\x1b[0m, --oram-type=\x1b[4mTYPE\x1b[0m \n\t\tforce all ORAMs to be \x1b[4mTYPE\x1b[0m ORAMs. Valid types are \033[1msqrt\033[0m, \033[1mcircuit\033[0m, and \033[1mlinear\033[0m.\n\n\
   -i \x1b[4mNUMBER\x1b[0m, --samples=\x1b[4mNUMBER\x1b[0m \n\t\trun \x1b[4mNUMBER\x1b[0m iterations of the benchmark\n\n"
 
-static const char TESTNAME[] = "bsort_benchmark";
+static const char TESTNAME[] = "batcher_sort_benchmark";
 static const char options_string[] = "n:o:i:";
 static struct option long_options[] = {
 	{"size", required_argument, NULL, 'n'},
@@ -167,7 +167,9 @@ void test_main(void*varg) {
 			runbytes = tcp2PBytesSent(ocCurrentProto());
 			rungates = yaoGateCount();
 			runtime = current_timestamp();
+
 			batcherSort(input, size, sizeof(obliv int));
+
 			runtime = current_timestamp() - runtime;
 			rungates = yaoGateCount() - rungates;
 			runbytes = tcp2PBytesSent(ocCurrentProto()) - runbytes;

@@ -1,26 +1,18 @@
 #include <obliv.oh>
-
-#include "stdlib.h"
-#include "math.h"
-#include <time.h>
-
+#include "quick_sort.oh"
 #include "oram.oh"
-
+#include <copy.oh>
 #include "test_generic.h"
-#include "max.oh"
-
 
 #define TEXT_HELP_SUPPLEMENTARY "\
-  -n \x1b[4mNUMBER\x1b[0m, --vertices=\x1b[4mNUMBER\x1b[0m \n\t\tsimulate \x1b[4mNUMBER\x1b[0m pairs of participants\n\n\
+  -n \x1b[4mNUMBER\x1b[0m, --size=\x1b[4mNUMBER\x1b[0m \n\t\tsimulate \x1b[4mNUMBER\x1b[0m size of inputs\n\n\
   -o \x1b[4mTYPE\x1b[0m, --oram-type=\x1b[4mTYPE\x1b[0m \n\t\tforce all ORAMs to be \x1b[4mTYPE\x1b[0m ORAMs. Valid types are \033[1msqrt\033[0m, \033[1mcircuit\033[0m, and \033[1mlinear\033[0m.\n\n\
   -i \x1b[4mNUMBER\x1b[0m, --samples=\x1b[4mNUMBER\x1b[0m \n\t\trun \x1b[4mNUMBER\x1b[0m iterations of the benchmark\n\n"
 
-#define RANGE_MAX 10000
-
-static const char TESTNAME[] = "PointContain_benchmark";
+static const char TESTNAME[] = "quick_sort_benchmark";
 static const char options_string[] = "n:o:i:";
 static struct option long_options[] = {
-	{"vertices", required_argument, NULL, 'n'},
+	{"size", required_argument, NULL, 'n'},
 	{"oram-type", required_argument, NULL, 'o'},
 	{"samples", required_argument, NULL, 'i'},
 	{0, 0, 0, 0}
@@ -42,16 +34,6 @@ void print_supplementary_help() {
 	fprintf(stderr, TEXT_HELP_SUPPLEMENTARY);
 }
 
-void rand_array(int *array, size_t n) {
-	size_t i;
-    
-	for (i = 0; i < n ; i++) 
-	{
-		size_t j = rand() % (n*10);
-		array[i] = j;
-	}
-}
-
 void shuffle(uint32_t *array, size_t n) {
 	if (n > 1) {
 		size_t i;
@@ -65,13 +47,55 @@ void shuffle(uint32_t *array, size_t n) {
 	}
 }
 
+static obliv char cmpInt(OcCopy * cpy, void * a, void * b) {
+	obliv char result;
+	obliv bool cmpresult = ((obliv uint32_t *) a) > ((obliv uint32_t *) b);
+	obliv if (cmpresult) {
+		result = -1;
+	} else {
+		result = 1;
+	}
+	return result;
+	//return (*aa > *bb) - (*aa < *bb);
+}
+
+void rand_array(uint32_t *array, size_t n) {
+	size_t i;
+    
+	for (i = 0; i < n ; i++) 
+	{
+		size_t j = rand() % (n*2);
+		array[i] = j;
+	}
+}
+
+void print_array(uint32_t *array, size_t n) {
+	fflush(stdout);
+	size_t i;
+	fprintf(stdout, "\n");
+	for (i = 0; i < n ; i++) 
+	{
+		fprintf(stdout, "%u,", array[i]);
+	}
+	fprintf(stdout, "\n");
+}
+bool sorted(uint32_t *array, size_t n) {
+	size_t i;
+	bool sort = true;
+	for (i = 1; i < n ; i++) 
+	{
+		sort = sort && (array[i-1] <= array[i]);
+	}
+	return sort;
+}
+
 void test_main(void*varg) {
 
 	#ifdef ORAM_OVERRIDE
 	oram_set_default_type(ORAM_OVERRIDE);
 	#endif
 
-	int n = 1;
+	int size = 1;
 	int samples = 1;
 
 	args_t * args_pass = varg;
@@ -79,8 +103,8 @@ void test_main(void*varg) {
 	optind = 0; // this allows us to getopt a second time
 	while ((arg = getopt_long(args_pass->argc, args_pass->argv, options_string, long_options, NULL)) != -1) {
 		if (arg == 'n') {
-			n = atoi(optarg);
-			if (n <= 0) {
+			size = atoi(optarg);
+			if (size <= 0) {
 				fprintf (stderr, "Argument for -%c must be positive.\n", arg);
 				return;
 			}
@@ -114,78 +138,57 @@ void test_main(void*varg) {
 		}
 	}
 
-	fprintf(stdout, "# Max Three (sample 1, sample 2, ... sample n)\n");
+	fprintf(stdout, "# Quick Sort (size, (sample 1 time, gates, bytes), sample 2, ... sample n)\n");
 	fflush(stdout);
 
 	{
 		uint64_t tally = 0;
-		int64_t runbytes = 0;
-		int64_t rungates = 0;
-		int64_t runtime = 0;
+		uint64_t runtime = 0;
+		uint64_t rungates = 0;
+		uint64_t runbytes = 0;
+		fprintf(stdout, "%d", size);
 		fflush(stdout);
-        int *array = (int*)malloc(n*sizeof(int));
-        obliv int *oarr = (obliv int*)malloc(n*sizeof(obliv int));
-		for (int kk = 0; kk < samples; kk++) {
-            rand_array(array, n);
-            for(int i = 0; i < n/2; i++){
-                oarr[i] = feedOblivInt(array[i], 1);
-            }
-            for(int i = n/2; i < n; i++){
-                oarr[i] = feedOblivInt(array[i], 2);
-            }
-            obliv int ma;
-			runbytes = tcp2PBytesSent(ocCurrentProto());
-			rungates = yaoGateCount();
-			runtime = current_timestamp();
-            max_opt(&ma, oarr, n);
-			runtime = current_timestamp() - runtime;
-			rungates = yaoGateCount() - rungates;
-			runbytes = tcp2PBytesSent(ocCurrentProto()) - runbytes;
-			tally += runtime;
-			//fprintf(stdout, ",(%llu,%llu,%llu)", runtime, rungates, runbytes);
-			fflush(stdout);
-			{	
-				int o;
-				revealOblivInt(&o, ma, 0);
-				fprintf(stdout, "%d,", o);
-			}
-			
+
+		int * perm = malloc(size * sizeof(int));
+		for (int kk = 0; kk < size; kk++) {
+			perm[kk] = kk;
 		}
-		fprintf(stdout, "\n");
-		fprintf(stderr, "Max N: %llu microseconds avg, %llu gates avg, %llu bytes avg\n", tally/samples, rungates, runbytes);
-
 		
-		// tally = 0;
-		// fflush(stdout);
-		// for (int kk = 0; kk < samples; kk++) {
-		// 	rand_array(array, n);
-        //     for(int i = 0; i < n/2; i++){
-        //         oarr[i] = feedOblivInt(array[i], 1);
-        //     }
-        //     for(int i = n/2; i < n; i++){
-        //         oarr[i] = feedOblivInt(array[i], 2);
-        //     }
-        //     obliv int ma;
-		// 	runbytes = tcp2PBytesSent(ocCurrentProto());
-		// 	rungates = yaoGateCount();
-		// 	runtime = current_timestamp();
-        //     max(&ma, oarr, n);
-		// 	runtime = current_timestamp() - runtime;
-		// 	rungates = yaoGateCount() - rungates;
-		// 	runbytes = tcp2PBytesSent(ocCurrentProto()) - runbytes;
-		// 	tally += runtime;
-		// 	//fprintf(stdout, ",(%llu,%llu,%llu)", runtime, rungates, runbytes);
-		// 	fflush(stdout);
-		// 	{	
-		// 		int o;
-		// 		revealOblivInt(&o, ma, 0);
-		// 		fprintf(stdout, "%d,", o);
-		// 	}
+		obliv int * input = malloc(size * sizeof(obliv int));
+		int *output =  malloc(size * sizeof(int));
 
-		// }
+		for (int kk = 0; kk < samples; kk++) {
+            shuffle(perm, size);
+			
+            for (int jj = 0; jj < size/2; jj++) {
+                input[jj] = feedOblivInt(perm[jj], 1);
+            }
 
-		// fprintf(stdout, "\n");
-		// fprintf(stderr, "Max N OPT: %llu microseconds avg, %llu gates avg, %llu bytes avg\n", tally/samples, rungates, runbytes);
+            for (int jj = size/2; jj < size; jj++) {
+                input[jj] = feedOblivInt(perm[jj], 2);
+            }
+
+			rungates = yaoGateCount();
+			runbytes = tcp2PBytesSent(ocCurrentProto());
+			runtime = current_timestamp();
+
+			oqsort(input, size, cmpInt);
+
+			runtime = current_timestamp() - runtime;
+			rungates = yaoGateCount() -rungates;
+			runbytes = tcp2PBytesSent(ocCurrentProto()) - runbytes;
+			fprintf(stdout, ",(%llu, %llu, %llu)", runtime, rungates, runbytes);
+			fflush(stdout);
+			tally += runtime;
+			//print_array(output, size);
+		}
+
+		free(perm);
+		free(input);
+		free(output);
+
+		fprintf(stdout, "\n");
+		fprintf(stderr, "Quick Sort (size:%d): %llu microseconds avg, %llu gates avg, %llu bytes avg\n", size, tally/samples, rungates, runbytes);
 	}
 
 }

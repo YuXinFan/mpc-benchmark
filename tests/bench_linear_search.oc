@@ -1,18 +1,27 @@
 #include <obliv.oh>
-#include "oqsort.oh"
+
+#include "stdlib.h"
+#include "math.h"
+#include <time.h>
+#include "float.h"
+
 #include "oram.oh"
-#include <copy.oh>
+
 #include "test_generic.h"
+#include "linear_search.oh"
+
+static const char TESTNAME[] = "linear_search_benchmark";
 
 #define TEXT_HELP_SUPPLEMENTARY "\
-  -n \x1b[4mNUMBER\x1b[0m, --size=\x1b[4mNUMBER\x1b[0m \n\t\tsimulate \x1b[4mNUMBER\x1b[0m size of participants\n\n\
+  -e \x1b[4mNUMBER\x1b[0m, --elements=\x1b[4mNUMBER\x1b[0m \n\t\tsearch through \x1b[4mNUMBER\x1b[0m elements\n\n\
+  -s \x1b[4mNUMBER\x1b[0m, --searches=\x1b[4mNUMBER\x1b[0m \n\t\tperform \x1b[4mNUMBER\x1b[0m searches on the same data\n\n\
   -o \x1b[4mTYPE\x1b[0m, --oram-type=\x1b[4mTYPE\x1b[0m \n\t\tforce all ORAMs to be \x1b[4mTYPE\x1b[0m ORAMs. Valid types are \033[1msqrt\033[0m, \033[1mcircuit\033[0m, and \033[1mlinear\033[0m.\n\n\
   -i \x1b[4mNUMBER\x1b[0m, --samples=\x1b[4mNUMBER\x1b[0m \n\t\trun \x1b[4mNUMBER\x1b[0m iterations of the benchmark\n\n"
 
-static const char TESTNAME[] = "qsort_benchmark";
-static const char options_string[] = "n:o:i:";
+static const char options_string[] = "e:s:o:i:";
 static struct option long_options[] = {
-	{"size", required_argument, NULL, 'n'},
+	{"elements", required_argument, NULL, 'e'},
+	{"searches", required_argument, NULL, 's'},
 	{"oram-type", required_argument, NULL, 'o'},
 	{"samples", required_argument, NULL, 'i'},
 	{0, 0, 0, 0}
@@ -34,6 +43,19 @@ void print_supplementary_help() {
 	fprintf(stderr, TEXT_HELP_SUPPLEMENTARY);
 }
 
+void rand_array(int *array, size_t n) {
+	size_t i;
+    
+	for (i = 0; i < n ; i++) 
+	{
+		size_t j = rand() % (n);
+		array[i] = j;
+	}
+}
+
+int rand_int(size_t range) {
+    return rand() % (range);
+}
 void shuffle(uint32_t *array, size_t n) {
 	if (n > 1) {
 		size_t i;
@@ -47,68 +69,33 @@ void shuffle(uint32_t *array, size_t n) {
 	}
 }
 
-static obliv char cmpInt(OcCopy * cpy, void * a, void * b) {
-	obliv char result;
-	obliv bool cmpresult = ((obliv uint32_t *) a) > ((obliv uint32_t *) b);
-	obliv if (cmpresult) {
-		result = -1;
-	} else {
-		result = 1;
-	}
-	return result;
-	//return (*aa > *bb) - (*aa < *bb);
-}
-
-void rand_array(uint32_t *array, size_t n) {
-	size_t i;
-    
-	for (i = 0; i < n ; i++) 
-	{
-		size_t j = rand() % (n*2);
-		array[i] = j;
-	}
-}
-
-void print_array(uint32_t *array, size_t n) {
-	fflush(stdout);
-	size_t i;
-	fprintf(stdout, "\n");
-	for (i = 0; i < n ; i++) 
-	{
-		fprintf(stdout, "%u,", array[i]);
-	}
-	fprintf(stdout, "\n");
-}
-bool sorted(uint32_t *array, size_t n) {
-	size_t i;
-	bool sort = true;
-	for (i = 1; i < n ; i++) 
-	{
-		sort = sort && (array[i-1] <= array[i]);
-	}
-	return sort;
-}
-
 void test_main(void*varg) {
 
 	#ifdef ORAM_OVERRIDE
 	oram_set_default_type(ORAM_OVERRIDE);
 	#endif
 
-	int size = 1;
+	int n = 1;
 	int samples = 1;
+	int searchct = 1;
 
 	args_t * args_pass = varg;
 	int arg;
 	optind = 0; // this allows us to getopt a second time
 	while ((arg = getopt_long(args_pass->argc, args_pass->argv, options_string, long_options, NULL)) != -1) {
-		if (arg == 'n') {
-			size = atoi(optarg);
-			if (size <= 0) {
+		if (arg == 'e') {
+			n = atoi(optarg);
+			if (n <= 0) {
 				fprintf (stderr, "Argument for -%c must be positive.\n", arg);
 				return;
 			}
-		} else if (arg == 'o') {
+		} else if (arg == 's') {
+			searchct = atoi(optarg);
+			if (searchct <= 0) {
+				fprintf (stderr, "Argument for -%c must be positive.\n", arg);
+				return;
+			}
+		}else if (arg == 'o') {
 			if (strcmp(optarg,"sqrt") == 0) {
 				oram_set_default_type(ORAM_TYPE_SQRT);
 			} else if (strcmp(optarg,"circuit") == 0) {
@@ -138,64 +125,53 @@ void test_main(void*varg) {
 		}
 	}
 
-	fprintf(stdout, "# Quick Sort (size, (sample 1 time, gates, bytes), sample 2, ... sample n)\n");
+	fprintf(stdout, "# Linear Search (sample 1, sample 2, ... sample n)\n");
 	fflush(stdout);
 
 	{
 		uint64_t tally = 0;
-		uint64_t runtime = 0;
-		uint64_t rungates = 0;
-		uint64_t runbytes = 0;
-		fprintf(stdout, "%d", size);
+		uint64_t tallygates = 0;
+		uint64_t tallybytes = 0;
+
+		int64_t runbytes = 0;
+		int64_t rungates = 0;
+		int64_t runtime = 0;
 		fflush(stdout);
-
-		int * perm = malloc(size * sizeof(int));
-		for (int kk = 0; kk < size; kk++) {
-			perm[kk] = kk;
-		}
-		//fprintf(stdout, "\nperm malloc\n");
-		
-		obliv int * input = malloc(size * sizeof(obliv int));
-		int *output =  malloc(size * sizeof(int));
-		//fprintf(stdout, "\nin out malloc\n");
-
+        int *array = (int*)malloc(n*sizeof(int));
+        obliv int *oarr = (obliv int*)malloc(n*sizeof(obliv int));
+		obliv int *needles = (obliv int*)malloc(searchct*sizeof(obliv int));
 		for (int kk = 0; kk < samples; kk++) {
-            shuffle(perm, size);
-			//fprintf(stdout, "\nshuffle malloc in %d\n", kk);
-			
-            for (int jj = 0; jj < size; jj++) {
-                input[jj] = feedOblivInt(perm[jj], 1);
+			rand_array(array, n);
+            for(int i = 0; i < n; i++){
+                oarr[i] = feedOblivInt(array[i], 1);
             }
-			//fprintf(stdout, "\nfeed in %d\n", 1);
-
-            // for (int jj = size/2; jj < size; jj++) {
-            //     input[jj] = feedOblivInt(perm[jj], 2);
-            // }
-			//fprintf(stdout, "\nfeed in %d\n", 2);
-
-			rungates = yaoGateCount();
+			for(int i = 0; i < searchct;i++){
+				needles[i] = feedOblivInt(rand_int(n), 2);
+			}
+            obliv int idx;
 			runbytes = tcp2PBytesSent(ocCurrentProto());
+			rungates = yaoGateCount();
 			runtime = current_timestamp();
-			//fprintf(stdout, "\nbefore qsort \n");
-
-			oqsort(input, size, cmpInt);
-			//fprintf(stdout, "\nafter qsort \n");
-
+			for (int i = 0; i < searchct; i++) {
+            	linear_search(&idx, &needles[i], oarr, n);
+			}
 			runtime = current_timestamp() - runtime;
-			rungates = yaoGateCount() -rungates;
+			rungates = yaoGateCount() - rungates;
 			runbytes = tcp2PBytesSent(ocCurrentProto()) - runbytes;
-			fprintf(stdout, ",(%llu, %llu, %llu)", runtime, rungates, runbytes);
-			fflush(stdout);
+			fprintf(stdout, ",(%llu,%llu,%llu)", runtime, rungates, runbytes);
 			tally += runtime;
-			//print_array(output, size);
+			tallygates += rungates;
+			tallybytes += runbytes;
+			fflush(stdout);
+			{	
+				// int o;
+				// revealOblivInt(&o, idx, 0);
+				// fprintf(stdout, "%d,", o);
+			}
+			
 		}
-
-		free(perm);
-		free(input);
-		free(output);
-
 		fprintf(stdout, "\n");
-		fprintf(stderr, "Quick Sort (size:%d): %llu microseconds avg, %llu gates avg, %llu bytes avg\n", size, tally/samples, rungates, runbytes);
+		fprintf(stderr, "Linear Search: %llu microseconds avg, %llu gates avg, %llu bytes avg\n", tally/samples, tallygates/samples, tallybytes/samples);
 	}
 
 }

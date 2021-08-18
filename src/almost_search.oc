@@ -1,0 +1,57 @@
+#include "almost_search.oh"
+#include <obliv_common.h>
+#include "stdbool.h"
+
+void binary_almost_search_main(obliv int *idx, obliv int needle, obliv int* arr, int l, int r) obliv {
+    if (r >= l)
+    {
+        int mid = l + (r - l) / 2;
+        // If the element is present at
+        // one of the middle 3 positions
+        obliv if ( arr[mid] == needle ){
+            *idx = mid;
+        }else obliv if ( (mid > l) & (arr[mid - 1] == needle) ){
+            *idx = (mid-1);
+        }else obliv if ( (mid < r) & (arr[mid + 1] == needle) ){
+            *idx = (mid + 1);
+        }else obliv if ( arr[mid] > needle ){
+            binary_almost_search_main(idx, needle, arr, l, mid - 2);
+        }else{
+            binary_almost_search_main(idx, needle, arr, mid + 2, r);
+        }
+    }
+}
+void binary_almost_search(obliv int *idx, obliv int needle, obliv int* arr, int n){
+    binary_almost_search_main(idx, needle, arr, 0, n-1);
+}
+
+
+void binary_almost_search_opt_main(obliv int *idx, obliv int needle, obliv int* arr, int l, int r) obliv {
+    if (r >= l)
+    {
+        int mid = l + (r - l) / 2;
+        // If the element is present at
+        // one of the middle 3 positions
+        obliv if (arr[mid] == needle){
+            *idx = mid;
+        }else obliv if ( (mid > l) & (arr[mid - 1] == needle) ){
+            *idx = (mid-1);
+        }else obliv if ( (mid < r) & (arr[mid + 1] == needle) ){
+            *idx = (mid + 1);
+        }else {
+            obliv bool ogt = arr[mid] > needle;
+            bool gt;
+            ~obliv(){
+                revealOblivBool(&gt, ogt, 0);
+            }
+            if (gt){
+                binary_almost_search_opt_main(idx, needle, arr, l, mid - 2);
+            } else {
+                binary_almost_search_opt_main(idx, needle, arr, mid + 2, r);
+            }
+        }
+    }
+}
+void binary_almost_search_opt(obliv int *idx, obliv int needle, obliv int* arr, int n){
+    binary_almost_search_opt_main(idx, needle, arr, 0, n-1);
+}
