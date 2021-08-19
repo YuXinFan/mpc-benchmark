@@ -5,23 +5,23 @@
 #include <time.h>
 #include "float.h"
 
-#include "naive_psi.oc"
-
 #include "oram.oh"
 
 #include "test_generic.h"
+#include "line_insect.oh"
 
 
 #define TEXT_HELP_SUPPLEMENTARY "\
-  -n \x1b[4mNUMBER\x1b[0m, --size=\x1b[4mNUMBER\x1b[0m \n\t\tsimulate \x1b[4mNUMBER\x1b[0m of inputs\n\n\
+  -n \x1b[4mNUMBER\x1b[0m, --repeat=\x1b[4mNUMBER\x1b[0m \n\t\tsimulate \x1b[4mNUMBER\x1b[0m of repeats\n\n\
   -o \x1b[4mTYPE\x1b[0m, --oram-type=\x1b[4mTYPE\x1b[0m \n\t\tforce all ORAMs to be \x1b[4mTYPE\x1b[0m ORAMs. Valid types are \033[1msqrt\033[0m, \033[1mcircuit\033[0m, and \033[1mlinear\033[0m.\n\n\
   -i \x1b[4mNUMBER\x1b[0m, --samples=\x1b[4mNUMBER\x1b[0m \n\t\trun \x1b[4mNUMBER\x1b[0m iterations of the benchmark\n\n"
 
+#define RANGE_MAX 10000
 
-static const char TESTNAME[] = "naive_psi_benchmark";
+static const char TESTNAME[] = "PointContain_benchmark";
 static const char options_string[] = "n:o:i:";
 static struct option long_options[] = {
-	{"size", required_argument, NULL, 'n'},
+	{"repeat", required_argument, NULL, 'n'},
 	{"oram-type", required_argument, NULL, 'o'},
 	{"samples", required_argument, NULL, 'i'},
 	{0, 0, 0, 0}
@@ -43,19 +43,6 @@ void print_supplementary_help() {
 	fprintf(stderr, TEXT_HELP_SUPPLEMENTARY);
 }
 
-void rand_array(int *array, size_t n) {
-	size_t i;
-    
-	for (i = 0; i < n ; i++) 
-	{
-		size_t j = rand() % (n);
-		array[i] = j;
-	}
-}
-
-int rand_int(size_t range) {
-    return rand() % (range);
-}
 void shuffle(uint32_t *array, size_t n) {
 	if (n > 1) {
 		size_t i;
@@ -63,6 +50,23 @@ void shuffle(uint32_t *array, size_t n) {
 		{
 		  size_t j = i + rand() / (RAND_MAX / (n - i) + 1);
 		  int t = array[j];
+		  array[j] = array[i];
+		  array[i] = t;
+		}
+	}
+}
+
+float rand_float(){
+    return ((float)rand()/(float)(RAND_MAX)) * RANGE_MAX;
+}
+
+void float_shuffle(float* array, size_t n) {
+    if (n > 1) {
+		size_t i;
+		for (i = 0; i < n - 1; i++) 
+		{
+		  size_t j = i + rand() / (RAND_MAX / (n - i) + 1);
+		  float t = array[j];
 		  array[j] = array[i];
 		  array[i] = t;
 		}
@@ -118,41 +122,63 @@ void test_main(void*varg) {
 		}
 	}
 
-	fprintf(stdout, "# Naive PSI (sample 1, sample 2, ... sample n)\n");
+	fprintf(stdout, "# Line Intersection (repetition, sample 1, sample 2, ... sample n)\n");
 	fflush(stdout);
 
 	{
 		uint64_t tally = 0;
+        uint64_t tallygates = 0;
+        uint64_t tallybytes = 0;
 		int64_t runbytes = 0;
 		int64_t rungates = 0;
 		int64_t runtime = 0;
+		fprintf(stdout, "(%d, ", n);
 		fflush(stdout);
-        int *arrayA = (int*)malloc(n*sizeof(int));
-        int *arrayB = (int*)malloc(n*sizeof(int));
-        obliv int *oarrA = (obliv int*)malloc(n*sizeof(obliv int));
-        obliv int *oarrB = (obliv int*)malloc(n*sizeof(obliv int));
-        obliv int *out = (obliv int*)malloc(n*sizeof(obliv int));
+        OLine l1; OLine l2;
+        OPoint p;
 		for (int kk = 0; kk < samples; kk++) {
-			rand_array(arrayA, n);
-            rand_array(arrayB, n);
-            for(int i = 0; i < n; i++){
-                oarrA[i] = feedOblivInt(arrayA[i], 1);
-                oarrB[i] = feedOblivInt(arrayB[i], 2);
+            for (int ii = 0; ii < n; ii++) {
+                l1.S.x = feedOblivFloat(rand_float(), 1);
+                l1.S.y = feedOblivFloat(rand_float(), 1);
+                l1.E.x = feedOblivFloat(rand_float(), 1);
+                l1.E.y = feedOblivFloat(rand_float(), 1);
+
+                l2.S.x = feedOblivFloat(rand_float(), 1);
+                l2.S.y = feedOblivFloat(rand_float(), 1);
+                l2.E.x = feedOblivFloat(rand_float(), 1);
+                l2.E.y = feedOblivFloat(rand_float(), 1);
+
+
+                runbytes = tcp2PBytesSent(ocCurrentProto());
+                rungates = yaoGateCount();
+                runtime = current_timestamp();
+                line_insect_opt(&p, &l1, &l2);
+                runtime = current_timestamp() - runtime;
+                rungates = yaoGateCount() - rungates;
+                runbytes = tcp2PBytesSent(ocCurrentProto()) - runbytes;
+                tally += runtime;
+                tallygates += rungates;
+                tallybytes += runbytes;
             }
-			runbytes = tcp2PBytesSent(ocCurrentProto());
-			rungates = yaoGateCount();
-			runtime = current_timestamp();
-            naive_psi(out, oarrA, oarrB, n);
-			runtime = current_timestamp() - runtime;
-			rungates = yaoGateCount() - rungates;
-			runbytes = tcp2PBytesSent(ocCurrentProto()) - runbytes;
-			tally += runtime;
-			fprintf(stdout, ",(%llu,%llu,%llu)", runtime, rungates, runbytes);
+			fprintf(stdout, ",(%llu,%llu,%llu)", tally, tallygates, tallybytes);
 			fflush(stdout);
+			{	
+				// int oo;
+				// revealOblivInt(&oo, out, 0);
+				// fprintf(stderr, "Output: ");
+				// if ( oo == -1 ){
+				// 	fprintf(stderr, "Not contain.");
+				// }else if ( oo == 1){
+				// 	fprintf(stderr, "Contain");
+				// }else {
+				// 	fprintf(stderr, "At edge");
+				// }
+				// fprintf(stderr,"\n");
+			}
 			
 		}
 		fprintf(stdout, "\n");
-		fprintf(stderr, "NAIVE PSI: %llu microseconds avg, %llu gates avg, %llu bytes avg\n", tally/samples, rungates, runbytes);
+		fprintf(stderr, "Line Insection (% times): %llu microseconds avg, %llu gates avg, %llu bytes avg\n", n, tally/samples, tallygates/samples, tallygates/samples);
 	}
 
 }

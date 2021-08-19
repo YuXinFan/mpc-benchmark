@@ -1,0 +1,184 @@
+#include <obliv.oh>
+
+#include "stdlib.h"
+#include "math.h"
+#include <time.h>
+#include "float.h"
+
+#include "oram.oh"
+
+#include "test_generic.h"
+#include "line_insect.oh"
+
+
+#define TEXT_HELP_SUPPLEMENTARY "\
+  -n \x1b[4mNUMBER\x1b[0m, --repeat=\x1b[4mNUMBER\x1b[0m \n\t\tsimulate \x1b[4mNUMBER\x1b[0m of repeats\n\n\
+  -o \x1b[4mTYPE\x1b[0m, --oram-type=\x1b[4mTYPE\x1b[0m \n\t\tforce all ORAMs to be \x1b[4mTYPE\x1b[0m ORAMs. Valid types are \033[1msqrt\033[0m, \033[1mcircuit\033[0m, and \033[1mlinear\033[0m.\n\n\
+  -i \x1b[4mNUMBER\x1b[0m, --samples=\x1b[4mNUMBER\x1b[0m \n\t\trun \x1b[4mNUMBER\x1b[0m iterations of the benchmark\n\n"
+
+#define RANGE_MAX 10000
+
+static const char TESTNAME[] = "PointContain_benchmark";
+static const char options_string[] = "n:o:i:";
+static struct option long_options[] = {
+	{"repeat", required_argument, NULL, 'n'},
+	{"oram-type", required_argument, NULL, 'o'},
+	{"samples", required_argument, NULL, 'i'},
+	{0, 0, 0, 0}
+};
+
+char* get_test_name() {
+	return TESTNAME;
+}
+
+char* get_supplementary_options_string() {
+	return options_string;
+}
+
+struct option* get_long_options() {
+	return long_options;
+}
+
+void print_supplementary_help() {
+	fprintf(stderr, TEXT_HELP_SUPPLEMENTARY);
+}
+
+void shuffle(uint32_t *array, size_t n) {
+	if (n > 1) {
+		size_t i;
+		for (i = 0; i < n - 1; i++) 
+		{
+		  size_t j = i + rand() / (RAND_MAX / (n - i) + 1);
+		  int t = array[j];
+		  array[j] = array[i];
+		  array[i] = t;
+		}
+	}
+}
+
+float rand_float(){
+    return ((float)rand()/(float)(RAND_MAX)) * RANGE_MAX;
+}
+
+void float_shuffle(float* array, size_t n) {
+    if (n > 1) {
+		size_t i;
+		for (i = 0; i < n - 1; i++) 
+		{
+		  size_t j = i + rand() / (RAND_MAX / (n - i) + 1);
+		  float t = array[j];
+		  array[j] = array[i];
+		  array[i] = t;
+		}
+	}
+}
+
+void test_main(void*varg) {
+
+	#ifdef ORAM_OVERRIDE
+	oram_set_default_type(ORAM_OVERRIDE);
+	#endif
+
+	int n = 1;
+	int samples = 1;
+
+	args_t * args_pass = varg;
+	int arg;
+	optind = 0; // this allows us to getopt a second time
+	while ((arg = getopt_long(args_pass->argc, args_pass->argv, options_string, long_options, NULL)) != -1) {
+		if (arg == 'n') {
+			n = atoi(optarg);
+			if (n <= 0) {
+				fprintf (stderr, "Argument for -%c must be positive.\n", arg);
+				return;
+			}
+		} else if (arg == 'o') {
+			if (strcmp(optarg,"sqrt") == 0) {
+				oram_set_default_type(ORAM_TYPE_SQRT);
+			} else if (strcmp(optarg,"circuit") == 0) {
+				oram_set_default_type(ORAM_TYPE_CIRCUIT);
+			} else if (strcmp(optarg,"linear") == 0) {
+				oram_set_default_type(ORAM_TYPE_LINEAR);
+			} else {
+				fprintf (stderr, "Invalid argument for -%c.\n", arg);
+				return;
+			}
+		} else if (arg == 'i') {
+			samples = atoi(optarg);
+			if (samples <= 0) {
+				fprintf (stderr, "Argument for -%c must be positive.\n", arg);
+				return;
+			}
+		} else if (arg == '?' || arg == ':') {
+			if (optopt == 'n' || optopt == 'o' || optopt == 'i') {
+				fprintf (stderr, "Option -%c requires an argument.\n", optopt);
+				return;
+			} else {
+				fprintf (stderr, "Option -%c not recognized.\n", optopt);
+				return;
+			}
+		} else {
+			abort();
+		}
+	}
+
+	fprintf(stdout, "# Line Intersection (repetition, sample 1, sample 2, ... sample n)\n");
+	fflush(stdout);
+
+	{
+		uint64_t tally = 0;
+        uint64_t tallygates = 0;
+        uint64_t tallybytes = 0;
+		int64_t runbytes = 0;
+		int64_t rungates = 0;
+		int64_t runtime = 0;
+		fprintf(stdout, "(%d, ", n);
+		fflush(stdout);
+        OLine l1; OLine l2;
+        OPoint p;
+		for (int kk = 0; kk < samples; kk++) {
+            for (int ii = 0; ii < n; ii++) {
+                l1.S.x = feedOblivFloat(rand_float(), 1);
+                l1.S.y = feedOblivFloat(rand_float(), 1);
+                l1.E.x = feedOblivFloat(rand_float(), 1);
+                l1.E.y = feedOblivFloat(rand_float(), 1);
+
+                l2.S.x = feedOblivFloat(rand_float(), 1);
+                l2.S.y = feedOblivFloat(rand_float(), 1);
+                l2.E.x = feedOblivFloat(rand_float(), 1);
+                l2.E.y = feedOblivFloat(rand_float(), 1);
+
+
+                runbytes = tcp2PBytesSent(ocCurrentProto());
+                rungates = yaoGateCount();
+                runtime = current_timestamp();
+                line_insect(&p, &l1, &l2);
+                runtime = current_timestamp() - runtime;
+                rungates = yaoGateCount() - rungates;
+                runbytes = tcp2PBytesSent(ocCurrentProto()) - runbytes;
+                tally += runtime;
+                tallygates += rungates;
+                tallybytes += runbytes;
+            }
+			fprintf(stdout, ",(%llu,%llu,%llu)", tally, tallygates, tallybytes);
+			fflush(stdout);
+			{	
+				// int oo;
+				// revealOblivInt(&oo, out, 0);
+				// fprintf(stderr, "Output: ");
+				// if ( oo == -1 ){
+				// 	fprintf(stderr, "Not contain.");
+				// }else if ( oo == 1){
+				// 	fprintf(stderr, "Contain");
+				// }else {
+				// 	fprintf(stderr, "At edge");
+				// }
+				// fprintf(stderr,"\n");
+			}
+			
+		}
+		fprintf(stdout, "\n");
+		fprintf(stderr, "Line Insection (% times): %llu microseconds avg, %llu gates avg, %llu bytes avg\n", n, tally/samples, tallygates/samples, tallygates/samples);
+	}
+
+}

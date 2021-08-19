@@ -1,48 +1,53 @@
 #include "point_contain.oh"
-// #include "oram.oh"
-// #include "oqueue.oh"
-#include "copy.oh"
-#include "assert.h"
 
 // Ax+By+C=0, from (x1, y1) to (x2, y2)
-static obliv int direction(obliv float tx, obliv float ty, obliv float x1, obliv float y1, obliv float x2, obliv float y2){
-    obliv float A = y2-y1;
-    obliv float B = x1-x2;
-    obliv float C = x2*y1-x1*y2;
-    obliv float D = A*tx + B*ty + C;
-    obliv bool res = D > 0 - D < 0;
+// x1y2-x2y1
+obliv int direction(OPoint *p, OVector *v){
+    obliv float x1 = v->begin.x; - p->x;
+    obliv float y1 = v->begin.y - p->y;
+    obliv float x2 = v->end.x - v->begin.x;
+    obliv float y2 = v->end.y - v->begin.y;
+    obliv float delta = x1 * y2 - x2 * y1;
+    obliv int res = (delta > 0.0f) - (delta < 0.0f);
     return res;
 }
-void point_contain_raw(obliv int *out, obliv float tx, obliv float ty, obliv float *X, obliv float*Y, int n){
-    // obliv int rand = ;
+
+void point_contain(obliv int *out, OPoint *p, OVector *v, int size){
     *out = 1;
-    obliv int first_d = direction(tx, ty, X[0], Y[0], X[1], Y[1]);
-    for (int i = 1; i < n; i++) {
-        obliv int next_d = direction(tx, ty, X[i], Y[i], X[i+1], Y[i+1]);
+    obliv int first_d = direction(p, &v[0]);
+    obliv bool findout = false;
+    for (int i = 1; i < size; i++) {
+        obliv int next_d = direction(p, &v[i]);
         obliv bool at_edge = first_d == 0 | next_d == 0;
-        obliv if (at_edge) {
+        obliv if (at_edge){
             *out = 0;
-        }else {
+            findout = true;
+        }else obliv if ( findout == false ){
             obliv if (first_d != next_d) {
                 *out = -1;
+                findout = true;
             }
         }
     }
 }
 
-void point_contain_opt(obliv int *out, obliv float tx, obliv float ty, obliv float *X, obliv float*Y, int n){
-
-    // obliv int rand = ;
+void point_contain_opt(obliv int *out, OPoint *p, OVector *v, int size){
     *out = 1;
-    obliv int first_d = direction(tx, ty, X[0], Y[0], X[1], Y[1]);
-    for (int i = 1; i < n; i++) {
-        obliv int next_d = direction(tx, ty, X[i], Y[i], X[i+1], Y[i+1]);
+    obliv int first_d = direction(p, &v[0]);
+    for (int i = 1; i < size; i++) {
+        obliv int next_d = direction(p, &v[i]);
         obliv bool at_edge = first_d == 0 | next_d == 0;
-        obliv if (at_edge) {
+        bool findout;
+        revealOblivBool(&findout, at_edge, 0);
+        if (findout) {
             *out = 0;
-        }else {
-            obliv if (first_d != next_d) {
+            break;
+        } else {
+            obliv bool diff_direct = first_d != next_d;
+            revealOblivBool(&findout, diff_direct, 0);
+            if (findout) {
                 *out = -1;
+                break;
             }
         }
     }

@@ -22,9 +22,10 @@ OBJS=$(DEPS) $(ORAM_DEPS) obig.oo ochacha.oo ograph.oo omatch.oo omatch_textbook
 		binary_search.oo \
 		linear_search.oo\
 		almost_search.oo \
+		naive_psi.oo \
+		line_insect.oo \
 		point_contain.oo \
-		max_three.oo max.oo second_max.oo \
-		naive_psi.oo 
+		max_three.oo max.oo second_max.oo 
 
 TEST_PATH=tests/
 TEST_OUT_PATH=build/tests/
@@ -37,7 +38,10 @@ TEST_BINS = test_obig test_osha256 test_osha512 test_osalsa test_ochacha test_oa
 		bench_binary_search bench_binary_search_opt \
 		bench_linear_search bench_linear_search_opt \
 		bench_almost_search bench_almost_search_opt \
-		bench_point_contain bench_max_three bench_max bench_second_max bench_naive_psi 
+		bench_naive_psi bench_naive_psi_opt \
+		bench_line_insect bench_line_insect_opt \
+		bench_point_contain \
+		bench_max_three bench_max bench_second_max  
 
 default: $(ACKLIB) tests
 

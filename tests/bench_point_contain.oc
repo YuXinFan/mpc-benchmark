@@ -12,13 +12,13 @@
 
 
 #define TEXT_HELP_SUPPLEMENTARY "\
-  -n \x1b[4mNUMBER\x1b[0m, --vertices=\x1b[4mNUMBER\x1b[0m \n\t\tsimulate \x1b[4mNUMBER\x1b[0m pairs of participants\n\n\
+  -n \x1b[4mNUMBER\x1b[0m, --vertices=\x1b[4mNUMBER\x1b[0m \n\t\tsimulate \x1b[4mNUMBER\x1b[0m vertices\n\n\
   -o \x1b[4mTYPE\x1b[0m, --oram-type=\x1b[4mTYPE\x1b[0m \n\t\tforce all ORAMs to be \x1b[4mTYPE\x1b[0m ORAMs. Valid types are \033[1msqrt\033[0m, \033[1mcircuit\033[0m, and \033[1mlinear\033[0m.\n\n\
   -i \x1b[4mNUMBER\x1b[0m, --samples=\x1b[4mNUMBER\x1b[0m \n\t\trun \x1b[4mNUMBER\x1b[0m iterations of the benchmark\n\n"
 
-#define RANGE_MAX 10000
+#define RANGE_MAX 1000
 
-static const char TESTNAME[] = "PointContain_benchmark";
+static const char TESTNAME[] = "point_contain_benchmark";
 static const char options_string[] = "n:o:i:";
 static struct option long_options[] = {
 	{"vertices", required_argument, NULL, 'n'},
@@ -42,12 +42,6 @@ struct option* get_long_options() {
 void print_supplementary_help() {
 	fprintf(stderr, TEXT_HELP_SUPPLEMENTARY);
 }
-
-struct Point{
-        float x;
-        float y;
-};
-typedef struct Point Point;
 
 void shuffle(uint32_t *array, size_t n) {
 	if (n > 1) {
@@ -280,26 +274,38 @@ void test_main(void*varg) {
 		fprintf(stdout, "(%d, ", n);
 		fflush(stdout);
 
-		Point* poly = gen_convex_poly(n);
-		obliv float *X = malloc(n * sizeof(obliv float));
-		obliv float *Y = malloc(n * sizeof(obliv float));
+		OVector *v = malloc(n*sizeof(OVector));
+		OPoint p;
+		obliv int out;
 		for (int kk = 0; kk < samples; kk++) {
-			for (int ll = 0; ll < n; ll++) {
-				X[ll] = feedOblivFloat(poly[ll].x, 1);
-				Y[ll] = feedOblivFloat(poly[ll].y, 1);
+			Point* poly = gen_convex_poly(n);
+			for(int i = 0; i < n; i++) {
+				//fprintf(stderr, "(%f, %f)\n", poly[i].x, poly[i].y);
 			}
+			for (int ll = 0; ll < n-1; ll++) {
+				v[ll].begin.x = feedOblivFloat(poly[ll].x, 1);
+				v[ll].begin.y = feedOblivFloat(poly[ll].y, 1);
+
+				v[ll].end.x = feedOblivFloat(poly[ll+1].x, 1);
+				v[ll].end.y = feedOblivFloat(poly[ll+1].y, 1);
+			}
+			v[n-1].begin.x = feedOblivFloat(poly[n-1].x, 1);
+			v[n-1].begin.y = feedOblivFloat(poly[n-1].y, 1);
+
+			v[n-1].end.x = feedOblivFloat(poly[0].x, 1);
+			v[n-1].end.y = feedOblivFloat(poly[0].y, 1);
+
 			float tx = ((float)rand()/(float)(RAND_MAX)) * RANGE_MAX;
 			float ty = ((float)rand()/(float)(RAND_MAX)) * RANGE_MAX;
+			//fprintf(stderr, "(%f, %f)\n", tx, ty);
 
-			obliv float ttx = feedOblivFloat(tx ,2);
-			obliv float tty = feedOblivFloat(ty ,2);
-
-			obliv int out;
+			p.x = feedOblivFloat(tx ,2);
+			p.y = feedOblivFloat(ty ,2);
 
 			runbytes = tcp2PBytesSent(ocCurrentProto());
 			rungates = yaoGateCount();
 			runtime = current_timestamp();
-			point_contain_raw(&out, ttx, tty, X, Y, n);
+			point_contain_opt(&out, &p, v, n);
 			runtime = current_timestamp() - runtime;
 			rungates = yaoGateCount() - rungates;
 			runbytes = tcp2PBytesSent(ocCurrentProto()) - runbytes;

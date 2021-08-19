@@ -3,6 +3,22 @@
 
 #include <obliv.oh>
 
-void point_contain_raw(obliv int*, obliv float, obliv float, obliv float*, obliv float*, int n);
-void point_contain_opt(obliv int*, obliv float, obliv float, obliv float*, obliv float*, int n);
+typedef struct OblivPoint {
+    obliv float x;
+    obliv float y;
+}OPoint;
+
+typedef struct Point {
+    float x;
+    float y;
+}Point;
+
+typedef struct OblivVector {
+    OPoint begin;
+    OPoint end;
+}OVector;
+
+void point_contain(obliv int*, OPoint *p, OVector *v, int size);
+void point_contain_opt(obliv int*, OPoint *p, OVector *v, int size);
+
 #endif 

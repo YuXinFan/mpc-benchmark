@@ -142,7 +142,7 @@ void test_main(void*varg) {
 			runbytes = tcp2PBytesSent(ocCurrentProto());
 			rungates = yaoGateCount();
 			runtime = current_timestamp();
-            naive_psi(out, oarrA, oarrB, n);
+            naive_psi_opt(out, oarrA, oarrB, n);
 			runtime = current_timestamp() - runtime;
 			rungates = yaoGateCount() - rungates;
 			runbytes = tcp2PBytesSent(ocCurrentProto()) - runbytes;
