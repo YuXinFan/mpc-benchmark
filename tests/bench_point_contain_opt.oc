@@ -270,6 +270,9 @@ void test_main(void*varg) {
 
 	{
 		uint64_t tally = 0;
+		uint64_t tallyBytes = 0;
+		uint64_t tallyGates = 0;
+
 		int64_t runbytes = 0;
 		int64_t rungates = 0;
 		int64_t runtime = 0;
@@ -310,11 +313,14 @@ void test_main(void*varg) {
 			point_contain(&out, &p, v, n);
 			runtime = current_timestamp() - runtime;
 			rungates = yaoGateCount() - rungates;
-			runbytes = tcp2PBytesSent(ocCurrentProto()) - runbytes;
+			runbytes = tcp2PBytesSent(ocCurrentProto()) - runbytes; 
+
+			tally += runtime;
+            tallyBytes += runbytes;
+            tallyGates += rungates;
 
 			fprintf(stdout, ",(%llu,%llu,%llu)", runtime, rungates, runbytes);
 			fflush(stdout);
-			tally += runtime;
 			{	
 				// int oo;
 				// revealOblivInt(&oo, out, 0);
@@ -332,43 +338,7 @@ void test_main(void*varg) {
 			
 		}
 		fprintf(stdout, "\n");
-		fprintf(stderr, "Point Contain (vertices:%d): %llu microseconds avg, %llu gates avg, %llu bytes avg\n", n, tally/samples, rungates, runbytes);
-
-		
-		// tally = 0;
-		// fprintf(stdout, "%d", pairs);
-		// fflush(stdout);
-		// for (int kk = 0; kk < samples; kk++) {
-		// 	for (int ll = 0; ll < pairs; ll++) {
-		// 		shuffle(perm, pairs);
-		// 		for (int jj = 0; jj < pairs; jj++) {
-		// 			mPrefs[ll * pairs + jj] = feedOblivInt(perm[jj], 2);
-		// 		}
-		// 		for (int jj = 0; jj < pairs; jj++) {
-		// 			wPrefs[ll * pairs + jj] = feedOblivInt(perm[jj], 1);
-		// 		}
-		// 	}
-
-		// 	runbytes = tcp2PBytesSent(ocCurrentProto());
-		// 	rungates = yaoGateCount();
-		// 	runtime = current_timestamp();
-		// 	ogale_shapley_textbook_revealed(output, mPrefs, wPrefs, pairs);
-		// 	runtime = current_timestamp() - runtime;
-		// 	rungates = yaoGateCount() - rungates;
-		// 	runbytes = tcp2PBytesSent(ocCurrentProto()) - runbytes;
-		// 	fprintf(stdout, ",(%llu,%llu,%llu)", runtime, rungates, runbytes);
-		// 	fflush(stdout);
-		// 	tally += runtime;
-
-		// }
-
-		// free(perm);
-		// free(mPrefs);
-		// free(wPrefs);
-		// free(output);
-
-		// fprintf(stdout, "\n");
-		// fprintf(stderr, "Gale Shapley Revealed (pairs:%d): %llu microseconds avg, %llu gates avg, %llu bytes avg\n", pairs, tally/samples, rungates, runbytes);
+		fprintf(stderr, "Point Contain OPT(vertices:%d): %llu microseconds avg, %llu gates avg, %llu bytes avg\n", n, tally/samples, tallyGates/samples, tallyBytes/samples);
 	}
 
 }

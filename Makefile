@@ -40,7 +40,7 @@ TEST_BINS = test_obig test_osha256 test_osha512 test_osalsa test_ochacha test_oa
 		bench_almost_search bench_almost_search_opt \
 		bench_naive_psi bench_naive_psi_opt \
 		bench_line_insect bench_line_insect_opt \
-		bench_point_contain \
+		bench_point_contain bench_point_contain_opt \
 		bench_max_three bench_max bench_second_max  
 
 default: $(ACKLIB) tests

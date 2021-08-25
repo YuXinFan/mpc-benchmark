@@ -5,3 +5,5 @@
 *.oo
 build
 .vscode/
+raw/klee-*
+raw/klee-*/*

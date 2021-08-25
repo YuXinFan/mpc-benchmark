@@ -3,7 +3,7 @@
 // Ax+By+C=0, from (x1, y1) to (x2, y2)
 // x1y2-x2y1
 obliv int direction(OPoint *p, OVector *v){
-    obliv float x1 = v->begin.x; - p->x;
+    obliv float x1 = v->begin.x - p->x;
     obliv float y1 = v->begin.y - p->y;
     obliv float x2 = v->end.x - v->begin.x;
     obliv float y2 = v->end.y - v->begin.y;
