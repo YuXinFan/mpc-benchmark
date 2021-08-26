@@ -1,4 +1,5 @@
 import re
+import os
 file1 = open("klee-out.txt","r+") 
 content = file1.read()
 content = content.replace("\t", " ")
@@ -7,52 +8,79 @@ content = content.replace("\r", " ")
 content = content.replace("  ", " ")
 #print (content)
 
+class Constraint:
+    
+    def __init__(self, type, expr, val, total, now):
+        self.type = type
+        self.total = expr
+        self.now = now
+        self.expr = expr
+        self.val = val
+
+    def getType(self):
+        return self.type
+
+    def toKqueryExpr(self):
+        return "(Eq %s (%s))\n" % (self.val, self.expr)
+
+def loadDecl():
+    # find klee-last folder
+    klee_last_folder = "./klee-last/"
+    # load context from test*.kquery file
+    kquery_file = "test000001.kquery"
+    kquery = open(klee_last_folder+kquery_file, "r+").read()
+    kquery = kquery.replace("\t", " ")
+    kquery = kquery.replace("\r", " ")
+    kquery = kquery.replace("  ", " ")
+    # load decl from context 
+    decl = re.split("\n\(query", kquery)[0]
+    
+    return decl
 
 def match(stream):
-    regex = r"is (\d+), total (\d+), now (\d+)-th:\((.*)\) == (0|1) "
+    regex = r"Output is (\d+), total (\d+), now (\d+)-th:\((.*)\) == (0|1) "
     
     match = re.search(regex, stream) 
     if match != None: 
-        
-        # We reach here when the expression "([a-zA-Z]+) (\d+)" 
-        # matches the date string. 
-        
-        # This will print [14, 21), since it matches at index 14 
-        # and ends at 21.  
-        print("Match at index % s, % s" % (match.start(), match.end()))
-        
-        # We us group() method to get all the matches and 
-        # captured groups. The groups contain the matched values. 
-        # In particular: 
-        # match.group(0) always returns the fully matched string 
-        # match.group(1) match.group(2), ... return the capture 
-        # groups in order from left to right in the input string 
-        # match.group() is equivalent to match.group(0) 
-        
-        # So this will print "June 24" 
-        print("Full match: % s" % (match.group(0)))
-        # So this will print "June" 
-        print("Result is: % s" % (match.group(1)))
-        
-        # So this will print "24" 
-        print("Total is: % s" % (match.group(2)))
-        print("Now is: % s" % (match.group(3)))
-        print("Expr is: % s" % (match.group(4)).replace("  "," "))
-
-        print("Value is: % s" % (match.group(5)))
-        
-
-        
+        return Constraint(match.group(1), match.group(4), match.group(5), match.group(2), match.group(3))
     else: 
-        print("The regex pattern does not match.")
+        return None
 
-def findall(stream):
-    stream = re.split("Output", stream)
+def findall(decl, stream):
+    stream = re.split("MARK:", stream)
+    types = {}
+    constrs = []
     for each in stream[1:]:
-        match(each)
-        print("\n")
+        m = match(each)
+        if (m is None):
+            pass
+        else:
+            if m.type in types.keys():
+                idx = types.get(m.type)
+                constrs[idx].append(m)
+            else:
+                types[m.type] = len(constrs)
+                constrs.append([m])
+    folder = "./verifies"
+    if not os.path.isdir(folder):
+        os.mkdir(folder)
+    kquery = decl 
+    qIdx = 0
+    for type in types.items():
+        kquery = kquery + "\n# query %d, type %s\n(query [\n" % (qIdx, type[0])
+        qIdx = qIdx + 1
+        for each in constrs[type[1]]:
+            kquery = kquery + each.toKqueryExpr()
+        kquery = kquery + "] false )"
+    file_name = "query.kquery"
+    w = open(folder+"/"+file_name, "w+")
+    w.write(kquery)
+    w.close()
+    cmd = "kleaver %s/%s" % (folder, file_name)
+    os.system(cmd)
 
 def main():
-    findall(content)
+    decl = loadDecl()
+    findall(decl, content)
 
 main()

@@ -42,7 +42,10 @@ static inline void revealOblivBool(bool *a, bool aa, int party){
 void max_three_opt(int *o, int *a, int *b, int *c){
     *o = 0;
     int max = *a;
-    if (max < *b) {
+    bool oll = max < *b;
+    bool ll;
+    revealOblivBool(&ll, oll, 0);
+    if (ll) {
         max = *b;
         *o = 1;
     }
@@ -64,14 +67,13 @@ int main() {
     klee_make_symbolic(&b, sizeof(b), "secret_b");
     klee_make_symbolic(&c, sizeof(c), "secret_c");
     klee_make_symbolic(&o, sizeof(o), "o");
-
     max_three_opt(&o, &a, &b, &c);
     
     char *label = (char *)malloc(sizeof(char)*100);
     char output[10];
     sprintf(output,"%d",o);
     for (int j = 0; j < i; j++) {
-        sprintf(label, "Output is %d, total %d, now %d-th", o, i, j+1);
+        sprintf(label, "MARK:Output is %d, total %d, now %d-th", o, i, j+1);
         const char *const_res =  label;
         klee_print_range(const_res, A[j].expr);
     }

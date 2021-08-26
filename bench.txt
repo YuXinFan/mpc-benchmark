@@ -318,3 +318,31 @@ Executing test: naive_psi_benchmark
 Executing test: naive_psi_benchmark
 Role: 2/Client
 Role: 1/Server
+
+------      ------      ------ bench_naive_psi_opt -n 10 -i 10
+Executing test: naive_psi_benchmark
+Role: 2/Client
+Executing test: naive_psi_benchmark
+Role: 1/Server
+NAIVE PSI: 2196 microseconds avg, 1798 gates avg, 58 bytes avg
+Total time: 0.251882 s
+NAIVE PSI: 2257 microseconds avg, 1798 gates avg, 57594 bytes avg
+Total time: 0.251947 s
+------      ------      ------bench_naive_psi_opt -n 100 -i 10
+Executing test: naive_psi_benchmark
+Role: 2/Client
+Executing test: naive_psi_benchmark
+Role: 1/Server
+NAIVE PSI: 209520 microseconds avg, 207452 gates avg, 6692 bytes avg
+Total time: 2.403585 s
+NAIVE PSI: 209590 microseconds avg, 207452 gates avg, 6645156 bytes avg
+Total time: 2.403591 s
+------      ------      ------  bench_naive_psi_opt -n 1000 -i 10
+Executing test: naive_psi_benchmark
+Role: 2/Client
+Executing test: naive_psi_benchmark
+Role: 1/Server
+NAIVE PSI: 21840869 microseconds avg, 20585519 gates avg, 664049 bytes avg
+Total time: 219.504576 s
+NAIVE PSI: 21840962 microseconds avg, 20585519 gates avg, 659400657 bytes avg
+Total time: 219.504659 s
