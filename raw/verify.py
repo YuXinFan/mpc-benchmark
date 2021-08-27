@@ -37,8 +37,14 @@ def loadDecl():
     
     return decl
 
+def AndCat(l):
+    if len(l) == 1:
+        return l[0].toKqueryExpr()
+    else:
+        return "(And " + l[0].toKqueryExpr() + AndCat(l[1:]) + ")"
+
 def match(stream):
-    regex = r"Output is (\d+), total (\d+), now (\d+)-th:\((.*)\) == (0|1) "
+    regex = r"Output is ([-]?\d+), total (\d+), now (\d+)-th:\((.*)\) == (0|1) "
     
     match = re.search(regex, stream) 
     if match != None: 
@@ -67,11 +73,10 @@ def findall(decl, stream):
     kquery = decl 
     qIdx = 0
     for type in types.items():
-        kquery = kquery + "\n# query %d, type %s\n(query [\n" % (qIdx, type[0])
+        kquery = kquery + "\n# query %d, type %s\n(query [ ]\n (Not " % (qIdx, type[0])
         qIdx = qIdx + 1
-        for each in constrs[type[1]]:
-            kquery = kquery + each.toKqueryExpr()
-        kquery = kquery + "] false )"
+        kquery = kquery + AndCat(constrs[type[1]])
+        kquery = kquery + "))"
     file_name = "query.kquery"
     w = open(folder+"/"+file_name, "w+")
     w.write(kquery)
