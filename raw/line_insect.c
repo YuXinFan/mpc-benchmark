@@ -11,6 +11,8 @@
 #define d0 B->E.x
 #define d1 B->E.y
 
+#define float int 
+
 typedef struct Point{
     float x;
     float y;
@@ -29,6 +31,7 @@ typedef struct OblivLine{
 void line_insect_opt(OPoint *p, OLine *A, OLine *B){
     float area_abc = (a0 - c0) * (b1 - c1) - (a1 - c1) * (b0 - c0);
     float area_abd = (a0 - d0) * (b1 - d1) - (a1 - d1) * (b0 - d0);
+    checker_assume(area_abc != area_abd);
     bool is_cd_same_side_of_ab = (area_abc * area_abd) >= 0;
 
     float area_cda = (c0 - a0) * (d1 - a1) - (c1 - a1) * (d0 - a0);
@@ -39,8 +42,10 @@ void line_insect_opt(OPoint *p, OLine *A, OLine *B){
     bool is_not_insect;
     revealOblivBool(&is_not_insect, ois_not_insect, 0);
     if (is_not_insect){
-        p->x = FLT_MIN;
-        p->y = FLT_MIN;
+        // p->x = FLT_MIN;
+        // p->y = FLT_MIN;
+        p->x = INT_MIN;
+        p->y = INT_MIN;
     }else{
         float t = area_cda / ( area_abd - area_abc );
         float dx= t * (b0 - a0);
@@ -83,7 +88,8 @@ int main(){
   
     OPoint p;
     line_insect_opt(&p, &l1, &l2);
-    checker_check_float(p.x);
+    checker_check_int(p.x);
+    //checker_check_float(p.x);
 
     return 0;
 }

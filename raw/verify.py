@@ -23,7 +23,7 @@ class Constraint:
     def toKqueryExpr(self):
         return "(Eq %s (%s))\n" % (self.val, self.expr)
 
-def loadDecl():
+def load_decls():
     # find klee-last folder
     klee_last_folder = "./klee-last/"
     # load context from test*.kquery file
@@ -39,12 +39,35 @@ def loadDecl():
 
 def AndCat(l):
     if len(l) == 1:
-        return l[0].toKqueryExpr()
+        return "(Eq %s (%s))\n" % (l[0][1], l[0][0])
     else:
-        return "(And " + l[0].toKqueryExpr() + AndCat(l[1:]) + ")"
+        andcat = ""
+        lbracket = 0
+        for i in range(0, len(l)-1):
+            andcat  = andcat + "(And " + "(Eq %s %s)\n" % (l[i][1], l[i][0]) + " "
+            lbracket = lbracket + 1
+        andcat = andcat + "(Eq %s %s)\n" % (l[len(l)-1][1], l[len(l)-1][0]) + ")"*lbracket
+        return andcat 
 
-def match(stream):
-    regex = r"Output is ([-]?\d+), total (\d+), now (\d+)-th:\((.*)\) == (0|1) "
+def find_assume(stream):
+    regex = r"Assume:(\([\(0-9a-zA-Z\_\ \)]*\))"
+    assume = re.search(regex, stream)
+    if assume != None:
+        return "(Eq 1 %s)" % assume.group(1)
+    else:
+        return None 
+
+def load_assumes(stream):
+    stream = re.split("Part-A:", stream)
+    assumes = []
+    for each in stream:
+        l = find_assume(each)
+        if not (l is None):
+            assumes.append(l)
+    return assumes 
+
+def find_constraint(stream):
+    regex = r"Output is ([\(\-\d+,\)]*), total (\d+), now (\d+)-th:\((.*)\) == (0|1) "
     
     match = re.search(regex, stream) 
     if match != None: 
@@ -52,40 +75,89 @@ def match(stream):
     else: 
         return None
 
-def findall(decl, stream):
-    stream = re.split("MARK:", stream)
-    types = {}
-    constrs = []
-    for each in stream[1:]:
-        m = match(each)
-        if (m is None):
-            pass
+def make_assumes(part):
+    return ["(Eq 1 %s)\n" % x for x in part]
+
+def make_constraints(partB, partC):
+    # sort by id 
+    # construct expr for each id 
+    # merge same id
+    # one expr --> multi-id 
+    # one id --> multi-constraint
+    
+    # sort by id 
+    def cmp_id(l):
+        return int(l[0])
+    def cmp_idx(l):
+        return int(l[1])
+    def cmp_result(l):
+        return l[1]
+
+    # ret expr --> milti-id
+    sorted_parts = sorted(partB, key=cmp_id)
+    ret_ids_map = {}
+    id_exprs_map = {}
+    for i in range(0, len(sorted_parts), 4):
+        part = sorted(sorted_parts[i:i+4], key=cmp_idx)
+        if part[0][0] in id_exprs_map.keys():
+            print(part[0][0])
+            #exit("more then 4")
         else:
-            if m.type in types.keys():
-                idx = types.get(m.type)
-                constrs[idx].append(m)
+            id_exprs_map[part[0][0]] = []
+            ret =", ".join([x[2] for x in part])
+            if ret in ret_ids_map.keys():
+                ret_ids_map[ret].append(part[0][0])
             else:
-                types[m.type] = len(constrs)
-                constrs.append([m])
+                ret_ids_map[ret] = [part[0][0]]
+    print("%d different results" % len(ret_ids_map.keys()))
+
+    # id --> multi-constraints
+    for i in partC:
+        id_exprs_map[i[0]].append((i[3],i[4]))
+    
+    ret_exprs_map = {}
+    for ret in ret_ids_map.keys():
+        all_exprs = [x for id in ret_ids_map[ret] for x in id_exprs_map[id]]
+        const_expr = "(Not " + AndCat(all_exprs) + ")"    
+        ret_exprs_map[ret] = const_expr
+    # ret expr --> constraints
+    return ret_exprs_map
+
+
+def make_query(decls, assumes, constraints):
     folder = "./verifies"
     if not os.path.isdir(folder):
         os.mkdir(folder)
-    kquery = decl 
+    kquery = decls 
+    assumes = " ".join(assumes)
     qIdx = 0
-    for type in types.items():
-        kquery = kquery + "\n# query %d, type %s\n(query [ ]\n (Not " % (qIdx, type[0])
+    for ret_expr in constraints.keys():
+        kquery = kquery + "\n# query %d, ret expr %s\n" % (qIdx, ret_expr) \
+             + "(query [ " + assumes + "]\n" \
+             + constraints[ret_expr] + ")" 
         qIdx = qIdx + 1
-        kquery = kquery + AndCat(constrs[type[1]])
-        kquery = kquery + "))"
     file_name = "query.kquery"
     w = open(folder+"/"+file_name, "w+")
     w.write(kquery)
     w.close()
-    cmd = "kleaver %s/%s" % (folder, file_name)
-    os.system(cmd)
+    #cmd = "kleaver %s/%s" % (folder, file_name)
+    #os.system(cmd)
 
 def main():
-    decl = loadDecl()
-    findall(decl, content)
+    #decls = load_decls()
+    decls = ""
+    partA = re.findall(r"\[Part\-A\] Assume:(\([\(0-9a-zA-Z\_\ \)]*\))", content)
+    assumes = make_assumes(partA)
+    partB = re.findall(r"\[Part\-B\] id (-?\d+), array idx (\d+):(\([\(0-9a-zA-Z\_\ \)]*\)|-?\d+)", content)
+    #print(partB)[Part-C] id 1502742394, total 6, now 1-th:(ZExt w32 (Extract 0 (
+    partC = re.findall(r"\[Part\-C\] id (-?\d+), total (\d+), now (\d+)\-th:(\([\(0-9a-zA-Z\_\ \)]*\)|-?\d+) == (0|1)", content)
+    constraints = make_constraints(partB, partC)
+    #assumes = load_assumes()
+    #print(partC)
+    print(assumes)
+    # decls, assumes, constraints
+    make_query(decls, assumes, constraints)
+    #constraints = load_constraints(splits[1:])
+    #gen_queries(decls, assumes, constraints)
 
 main()
