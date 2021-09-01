@@ -23,6 +23,7 @@ def load_decls():
     return decl
 
 def AndCat(l):
+    #print("AndCat", l)
     if len(l) == 1:
         return "(Eq %s %s)\n" % (l[0][1], l[0][0])
     else:
@@ -67,6 +68,7 @@ def make_constraints(partB, partC):
         for i in range(0, len(sorted_parts), 4):
             part = sorted(sorted_parts[i:i+4], key=cmp_idx)
             if part[0][0] in id_exprs_map.keys():
+                os.error("morethan 4")
                 print("morethan 4:", part[0][0])
                 #exit("more then 4")
             else:
@@ -77,7 +79,7 @@ def make_constraints(partB, partC):
                 else:
                     ret_ids_map[ret] = [part[0][0]]
     print("%d different results" % len(ret_ids_map.keys()))
-    print(ret_ids_map)
+    #print(ret_ids_map)
 
     # id --> multi-constraints
     for i in partC:
@@ -118,16 +120,15 @@ def main():
     isArray = False
     partA = re.findall(r"\[Part\-A\] Assume:(\([\(0-9a-zA-Z\_\ \)]*\))", content)
     assumes = make_assumes(partA)
-    print("Assumes:\n", partA)
+    #print("Assumes:\n", partA)
     partB = re.findall(r"\[Part\-B\] id (-?\d+), array idx (\d+):(\([\(0-9a-zA-Z\_\ \)]*\)|-?\d+)", content)
     #print(partB)[Part-C] id 1502742394, total 6, now 1-th:(ZExt w32 (Extract 0 (
-    print("Array:\n",partB)
-    partC = re.findall(r"\[Part\-C\] id is (-?\d+), total (\d+), now (\d+)\-th:(\([\(0-9a-zA-Z\_\ \)]*\)|-?\d+) == (0|1)", content)
-    print("Constraints:\n", partC)
+    #print("Array:\n",partB)
+    partC = re.findall(r"\[Part\-C\] id (-?\d+), total (\d+), now (\d+)\-th:(\([\(0-9a-zA-Z\_\ \)]*\)|-?\d+) == (0|1)", content)
+    #print("Constraints:\n", partC)
     constraints = make_constraints(partB, partC)
     #assumes = load_assumes()
     #print(partC)
-    print(assumes)
     # decls, assumes, constraints
     make_query(decls, assumes, constraints)
     #constraints = load_constraints(splits[1:])

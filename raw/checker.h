@@ -47,6 +47,8 @@ void checker_check_int8_array(int8_t *o, int size){
     l = l + rand();
     srand(time(0));
     l = l + rand();
+    srand(ChecherIDX);
+    l = l + rand();
     #pragma clang loop unroll(full)
     for (int ii = 0; ii < size; ii++) {
         snprintf(ll, 64, "[Part-B] id %d, array idx %d", l, ii);
