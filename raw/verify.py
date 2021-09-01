@@ -8,21 +8,6 @@ content = content.replace("\r", " ")
 content = content.replace("  ", " ")
 #print (content)
 
-class Constraint:
-    
-    def __init__(self, type, expr, val, total, now):
-        self.type = type
-        self.total = expr
-        self.now = now
-        self.expr = expr
-        self.val = val
-
-    def getType(self):
-        return self.type
-
-    def toKqueryExpr(self):
-        return "(Eq %s (%s))\n" % (self.val, self.expr)
-
 def load_decls():
     # find klee-last folder
     klee_last_folder = "./klee-last/"
@@ -39,7 +24,7 @@ def load_decls():
 
 def AndCat(l):
     if len(l) == 1:
-        return "(Eq %s (%s))\n" % (l[0][1], l[0][0])
+        return "(Eq %s %s)\n" % (l[0][1], l[0][0])
     else:
         andcat = ""
         lbracket = 0
@@ -49,31 +34,6 @@ def AndCat(l):
         andcat = andcat + "(Eq %s %s)\n" % (l[len(l)-1][1], l[len(l)-1][0]) + ")"*lbracket
         return andcat 
 
-def find_assume(stream):
-    regex = r"Assume:(\([\(0-9a-zA-Z\_\ \)]*\))"
-    assume = re.search(regex, stream)
-    if assume != None:
-        return "(Eq 1 %s)" % assume.group(1)
-    else:
-        return None 
-
-def load_assumes(stream):
-    stream = re.split("Part-A:", stream)
-    assumes = []
-    for each in stream:
-        l = find_assume(each)
-        if not (l is None):
-            assumes.append(l)
-    return assumes 
-
-def find_constraint(stream):
-    regex = r"Output is ([\(\-\d+,\)]*), total (\d+), now (\d+)-th:\((.*)\) == (0|1) "
-    
-    match = re.search(regex, stream) 
-    if match != None: 
-        return Constraint(match.group(1), match.group(4), match.group(5), match.group(2), match.group(3))
-    else: 
-        return None
 
 def make_assumes(part):
     return ["(Eq 1 %s)\n" % x for x in part]
@@ -97,19 +57,27 @@ def make_constraints(partB, partC):
     sorted_parts = sorted(partB, key=cmp_id)
     ret_ids_map = {}
     id_exprs_map = {}
-    for i in range(0, len(sorted_parts), 4):
-        part = sorted(sorted_parts[i:i+4], key=cmp_idx)
-        if part[0][0] in id_exprs_map.keys():
-            print(part[0][0])
-            #exit("more then 4")
-        else:
-            id_exprs_map[part[0][0]] = []
-            ret =", ".join([x[2] for x in part])
-            if ret in ret_ids_map.keys():
-                ret_ids_map[ret].append(part[0][0])
+    if partB == []:
+        for t in partC:
+            if t[0] not in ret_ids_map.keys():
+                ret_ids_map[t[0]] = [t[0]]
+                id_exprs_map[t[0]] = []
+
+    else:
+        for i in range(0, len(sorted_parts), 4):
+            part = sorted(sorted_parts[i:i+4], key=cmp_idx)
+            if part[0][0] in id_exprs_map.keys():
+                print("morethan 4:", part[0][0])
+                #exit("more then 4")
             else:
-                ret_ids_map[ret] = [part[0][0]]
+                id_exprs_map[part[0][0]] = []
+                ret =", ".join([x[2] for x in part])
+                if ret in ret_ids_map.keys():
+                    ret_ids_map[ret].append(part[0][0])
+                else:
+                    ret_ids_map[ret] = [part[0][0]]
     print("%d different results" % len(ret_ids_map.keys()))
+    print(ret_ids_map)
 
     # id --> multi-constraints
     for i in partC:
@@ -122,6 +90,7 @@ def make_constraints(partB, partC):
         ret_exprs_map[ret] = const_expr
     # ret expr --> constraints
     return ret_exprs_map
+
 
 
 def make_query(decls, assumes, constraints):
@@ -146,11 +115,15 @@ def make_query(decls, assumes, constraints):
 def main():
     #decls = load_decls()
     decls = ""
+    isArray = False
     partA = re.findall(r"\[Part\-A\] Assume:(\([\(0-9a-zA-Z\_\ \)]*\))", content)
     assumes = make_assumes(partA)
+    print("Assumes:\n", partA)
     partB = re.findall(r"\[Part\-B\] id (-?\d+), array idx (\d+):(\([\(0-9a-zA-Z\_\ \)]*\)|-?\d+)", content)
     #print(partB)[Part-C] id 1502742394, total 6, now 1-th:(ZExt w32 (Extract 0 (
-    partC = re.findall(r"\[Part\-C\] id (-?\d+), total (\d+), now (\d+)\-th:(\([\(0-9a-zA-Z\_\ \)]*\)|-?\d+) == (0|1)", content)
+    print("Array:\n",partB)
+    partC = re.findall(r"\[Part\-C\] id is (-?\d+), total (\d+), now (\d+)\-th:(\([\(0-9a-zA-Z\_\ \)]*\)|-?\d+) == (0|1)", content)
+    print("Constraints:\n", partC)
     constraints = make_constraints(partB, partC)
     #assumes = load_assumes()
     #print(partC)

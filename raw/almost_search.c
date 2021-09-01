@@ -5,12 +5,20 @@ void binary_almost_search_opt_main(int *idx, int needle, int* arr, int l, int r)
         int mid = l + (r - l) / 2;
         // If the element is present at
         // one of the middle 3 positions
+        bool left = mid > l;
+        if ( left ){
+            left = arr[mid+1] == needle;
+        } 
+        bool right = mid < r;
+        if (right) {
+            right =  arr[mid+1] == needle;
+        }
         if (arr[mid] == needle){
             *idx = mid;
-        }else if ( (mid > l) & (arr[mid - 1] == needle) ){
-            *idx = (mid-1);
-        }else if ( (mid < r) & (arr[mid + 1] == needle) ){
-            *idx = (mid + 1);
+        }else if (left){
+                *idx = (mid-1);
+        }else if (right) {
+                *idx = (mid + 1);
         }else {
             bool ogt = arr[mid] > needle;
             bool gt;
@@ -33,17 +41,17 @@ int main(){
     int val;
     int idx = -1;
     checker_make_symbolic(&arr, sizeof(arr), "arr");
-    for(int i = 0; i < arr_size-2; i++){
-        checker_assume(arr[i]<arr[i+2]);
+    for (int i = 1; i < arr_size; i++) {
+        checker_assume(arr[i-1] < arr[i]);
     }
-    
-    for(int i = 2; i < arr_size; i++){
-        checker_assume(arr[i]>arr[i-2]);
-    }
+    // for(int i = 2; i < arr_size-2; i++){
+    //     checker_assume( ((arr[i-1]<arr[i]) & (arr[i] < arr[i+1])) |
+    //         ( (((arr[i] < arr[i-1]) & (arr[i-2] < arr[i])) & (arr[i-1]>arr[i+1]))) |
+    //         ( (((arr[i-1] < arr[i+1]) & (arr[i+1]<arr[i])) & (arr[i] < arr[i+2]))));
+    // }
+    // checker_assume( (arr[0] < arr[1]) | ((arr[1] < arr[0]) & (arr[0] < arr[2])));
+    // checker_assume( (arr[arr_size-2] < arr[arr_size-1]) | ((arr[arr_size-3] < arr[arr_size-1]) & (arr[arr_size-1] < arr[arr_size-2])));
 
-    for (int i = 0; i < arr_size-1; i++) {
-        checker_assume(arr[i] != arr[i+1]);
-    }
     checker_make_symbolic(&val, sizeof(val), "val");
 
     binary_almost_search_opt(&idx, val, arr, arr_size);
