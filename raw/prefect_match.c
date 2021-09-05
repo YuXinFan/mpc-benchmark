@@ -1,6 +1,6 @@
 #include "checker.h"
 
-#define N  4
+#define N  2
 
 // A structure to represent a queue
 typedef struct Queue {
@@ -215,12 +215,6 @@ char **gen_labels(const char *prefix, int nums, int nums2){
     return ptr;
 }
 
-int8_t checker_int8(const char *name){
-	int8_t x;
-	checker_make_symbolic(&x, sizeof(x), name);
-	return x;
-}
-
 int main() {
 	int pairs = N;
 	u_int8_t mPrefs[pairs*pairs];
@@ -250,7 +244,7 @@ int main() {
 	}
 	printf("Assume Done.\n");
 	ogale_shapley_textbook_revealed(output, mPrefs, wPrefs, pairs);
-	checker_check_int8_array(output, pairs);
+	checker_check_int8_array(output, pairs, true);
 	return 0;
 }
 // int main() {

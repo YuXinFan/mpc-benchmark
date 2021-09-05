@@ -37,12 +37,20 @@ def main():
         if not os.path.isdir(folder):
             os.mkdir(folder)
         outfile = open("./log/"+ofile, "w+")
+        # exit_code = subprocess.call("klee --disable-verify \
+        #     --use-query-log=solver:kquery \
+        #     --external-calls=all \
+        #     --posix-runtime \
+        #     --optimize-array=all \
+        #     --write-kqueries \
+        #     --write-no-tests \
+        #     " + bcfile , shell=True, stderr=outfile)
         exit_code = subprocess.call("klee --disable-verify \
             --use-query-log=solver:kquery \
             --external-calls=all \
             --posix-runtime \
-            --optimize-array=all \
             --write-kqueries \
+            --write-no-tests \
             " + bcfile , shell=True, stderr=outfile)
         outfile.close()
         # check klee states

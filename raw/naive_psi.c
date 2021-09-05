@@ -19,41 +19,39 @@ void naive_psi_opt(int8_t *int8_tersection, int8_t *aarr, int8_t *barr, int8_t s
     }
 }
 
+char **gen_labels(const char *prefix, int nums){
+    char **ptr = (char **)malloc(sizeof(char *)*nums);
+    #pragma clang loop unroll(full)
+    for (int i = 0; i < nums; i++){
+			ptr[i] = (char *)malloc(sizeof(char)*64);
+			snprintf(ptr[i], 36, "%s_%d", prefix, i);
+    }
+    return ptr;
+}
+
 int main(){
     int8_t size = 4;
-    SYMINT8(a0, "a0") 
-    SYMINT8(a1, "a1") 
-    SYMINT8(a2, "a2") 
-    SYMINT8(a3, "a3") 
-
-    ASSUME(a0 != a1);
-    ASSUME(a0 != a2);
-    ASSUME(a0 != a3);
-    ASSUME(a1 != a2);
-    ASSUME(a1 != a3);
-    ASSUME(a2 != a3);
-
-    SYMINT8(b0, "b0") 
-    SYMINT8(b1, "b1") 
-    SYMINT8(b2, "b2") 
-    SYMINT8(b3, "b3")
-
-    ASSUME(b0 != b1);
-    ASSUME(b0 != b2);
-    ASSUME(b0 != b3);
-    ASSUME(b1 != b2);
-    ASSUME(b1 != b3);
-    ASSUME(b2 != b3);
     int8_t aarr[size];
-    aarr[0] = a0;
-    aarr[1] = a1;
-    aarr[2] = a2;
-    aarr[3] = a3;
     int8_t barr[size];
-    barr[0] = b0;
-    barr[1] = b1;
-    barr[2] = b2;
-    barr[3] = b3;
+    char **la = gen_labels("aarr", size);
+    char **lb = gen_labels("barr", size);
+
+    #pragma clang loop unroll(full)
+	for (int i = 0; i < size; i++) {
+		aarr[i] = checker_int8(la[i]);
+		checker_assume(aarr[i] >=0 );
+        barr[i] = checker_int8(lb[i]);
+		checker_assume(barr[i] >=0 );
+	}
+
+    #pragma clang loop unroll(full)
+	for (int ll = 0; ll < size; ll++) {
+    	#pragma clang loop unroll(full)
+		for (int kk = ll+1; kk < size; kk++) {
+            checker_assume(aarr[ll] != aarr[kk]);
+            checker_assume(barr[ll] != barr[kk]);
+		}
+	}
     int8_t intersection[size];
     intersection[0]=-1;
     intersection[1]=-1;
