@@ -18,6 +18,13 @@ Pair A[10000];
 int ChecherIDX = 0;
 void checker_make_symbolic(void *addr, size_t nbytes, const char *name){
     klee_make_symbolic(addr, nbytes, name);
+    printf("[Part-0] Make symbolic %s\n", name);
+}
+
+int8_t checker_int8(const char *name){
+	int8_t x;
+	checker_make_symbolic(&x, sizeof(x), name);
+	return x;
 }
 
 void checker_assume(uintptr_t condition) {
@@ -25,7 +32,8 @@ void checker_assume(uintptr_t condition) {
     klee_print_expr("[Part-A] Assume", condition);
 }
 
-void checker_check_int8_array(int8_t *o, int size){
+void checker_check_int8_array(int8_t *o, int size, bool range ){
+    klee_print_expr("[Array] Size", size);
     char *label = (char *)malloc(sizeof(char)*256);
     // char **output = (char **)malloc(sizeof(char *)*size);
     // for (int j = 0; j < size; j++) {
@@ -52,7 +60,11 @@ void checker_check_int8_array(int8_t *o, int size){
     #pragma clang loop unroll(full)
     for (int ii = 0; ii < size; ii++) {
         snprintf(ll, 64, "[Part-B] id %d, array idx %d", l, ii);
-        klee_print_expr(ll, o[ii]);
+        if (range) {
+            klee_print_range(ll, o[ii]);
+        }else{
+            klee_print_expr(ll, o[ii]);
+        }
     }
     #pragma clang loop unroll(full)
     for (int j = 0; j < ChecherIDX; j++) {
@@ -67,7 +79,7 @@ void checker_check_float_array(int o){
 void checker_check_int(int o){
     char *label = (char *)malloc(sizeof(char)*256);
     for (int j = 0; j < ChecherIDX; j++) {
-        sprintf(label, "[Part-C] id is %d, total %d, now %d-th", o, ChecherIDX, j+1);
+        sprintf(label, "[Part-C] id %d, total %d, now %d-th", o, ChecherIDX, j+1);
         const char *const_res =  label;
         klee_print_range(const_res, A[j].expr);
     }

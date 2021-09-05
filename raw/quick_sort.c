@@ -51,14 +51,7 @@ void oqsort(int8_t * data, size_t end){
   free(temp);
 }
 
-char **checker_labels(const char *prefix, int nums){
-    char **ptr = (char **)malloc(sizeof(char *)*nums);
-    #pragma clang loop unroll(full)
-    for (int i = 0; i < nums; i++){
 
-    }
-    return NULL;
-}
 int main(){
     int size = 4;
     int8_t arr[size];

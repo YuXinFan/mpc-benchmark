@@ -1,12 +1,5 @@
 import re
 import os
-file1 = open("klee-out.txt","r+") 
-content = file1.read()
-content = content.replace("\t", " ")
-content = content.replace("\n", " ")
-content = content.replace("\r", " ")
-content = content.replace("  ", " ")
-#print (content)
 
 def load_decls():
     # find klee-last folder
@@ -35,11 +28,10 @@ def AndCat(l):
         andcat = andcat + "(Eq %s %s)\n" % (l[len(l)-1][1], l[len(l)-1][0]) + ")"*lbracket
         return andcat 
 
-
 def make_assumes(part):
     return ["(Eq 1 %s)\n" % x for x in part]
 
-def make_constraints(partB, partC):
+def make_constraints(partB, partC, asize):
     # sort by id 
     # construct expr for each id 
     # merge same id
@@ -65,11 +57,10 @@ def make_constraints(partB, partC):
                 id_exprs_map[t[0]] = []
 
     else:
-        for i in range(0, len(sorted_parts), 4):
-            part = sorted(sorted_parts[i:i+4], key=cmp_idx)
+        for i in range(0, len(sorted_parts), asize):
+            part = sorted(sorted_parts[i:i+asize], key=cmp_idx)
             if part[0][0] in id_exprs_map.keys():
-                os.error("morethan 4")
-                print("morethan 4:", part[0][0])
+                os.error("Array size %d, find id %d appears more than %d times." %(asize, part[0][0], asize))
                 #exit("more then 4")
             else:
                 id_exprs_map[part[0][0]] = []
@@ -79,6 +70,8 @@ def make_constraints(partB, partC):
                 else:
                     ret_ids_map[ret] = [part[0][0]]
     print("%d different results" % len(ret_ids_map.keys()))
+    for ret in ret_ids_map.keys():
+        print("%d ids for %s" % (len(ret_ids_map[ret]), ret) )
     #print(ret_ids_map)
 
     # id --> multi-constraints
@@ -95,8 +88,8 @@ def make_constraints(partB, partC):
 
 
 
-def make_query(decls, assumes, constraints):
-    folder = "./verifies"
+def make_query(file_name, decls, assumes, constraints):
+    folder = "./log"
     if not os.path.isdir(folder):
         os.mkdir(folder)
     kquery = decls 
@@ -107,31 +100,44 @@ def make_query(decls, assumes, constraints):
              + "(query [ " + assumes + "]\n" \
              + constraints[ret_expr] + ")" 
         qIdx = qIdx + 1
-    file_name = "query.kquery"
     w = open(folder+"/"+file_name, "w+")
     w.write(kquery)
     w.close()
     #cmd = "kleaver %s/%s" % (folder, file_name)
     #os.system(cmd)
 
-def main():
+def main(ofile,qfile):
     #decls = load_decls()
+
+    file1 = open(ofile,"r+") 
+    content = file1.read()
+    content = content.replace("\t", " ")
+    content = content.replace("\n", " ")
+    content = content.replace("\r", " ")
+    content = content.replace("  ", " ")
+    file1.close()
+    #print (content)
     decls = ""
     isArray = False
     partA = re.findall(r"\[Part\-A\] Assume:(\([\(0-9a-zA-Z\_\ \)]*\))", content)
     assumes = make_assumes(partA)
     #print("Assumes:\n", partA)
-    partB = re.findall(r"\[Part\-B\] id (-?\d+), array idx (\d+):(\([\(0-9a-zA-Z\_\ \)]*\)|-?\d+)", content)
-    #print(partB)[Part-C] id 1502742394, total 6, now 1-th:(ZExt w32 (Extract 0 (
+    arraySize = re.findall(r"\[Array\] Size:(\d+)", content)
+    if arraySize == [] :
+        arraySize = 0
+
+    else:
+        arraySize = int(arraySize[0])
+    print("Array size:", arraySize)
+    
+    partB = re.findall(r"\[Part\-B\] id (-?\d+), array idx (\d+):(\([\(0-9a-zA-Z\:\=\_\ \)]*\)|-?\d+) ", content)
     #print("Array:\n",partB)
-    partC = re.findall(r"\[Part\-C\] id (-?\d+), total (\d+), now (\d+)\-th:(\([\(0-9a-zA-Z\_\ \)]*\)|-?\d+) == (0|1)", content)
+    partC = re.findall(r"\[Part\-C\] id (-?\d+), total (\d+), now (\d+)\-th:(\([\(0-9a-zA-Z\:\=\_\ \)]*\)|-?\d+) == (0|1)", content)
     #print("Constraints:\n", partC)
-    constraints = make_constraints(partB, partC)
+    constraints = make_constraints(partB, partC, arraySize)
     #assumes = load_assumes()
     #print(partC)
     # decls, assumes, constraints
-    make_query(decls, assumes, constraints)
+    make_query(qfile, decls, assumes, constraints)
     #constraints = load_constraints(splits[1:])
     #gen_queries(decls, assumes, constraints)
-
-main()

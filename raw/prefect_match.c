@@ -1,20 +1,6 @@
 #include "checker.h"
 
-#define N  2
-
-bool declassify(bool x) {
-	return x;
-}
-void print_array(char * c, u_int8_t *a, int len, int elen) {
-	printf("%s: ", c);
-	for (int i = 0; i < len; i++) {
-		for (int k = 0; k < elen; k++) {
-			printf("%d,", a[i*elen+k]);
-		}
-		printf("\n");
-	}
-	printf("\n");
-}
+#define N  4
 
 // A structure to represent a queue
 typedef struct Queue {
@@ -126,25 +112,6 @@ void oram_free(void *v){
 
 u_int8_t* ogale_shapley_textbook_revealed(u_int8_t * output,  u_int8_t * mPrefsRaw, u_int8_t * wPrefsRaw, int n) {
 
-	for (int i = 0; i < n*n; i++) {
-		__builtin_assume(mPrefsRaw[i]>=0 && mPrefsRaw[i]<n);
-		__builtin_assume(wPrefsRaw[i]>=0 && wPrefsRaw[i]<n);
-	}
-	for (int i = 0; i < n; i++) {
-		__builtin_assume(mPrefsRaw[i*n] == 0 || mPrefsRaw[i*n+1] == 0 || mPrefsRaw[i*n+2] == 0 || mPrefsRaw[i*n+3] == 0|| mPrefsRaw[i*n+4] == 0);
-		__builtin_assume(mPrefsRaw[i*n] == 1 || mPrefsRaw[i*n+1] == 1 || mPrefsRaw[i*n+2] == 1 || mPrefsRaw[i*n+3] == 1|| mPrefsRaw[i*n+4] == 1);
-		//__builtin_assume(mPrefsRaw[i*n] == 2 || mPrefsRaw[i*n+1] == 2 || mPrefsRaw[i*n+2] == 2 || mPrefsRaw[i*n+3] == 2|| mPrefsRaw[i*n+4] == 2);
-		//__builtin_assume(mPrefsRaw[i*n] == 3 || mPrefsRaw[i*n+1] == 3 || mPrefsRaw[i*n+2] == 3 || mPrefsRaw[i*n+3] == 3|| mPrefsRaw[i*n+4] == 3);
-		//__builtin_assume(mPrefsRaw[i*n] == 4 || mPrefsRaw[i*n+1] == 4 || mPrefsRaw[i*n+2] == 4 || mPrefsRaw[i*n+3] == 4|| mPrefsRaw[i*n+4] == 4);
-
-		__builtin_assume(wPrefsRaw[i*n] == 0 || wPrefsRaw[i*n+1] == 0 || wPrefsRaw[i*n+2] == 0 || wPrefsRaw[i*n+3] == 0|| wPrefsRaw[i*n+4] == 0);
-		__builtin_assume(wPrefsRaw[i*n] == 1 || wPrefsRaw[i*n+1] == 1 || wPrefsRaw[i*n+2] == 1 || wPrefsRaw[i*n+3] == 1|| wPrefsRaw[i*n+4] == 1);
-		//__builtin_assume(wPrefsRaw[i*n] == 2 || wPrefsRaw[i*n+1] == 2 || wPrefsRaw[i*n+2] == 2 || wPrefsRaw[i*n+3] == 2|| wPrefsRaw[i*n+4] == 2);
-		//__builtin_assume(wPrefsRaw[i*n] == 3 || wPrefsRaw[i*n+1] == 3 || wPrefsRaw[i*n+2] == 3 || wPrefsRaw[i*n+3] == 3|| wPrefsRaw[i*n+4] == 3);
-		//__builtin_assume(wPrefsRaw[i*n] == 4 || wPrefsRaw[i*n+1] == 4 || wPrefsRaw[i*n+2] == 4 || wPrefsRaw[i*n+3] == 4|| wPrefsRaw[i*n+4] == 4);
-
-	}
-
 	//u_int8_t *mPrefs = calloc(n*n, sizeof(u_int8_t));
 	u_int8_t mPrefs[N*N];
 	for (int i = 0; i < n*n; i++) {
@@ -165,15 +132,10 @@ u_int8_t* ogale_shapley_textbook_revealed(u_int8_t * output,  u_int8_t * mPrefsR
 			oram_write(wPrefs, &jj, ii*n + wPrefsRaw[ii * n + jj], 1); 
 		}
 	}
-	//print_array("mPrefs", mPrefs, n, n);
-
-	//print_array("wPrefs", wPrefs, n, n);
 
 	Queue mQueue;
 	u_int8_t queueArray[2*N];
 	initQueue(&mQueue, n, queueArray);
-	//Queue *mQueue = createQueue(n);
-	//oqueue * mQueue = oqueue_new_static(&cpy2, n);
 	u_int8_t thisMQueue[2]; // [index, pref list pos]
 	u_int8_t nextMQueue[2]; // [index, pref list pos]
 	u_int8_t thisMStatus[2]; // [parter index, partner rating] 
@@ -190,14 +152,6 @@ u_int8_t* ogale_shapley_textbook_revealed(u_int8_t * output,  u_int8_t * mPrefsR
 		oqueue_push(&mQueue, thisMQueue);
 		oram_write(wStatus, thisWStatus, ii, 3);
 	}
-	// print_array("thisMQueue", mQueue.array, n, 2);
-	// for (size_t ii = 0; ii < n+2; ii++) {
-	// 	oqueue_pop(thisMQueue, &mQueue);
-	// 	printf("%d, %d\n", thisMQueue[0], thisMQueue[1]);
-	// 	oqueue_push(&mQueue, thisMQueue);
-	// }
-	// print_array("thisMQueue", mQueue.array, n, 2);
-
 
     bool cond = false;
 	for (size_t ii = 0; ii < n * n; ii++) {
@@ -216,7 +170,9 @@ u_int8_t* ogale_shapley_textbook_revealed(u_int8_t * output,  u_int8_t * mPrefsR
         // thisW 当前的 matching 的rank 小于 
 		cond = (thisWPrefs < thisWStatus[1]) | (thisWStatus[1] == 0xff);
         //revealOblivBool(&cond, ocond,0);
-		if (declassify(cond)) {
+		bool condd;
+		revealOblivBool(&condd, cond, 0);
+		if (condd) {
             if (queue_empty==0) {
 				// write new status for this m
 				thisMStatus[0] = proposedW;
@@ -244,40 +200,58 @@ u_int8_t* ogale_shapley_textbook_revealed(u_int8_t * output,  u_int8_t * mPrefsR
 		oram_read(thisMStatus, mStatus, ii, 2);
 		output[ii] = thisMStatus[0];
 	}
-	//print_array("mStatus", mStatus, n, 2);
-
-	//oqueue_free(mQueue);
-	//oram_free(mPrefs);
-	//oram_free(wPrefs);
-	//oram_free(mStatus);
-	//oram_free(wStatus);
 	return output;
 }
 
-void shuffle(u_int8_t *array, size_t n) {
-	if (n > 1) {
-		size_t i;
-		for (i = 0; i < n - 1; i++) 
-		{
-		  size_t j = i + rand() / (RAND_MAX / (n - i) + 1);
-		  u_int8_t t = array[j];
-		  array[j] = array[i];
-		  array[i] = t;
+char **gen_labels(const char *prefix, int nums, int nums2){
+    char **ptr = (char **)malloc(sizeof(char *)*nums*nums2);
+    #pragma clang loop unroll(full)
+    for (int i = 0; i < nums; i++){
+	    for (int j = 0; j < nums2; j++){
+			ptr[i*nums + j] = (char *)malloc(sizeof(char)*64);
+			snprintf(ptr[i*nums+j], 36, "%s_%d_%d", prefix, i, j);
 		}
-	}
+    }
+    return ptr;
 }
 
-int main(){
-    int pairs = N;
-    uint8_t output[N];
-    uint8_t mPrefs[N*N];
-    uint8_t wPrefs[N*N];
-    char *label = 
+int8_t checker_int8(const char *name){
+	int8_t x;
+	checker_make_symbolic(&x, sizeof(x), name);
+	return x;
+}
 
-    klee_int();
-    ogale_shapley_textbook_revealed(output, mPrefs, wPrefs, pairs);
+int main() {
+	int pairs = N;
+	u_int8_t mPrefs[pairs*pairs];
+	char **mPrefs_l = gen_labels("mPrefs", pairs, pairs);
+	u_int8_t wPrefs[pairs*pairs];
+	char **wPrefs_l = gen_labels("wPrefs", pairs, pairs);
+	u_int8_t output[pairs];
+    #pragma clang loop unroll(full)
+	for (int i = 0; i < pairs*pairs; i++) {
+		mPrefs[i] = checker_int8(mPrefs_l[i]);
+		checker_assume(mPrefs[i] >=0 && mPrefs[i] < pairs);
+		wPrefs[i] = checker_int8(wPrefs_l[i]);
+		checker_assume(wPrefs[i] >=0 && wPrefs[i] < pairs);
+	}
 
-    return 0;
+    #pragma clang loop unroll(full)
+	for (int ll = 0; ll < pairs; ll++) {
+    	#pragma clang loop unroll(full)
+		for (int kk = 0; kk < pairs; kk++) {
+			#pragma clang loop unroll(full)
+			for (int jj = kk+1; jj < pairs; jj++) {
+				checker_assume( wPrefs[ll * pairs + kk] != wPrefs[ll * pairs + jj] );
+
+				checker_assume( mPrefs[ll * pairs + kk] != mPrefs[ll * pairs + jj] );
+			}
+		}
+	}
+	printf("Assume Done.\n");
+	ogale_shapley_textbook_revealed(output, mPrefs, wPrefs, pairs);
+	checker_check_int8_array(output, pairs);
+	return 0;
 }
 // int main() {
 // 	int pairs = N;
