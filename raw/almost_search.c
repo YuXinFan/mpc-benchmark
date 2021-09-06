@@ -1,39 +1,5 @@
 #include "checker.h"
-int binarySearch(int arr[], int l, int r, int x)
-{
-if (r >= l)
-{
-        int mid = l + (r - l) / 2;
- 
-        // If the element is present at
-        // one of the middle 3 positions
-        if (arr[mid] == x){
-            return mid;
-        }
-        if (mid > l && arr[mid - 1] == x){
-            return (mid - 1);
-        }
-        if (mid < r && arr[mid + 1] == x){
-            return (mid + 1);
-        }
- 
-        // If element is smaller than mid, then
-        // it can only be present in left subarray
-         bool ogt = arr[mid] > x;
-            bool gt;
-            revealOblivBool(&gt, ogt, 0);
-        if (gt){
-            return binarySearch(arr, l, mid - 2, x);
-        }
- 
-        // Else the element can only be present
-        // in right subarray
-        return binarySearch(arr, mid + 2, r, x);
-}
- 
-// We reach here when element is not present in array
-return -1;
-}
+
 void binary_almost_search_opt_main(int *idx, int needle, int* arr, int l, int r) {
     if (r >= l)
     {
@@ -48,17 +14,18 @@ void binary_almost_search_opt_main(int *idx, int needle, int* arr, int l, int r)
         if (right) {
             right =  arr[mid+1] == needle;
         }
-        if (arr[mid] == needle){
+        bool oeq = arr[mid] == needle;
+        bool eq;
+        revealOblivBool(&eq, oeq, 0);
+        if (eq){
             *idx = mid;
+            return ;
         }else if (left){
                 *idx = (mid-1);
         }else if (right) {
                 *idx = (mid + 1);
         }else {
-            bool ogt = arr[mid] > needle;
-            bool gt;
-            revealOblivBool(&gt, ogt, 0);
-            if (gt){
+            if (arr[mid] > needle){
                 binary_almost_search_opt_main(idx, needle, arr, l, mid - 2);
             } else {
                 binary_almost_search_opt_main(idx, needle, arr, mid + 2, r);
@@ -111,9 +78,6 @@ int main(){
 
     checker_make_symbolic(&val, sizeof(val), "val");
 
-    //binary_almost_search_opt(&idx, val, arr, arr_size);
-    //checker_check_int(idx);
-    
-    int l = binarySearch(arr, 0, arr_size-1, val);
-    checker_check_int(l);
+    binary_almost_search_opt(&idx, val, arr, arr_size);
+    checker_check_int(idx);
 }

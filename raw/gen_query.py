@@ -34,42 +34,43 @@ def AndCat(l):
 
 def find_and_replace_label_def(expr):
     defcnt = 0
-    ll=re.search("N%d:\(" % defcnt, expr)
+    defdef = "N%d" % defcnt
+    ll=re.search(defdef+":", expr)
     while ll != None:    
         l = 1
-        defn = "("
-        idx = ll.end()
-        print("--%d" % defcnt)
-
+        defexpr = "("
+        idx = ll.end()+1
         while l > 0:
             if expr[idx] == "(":
                 l = l + 1
-                defn = defn + "("
+                defexpr = defexpr + "("
             elif expr[idx] == ")":
                 l = l - 1
-                defn = defn + ")"
+                defexpr = defexpr + ")"
             else:
-                defn = defn + expr[idx]
+                defexpr = defexpr + expr[idx]
             idx = idx + 1
-        print(expr)
+        expr = expr.replace(defdef+":", "")
 
-        expr = expr.replace("N%d:" % defcnt, " ")
-        print("--")
+        lop = " "+defdef+" "
+        lrep = " "+defexpr+" "
 
-        print(expr)
+        rop = " "+defdef+"\)"
+        rrep = " "+defexpr+")"
 
-        expr = expr.replace("N%d" % defcnt, defn)
-        print("--")
-        print(expr)
+        expr = re.sub(lop, lrep, expr)
+        expr = re.sub(rop, rrep, expr)
 
         defcnt = defcnt + 1
-        ll = re.search("N%d:\(" % defcnt, expr)
-
+        defdef = "N%d" % defcnt
+        ll = re.search(defdef+":", expr)
     return expr 
 
 def make_assumes(part):
     l = []
     for x in part:
+        if "N0:(ReadLSB w32 0 arr) N1:" in x:
+            print(x)
         m = find_and_replace_label_def(x)
         l.append("(Eq 1  %s)\n" % m)
     return l 
@@ -153,39 +154,37 @@ def main(ofile,qfile):
     #decls = load_decls()
 
     file1 = open(ofile,"r+") 
-    content = file1.read()
+    #content = file1.read()
+    content = []
+    for line in file1.readlines():
+        if "KLEE:" not in line and "WARNING:" not in line:
+            content.append(line)
+    content = "".join(content)
     content = " ".join(content.split())
-    # content = content.replace("\t", " ")
-    # content = content.replace("\n", " ")
-    # content = content.replace("\r", " ")
-    # content = content.replace("  ", " ")
+
+    file2 = open("./log/temp.out", "w+")
+    file2.write(content)
     file1.close()
-    #print (content)
+    file2.close()
+
+
     decls = ""
-    isArray = False
     partA = re.findall(r"\[Part\-A\] Assume:(\([\[\(0-9a-zA-Z\_\@\,\:\ \)\]]*\))", content)
+    arraySize = re.findall(r"\[Array\] Size:(\d+)", content)
+    partB = re.findall(r"\[Part\-B\] id (-?\d+), array idx (\d+):(\([\[\(0-9a-zA-Z\:\=\_\@\,\ \)\]]*\)|-?\d+)", content)
+    partC = re.findall(r"\[Part\-C\] id (-?\d+), total (\d+), now (\d+)\-th:(\([\[\(0-9a-zA-Z\:\=\@\,\_\ \)\]]*\)|-?\d+) == (0|1)", content)
+    #print("Array:\n",partB)
     assumes = make_assumes(partA)
     print("%d Assumes" % len(assumes))
     #print("Assumes:\n", partA)
-    arraySize = re.findall(r"\[Array\] Size:(\d+)", content)
     if arraySize == [] :
         arraySize = 0
-
     else:
         arraySize = int(arraySize[0])
-    
-    partB = re.findall(r"\[Part\-B\] id (-?\d+), array idx (\d+):(\([\[\(0-9a-zA-Z\:\=\_\@\,\ \)\]]*\)|-?\d+)", content)
-    #print("Array:\n",partB)
     print("%d Result Expr" %  (len(partB) if arraySize==0 else len(partB)/arraySize) )
-
-    partC = re.findall(r"\[Part\-C\] id (-?\d+), total (\d+), now (\d+)\-th:(\([\[\(0-9a-zA-Z\:\=\@\,\_\ \)\]]*\)|-?\d+) == (0|1)", content)
     #print("Constraints:\n", partC)
     print("%d Constraints" % len(partC))
 
     constraints = make_constraints(partB, partC, arraySize)
-    #assumes = load_assumes()
-    #print(partC)
     # decls, assumes, constraints
     make_query(qfile, decls, assumes, constraints)
-    #constraints = load_constraints(splits[1:])
-    #gen_queries(decls, assumes, constraints)
