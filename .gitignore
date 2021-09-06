@@ -8,3 +8,7 @@ build
 raw/klee-*
 raw/klee-*/*
 raw/verifies
+raw/*.bc
+log/
+temp.txt
+__pycache__/
