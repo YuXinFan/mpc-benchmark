@@ -49,25 +49,32 @@ async def quickSort(arr, low, high):
 def quickSortMain(arr, low, high):
     quickSort(arr, low, high)
 
-def main():
+def main(samples=1):
     import random
     import time
     MIN = 0
-    MAX = 10000
-    n = 1024
-    cleartext = random.sample(range(MIN, MAX), n)
-    x = list(map(secint, cleartext))
-    print(cleartext)
-    timeS = time.perf_counter()
-    quickSortMain(x, 0, len(x)-1)
-    print(mpc.run(mpc.output(x)))
-    timeE = time.perf_counter()
-    
-    print('程序运行时间:%.3f秒' % ((timeE - timeS)))
+    MAX = 1000000
+    n = 65535
+    totalTime = 0
+    print("start benchmark Batcher Sort, %d times repeat:" % samples)
+    for kk in range(samples):
+        cleartext = random.sample(range(MIN, MAX), n)
+        x = list(map(secint, cleartext))
+        # print(x)
+        timeS = time.perf_counter()
+        quickSortMain(x, 0, len(x)-1)
+        mpc.run(mpc.output(x))
+        timeE = time.perf_counter()
+
+        timeDiff = timeE-timeS 
+        print("%.3f, " % timeDiff, end="")
+        totalTime += timeDiff
+    print()
+    print("Total repeat %d times. Average execution time is %.3fs." % (samples, totalTime/samples))
 
 if __name__ == '__main__':
     # import timeit
     # iters = 1
     # time = timeit.timeit("main()", setup="from __main__ import main", number = iters) 
     # print("Total repeat %d times. Average execution time is %.3f." % (iters, time/iters))
-    main()
+    main(1)

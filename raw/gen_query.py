@@ -35,7 +35,7 @@ def AndCat(l):
 def find_and_replace_label_def(expr):
     defcnt = 0
     defdef = "N%d" % defcnt
-    ll=re.search(defdef+":", expr)
+    ll=re.search(defdef + ":", expr)
     while ll != None:    
         l = 1
         defexpr = "("
@@ -66,6 +66,17 @@ def find_and_replace_label_def(expr):
         ll = re.search(defdef+":", expr)
     return expr 
 
+def make_decls(path):
+    fs = open(path, "r+")
+    kqs = fs.read()
+    kq = kqs.split("# Query")[-1]
+    lines = kq.split("\n")
+    decl = ""
+    for line in lines:
+        if "array" in line:
+            decl = decl + line + "\n"
+    print(decl)
+    return decl
 def make_assumes(part):
     l = []
     for x in part:
@@ -124,7 +135,10 @@ def make_constraints(partB, partC, asize):
     
     ret_exprs_map = {}
     for ret in ret_ids_map.keys():
+        print(ret)
         all_exprs = [x for id in ret_ids_map[ret] for x in id_exprs_map[id]]
+        for i in range(len(all_exprs)):
+            all_exprs[i] = (find_and_replace_label_def(all_exprs[i][0]), all_exprs[i][1])
         const_expr = "(Not " + AndCat(all_exprs) + ")"    
         ret_exprs_map[ret] = const_expr
     # ret expr --> constraints
@@ -168,7 +182,6 @@ def main(ofile,qfile):
     file2.close()
 
 
-    decls = ""
     partA = re.findall(r"\[Part\-A\] Assume:(\([\[\(0-9a-zA-Z\_\@\,\:\ \)\]]*\))", content)
     arraySize = re.findall(r"\[Array\] Size:(\d+)", content)
     partB = re.findall(r"\[Part\-B\] id (-?\d+), array idx (\d+):(\([\[\(0-9a-zA-Z\:\=\_\@\,\ \)\]]*\)|-?\d+)", content)
@@ -187,4 +200,7 @@ def main(ofile,qfile):
 
     constraints = make_constraints(partB, partC, arraySize)
     # decls, assumes, constraints
+
+    decls = make_decls("./klee-last/solver-queries.kquery")
+
     make_query(qfile, decls, assumes, constraints)

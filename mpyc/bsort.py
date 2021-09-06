@@ -49,8 +49,8 @@ def main(samples=1):
     import random
     import time
     MIN = 0
-    MAX = 10000
-    n = 1024
+    MAX = 1000000
+    n = 65536
 
     totalTime = 0
     print("start benchmark Batcher Sort, %d times repeat:" % samples)
@@ -74,4 +74,4 @@ if __name__ == '__main__':
     # iters = 1
     # time = timeit.timeit("main()", setup="from __main__ import main", number = iters) 
     # print("Total repeat %d times. Average execution time is %.3f." % (iters, time/iters))
-    main(5)
+    main(1)

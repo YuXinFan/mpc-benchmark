@@ -18,11 +18,17 @@ Pair A[10000];
 int ChecherIDX = 0;
 void checker_make_symbolic(void *addr, size_t nbytes, const char *name){
     klee_make_symbolic(addr, nbytes, name);
-    printf("[Part-0] Make symbolic %s\n", name);
+    printf("[Checker] Make symbolic %s\n", name);
 }
 
 int8_t checker_int8(const char *name){
 	int8_t x;
+	checker_make_symbolic(&x, sizeof(x), name);
+	return x;
+}
+
+int checker_int(const char *name){
+	int x;
 	checker_make_symbolic(&x, sizeof(x), name);
 	return x;
 }
@@ -35,11 +41,6 @@ void checker_assume(uintptr_t condition) {
 void checker_check_int8_array(int8_t *o, int size, bool range ){
     klee_print_expr("[Array] Size", size);
     char *label = (char *)malloc(sizeof(char)*256);
-    // char **output = (char **)malloc(sizeof(char *)*size);
-    // for (int j = 0; j < size; j++) {
-    //     output[j] = (char *)malloc(sizeof(char)*256);
-    //     sprintf(output[j], " %d ", o[j]);
-    // }
     srand(time(0));
     int l = rand();
     srand(ChecherIDX);
@@ -78,21 +79,13 @@ void checker_check_float_array(int o){
 } 
 void checker_check_int(int o){
     char *label = (char *)malloc(sizeof(char)*256);
+    #pragma clang loop unroll(full)
     for (int j = 0; j < ChecherIDX; j++) {
         sprintf(label, "[Part-C] id %d, total %d, now %d-th", o, ChecherIDX, j+1);
         const char *const_res =  label;
         klee_print_range(const_res, A[j].expr);
     }
 }
-void checker_check_float(float o){
-    char *label = (char *)malloc(sizeof(char)*256);
-    for (int j = 0; j < ChecherIDX; j++) {
-        sprintf(label, "Part-B: Output is %3f, total %d, now %d-th", o, ChecherIDX, j+1);
-        const char *const_res =  label;
-        klee_print_range(const_res, A[j].expr);
-    }
-}
-
 
 static inline void revealOblivBool(bool *a, bool aa, int party){
     *a = aa;

@@ -1,6 +1,5 @@
 #include "checker.h"
 #include "limits.h"
-#include "float.h"
 
 #define a0 A->S.x
 #define a1 A->S.y
@@ -11,16 +10,14 @@
 #define d0 B->E.x
 #define d1 B->E.y
 
-#define float int 
-
 typedef struct Point{
-    float x;
-    float y;
+    int x;
+    int y;
 } Point;
 
 typedef struct OblivPoint{
-    float x;
-    float y;
+    int x;
+    int y;
 } OPoint;
 
 typedef struct OblivLine{
@@ -29,41 +26,38 @@ typedef struct OblivLine{
 }OLine;
 
 void line_insect_opt(OPoint *p, OLine *A, OLine *B){
-    float area_abc = (a0 - c0) * (b1 - c1) - (a1 - c1) * (b0 - c0);
-    float area_abd = (a0 - d0) * (b1 - d1) - (a1 - d1) * (b0 - d0);
-    checker_assume(area_abc != area_abd);
+    int area_abc = (a0 - c0) * (b1 - c1) - (a1 - c1) * (b0 - c0);
+    int area_abd = (a0 - d0) * (b1 - d1) - (a1 - d1) * (b0 - d0);
     bool is_cd_same_side_of_ab = (area_abc * area_abd) >= 0;
 
-    float area_cda = (c0 - a0) * (d1 - a1) - (c1 - a1) * (d0 - a0);
-    float area_cdb = area_cda + area_abc - area_abd; 
+    int area_cda = (c0 - a0) * (d1 - a1) - (c1 - a1) * (d0 - a0);
+    int area_cdb = area_cda + area_abc - area_abd; 
     bool is_ab_same_side_of_cd = (area_cda * area_cdb) >= 0;
     
     bool ois_not_insect = is_ab_same_side_of_cd  | is_cd_same_side_of_ab;
     bool is_not_insect;
     revealOblivBool(&is_not_insect, ois_not_insect, 0);
     if (is_not_insect){
-        // p->x = FLT_MIN;
-        // p->y = FLT_MIN;
         p->x = INT_MIN;
         p->y = INT_MIN;
     }else{
-        float t = area_cda / ( area_abd - area_abc );
-        float dx= t * (b0 - a0);
-        float dy= t * (b1 - a1);
+        int t = area_cda / ( area_abd - area_abc );
+        int dx= t * (b0 - a0);
+        int dy= t * (b1 - a1);
         p->x = a0 + dx;
         p->y = a1 + dy;
     }
 }
 
 int main(){
-    float l1ex;
-    float l1ey;
-    float l2ex;
-    float l2ey;
-    float l1sx;
-    float l1sy;
-    float l2sx;
-    float l2sy;
+    int l1ex;
+    int l1ey;
+    int l2ex;
+    int l2ey;
+    int l1sx;
+    int l1sy;
+    int l2sx;
+    int l2sy;
     
     checker_make_symbolic(&(l1ex), sizeof(l1ex), "l1ex");
     checker_make_symbolic(&(l1ey), sizeof(l1ey), "l1ey");
@@ -89,7 +83,7 @@ int main(){
     OPoint p;
     line_insect_opt(&p, &l1, &l2);
     checker_check_int(p.x);
-    //checker_check_float(p.x);
+    //checker_check_int(p.x);
 
     return 0;
 }
