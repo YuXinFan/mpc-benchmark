@@ -59,10 +59,11 @@ int main(){
     p.x = tx;
     p.y = ty;
 
-    int size = 6;
+    int size = 3;
     OVector v[size];
     char **vv = gen_labels("v", size);
     // assume a line has different start and end point
+    #pragma clang loop unroll(full)
     for (int i = 0; i < size; i++) {
         char ** ll = gen_labels(vv[i], 4);
         v[i].begin.x = checker_int(ll[0]);
@@ -71,12 +72,56 @@ int main(){
         v[i].end.y = checker_int(ll[3]);
         checker_assume( (v[i].begin.x != v[i].end.x) | (v[i].begin.y != v[i].end.y));
     }
-    // assume one line's end is one line's start | is a poly
+    // assume no two lines are same
+    #pragma clang loop unroll(full)
     for (int i = 0; i < size; i++) {
-
+        for (int j = 0; j < size; j++) {
+            if (i != j) {
+               checker_assume(v[i].begin.x != v[j].begin.x | v[i].begin.y != v[j].begin.y);
+               checker_assume(v[i].end.x != v[j].end.x | v[i].end.y != v[j].end.y);
+            }
+        }
+    }
+    // assume one line's end is one line's start | is a poly
+    bool c[size];
+    #pragma clang loop unroll(full)
+    for (int i = 0; i < size; i++){
+        c[i] = true;
+    }
+    #pragma clang loop unroll(full)
+    for (int i = 0; i < size; i++) {
+        for(int j = 0; j < size; j++){
+            if ( i != j) {
+                c[i] = c[i] | (v[i].begin.x == v[j].end.x &&  v[i].begin.y == v[j].end.y);    
+            }
+        }
+    }
+    #pragma clang loop unroll(full)
+    for (int i = 0; i < size; i++){
+        checker_assume(c[i]);
     }
 
     // assume the poly is convex
+    bool angle = false;
+    bool vb;
+    for (int i =0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            if (v[i].begin.x == v[j].end.x &&  v[i].begin.y == v[j].end.y) {
+                int x1 = v[j].end.x - v[j].begin.x;
+                int y1 = v[j].end.y - v[j].begin.y; 
+                int x2 = v[i].end.x - v[i].begin.x;
+                int y2 = v[i].end.y - v[i].begin.y;
+                int delta = x1 * y2 - x2 * y1;
+                if (angle) {
+                    vb = vb == (delta > 0);
+                }else {
+                    angle = true;
+                    vb = delta > 0;
+                }
+            }
+        }
+    }
+    checker_assume(vb);
 
 
 	int out;
