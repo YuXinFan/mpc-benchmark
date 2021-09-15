@@ -3,7 +3,8 @@ from mpyc.runtime import mpc    # load MPyC
 secflt = mpc.SecFlt()
 mpc.run(mpc.start())  
 
-def cross_raw(a,b,c,d):
+@mpc.coroutine  
+async def line_intersect(a,b,c,d):
     
     p = []
     area_abc = (a[0] - c[0]) * (b[1] - c[1]) - (a[1] - c[1]) * (b[0] - c[0])
@@ -24,21 +25,19 @@ def cross_raw(a,b,c,d):
     return (is_cross, p)
 
 @mpc.coroutine  
-async def cross_opt(a,b,c,d):
+async def line_intersect_opt(a,b,c,d):
     
     p = []
     area_abc = (a[0] - c[0]) * (b[1] - c[1]) - (a[1] - c[1]) * (b[0] - c[0])
     area_abd = (a[0] - d[0]) * (b[1] - d[1]) - (a[1] - d[1]) * (b[0] - d[0])
-    false = (area_abc * area_abd) >= 0.0
-    no_cross = await mpc.eq_public(false, 1)
-    if ( no_cross ):
-        return p
+    is_cd_same_side_of_ab = (area_abc * area_abd) >= 0.0
 
     area_cda = (c[0] - a[0]) * (d[1] - a[1]) - (c[1] - a[1]) * (d[0] - a[0])
     area_cdb = area_cda + area_abc - area_abd 
-    false = (area_cda * area_cdb) >= 0.0
-    no_cross = await mpc.eq_public(false, 1)
-    if ( no_cross ):
+    is_ab_same_side_of_cd = (area_cda * area_cdb) >= 0.0
+    onot_insect = is_ab_same_side_of_cd | is_cd_same_side_of_ab 
+    not_insect = await mpc.eq_public(onot_insect, 1)
+    if ( not_insect ):
         return p
     
     t = area_cda / ( area_abd - area_abc )
@@ -64,7 +63,7 @@ def main():
         sec_d = list(map(secflt, clear_d))
 
         timeS = time.perf_counter()
-        p = cross_opt(sec_a,sec_b,sec_c,sec_d)
+        p = line_intersect(sec_a,sec_b,sec_c,sec_d)
         #mpc.run(mpc.output(p))
         timeE = time.perf_counter()
         timeDiff = timeE-timeS 

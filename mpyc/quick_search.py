@@ -54,7 +54,7 @@ def main(samples=1):
     import time
     MIN = 0
     MAX = 1000000
-    n = 65535
+    n = 1000
     totalTime = 0
     print("start benchmark Batcher Sort, %d times repeat:" % samples)
     for kk in range(samples):
