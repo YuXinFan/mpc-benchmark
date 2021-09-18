@@ -102,8 +102,7 @@ int main(){
     }
 
     // assume the poly is convex
-    bool angle = false;
-    bool vb;
+    int flag = 0;
     for (int i =0; i < size; i++) {
         for (int j = 0; j < size; j++) {
             if (v[i].begin.x == v[j].end.x &&  v[i].begin.y == v[j].end.y) {
@@ -112,17 +111,13 @@ int main(){
                 int x2 = v[i].end.x - v[i].begin.x;
                 int y2 = v[i].end.y - v[i].begin.y;
                 int delta = x1 * y2 - x2 * y1;
-                if (angle) {
-                    vb = vb == (delta > 0);
-                }else {
-                    angle = true;
-                    vb = delta > 0;
+                if (delta != 0) {
+                    checker_assume(delta * flag >=0);
+                    flag = delta;
                 }
             }
         }
     }
-    checker_assume(vb);
-
 
 	int out;
     point_contain_opt(&out, &p, v, size);

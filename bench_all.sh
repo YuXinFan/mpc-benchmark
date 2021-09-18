@@ -20,10 +20,10 @@ bench_one bench_batcher_sort "-n 10000 -i 10" # sort 1000 elements, repeat 10 ti
 #bench_one bench_batcher_sort "-n 1000000 -i 10" # sort 1000 elements, repeat 10 times
 
 
-bench_one bench_binary_search "-e 10 -s 5 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
-bench_one bench_binary_search "-e 100 -s 50 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
-bench_one bench_binary_search "-e 1000 -s 500 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
-bench_one bench_binary_search "-e 10000 -s 5000 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
+bench_one bench_binary_search "-e 10 -s 3 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
+bench_one bench_binary_search "-e 100 -s 30 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
+bench_one bench_binary_search "-e 1000 -s 300 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
+bench_one bench_binary_search "-e 10000 -s 3000 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
 #bench_one bench_binary_search "-e 100000 -s 50000 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
 #bench_one bench_binary_search "-e 1000000 -s 500000 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
 
@@ -34,10 +34,10 @@ bench_one bench_binary_search_opt "-e 10000 -s 3000 -i 10"  # on 1000 elements, 
 #bench_one bench_binary_search_opt "-e 100000 -s 30000 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
 #bench_one bench_binary_search_opt "-e 1000000 -s 300000 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
 
-bench_one bench_linear_search "-e 10 -s 5 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
-bench_one bench_linear_search "-e 100 -s 50 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
-bench_one bench_linear_search "-e 1000 -s 500 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
-bench_one bench_linear_search "-e 10000 -s 5000 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
+bench_one bench_linear_search "-e 10 -s 3 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
+bench_one bench_linear_search "-e 100 -s 30 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
+bench_one bench_linear_search "-e 1000 -s 300 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
+bench_one bench_linear_search "-e 10000 -s 3000 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
 #bench_one bench_linear_search "-e 100000 -s 50000 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
 #bench_one bench_linear_search "-e 1000000 -s 500000 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
 
@@ -48,10 +48,10 @@ bench_one bench_linear_search_opt "-e 10000 -s 3000 -i 10"  # on 1000 elements, 
 #bench_one bench_linear_search_opt "-e 100000 -s 30000 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
 #bench_one bench_linear_search_opt "-e 1000000 -s 300000 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
 
-bench_one bench_almost_search "-e 10 -s 5 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
-bench_one bench_almost_search "-e 100 -s 50 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
-bench_one bench_almost_search "-e 1000 -s 500 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
-bench_one bench_almost_search "-e 10000 -s 5000 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
+bench_one bench_almost_search "-e 10 -s 3 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
+bench_one bench_almost_search "-e 100 -s 30 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
+bench_one bench_almost_search "-e 1000 -s 300 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
+bench_one bench_almost_search "-e 10000 -s 3000 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
 #bench_one bench_almost_search "-e 100000 -s 50000 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
 #bench_one bench_almost_search "-e 1000000 -s 500000 -i 10"  # on 1000 elements, search 20 elements, repeat 10 times
 

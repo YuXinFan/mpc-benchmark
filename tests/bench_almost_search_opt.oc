@@ -58,13 +58,13 @@ void rand_sorted_array(int *array, size_t n) {
     size_t j = 0;
 	for (i = 0; i < n ; i++) 
 	{
-		j += rand() % 8;
+		j += rand() % 4;
 		array[i] = j;
 	}
 }
 
 int rand_int(size_t range) {
-    return rand() % (range);
+    return rand() % ((range)*4);
 }
 void shuffle(uint32_t *array, size_t n) {
 	if (n > 1) {
