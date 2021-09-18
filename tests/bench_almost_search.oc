@@ -180,6 +180,37 @@ void test_main(void*varg) {
 			}
 			
 		}
+		if (ocCurrentParty()==1){
+			FILE *fptr;
+
+			// use appropriate location if you are using MacOS or Linux
+			fptr = fopen("./Part-1.txt","w");
+
+			if(fptr == NULL)
+			{
+				printf("Error!");   
+				exit(1);             
+			}
+
+			fprintf(fptr,"%.3f, %.3f, %.3f \n",tally/samples/10e6, tallygates/samples/10e6, tallybytes/samples/10e6);
+			fclose(fptr);
+
+		}else{
+			FILE *fptr;
+
+			// use appropriate location if you are using MacOS or Linux
+			fptr = fopen("./Part-0.txt","w");
+
+			if(fptr == NULL)
+			{
+				printf("Error!");   
+				exit(1);             
+			}
+
+			fprintf(fptr,"%.3f, %.3f, %.3f \n",tally/samples/10e6, tallygates/samples/10e6, tallybytes/samples/10e6);
+			fclose(fptr);
+
+		}
 		fprintf(stdout, "\n");
 		fprintf(stderr, "Almost Search: %llu microseconds avg, %llu gates avg, %llu bytes avg\n", tally/samples, tallygates/samples, tallybytes/samples);
 	}
