@@ -9,6 +9,7 @@
 
 #include "test_generic.h"
 #include "linear_search.oh"
+#include "staticutil.h" 
 
 static const char TESTNAME[] = "linear_search_opt_benchmark";
 

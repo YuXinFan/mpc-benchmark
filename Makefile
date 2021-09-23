@@ -29,18 +29,19 @@ OBJS=$(DEPS) $(ORAM_DEPS) obig.oo ochacha.oo ograph.oo omatch.oo omatch_textbook
 
 TEST_PATH=tests/
 TEST_OUT_PATH=build/tests/
-TEST_DEPS=test_main.o 
-TEST_BINS =test_obig test_osha256 test_osha512 test_osalsa test_ochacha test_oaes\
-		test_oqueue test_oram test_oscrypt test_ograph test_omatch \
-		bench_oram_write bench_oram_read bench_oram_init bench_oscrypt bench_bfs bench_bs\
-		bench_gs bench_gs_textbook bench_rp bench_oaes bench_oqueue bench_waksman\
-		bench_batcher_sort bench_quick_sort \
+TEST_DEPS=staticutil.o test_main.o 
+# TEST_BINS =test_obig test_osha256 test_osha512 test_osalsa test_ochacha test_oaes\
+# 		test_oqueue test_oram test_oscrypt test_ograph test_omatch \
+# 		bench_oram_write bench_oram_read bench_oram_init bench_oscrypt bench_bfs bench_bs\
+# 		bench_gs bench_gs_textbook bench_rp bench_oaes bench_oqueue bench_waksman\
+
+TEST_BINS =		bench_batcher_sort bench_quick_sort \
 		bench_binary_search bench_binary_search_opt \
 		bench_linear_search bench_linear_search_opt \
 		bench_almost_search bench_almost_search_opt \
 		bench_naive_psi bench_naive_psi_opt \
 		bench_line_insect bench_line_insect_opt \
-		bench_point_contain bench_point_contain_opt \
+		#bench_point_contain bench_point_contain_opt \
 		bench_max_three bench_max bench_second_max  
 
 default: $(ACKLIB) tests

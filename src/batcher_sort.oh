@@ -3,7 +3,6 @@
 
 #include <copy.oh>
 #include <obliv_common.h>
-#include "staticutil.h" 
 
 void batcherSort(void* data,size_t n,size_t w);
 

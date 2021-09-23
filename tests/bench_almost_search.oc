@@ -2,6 +2,7 @@
 #include "almost_search.oh"
 #include "oram.oh"
 #include "test_generic.h"
+#include "staticutil.h" 
 
 static const char TESTNAME[] = "almost_search_benchmark";
 

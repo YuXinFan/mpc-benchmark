@@ -10,6 +10,7 @@
 #include "oram.oh"
 
 #include "test_generic.h"
+#include "staticutil.h" 
 
 
 #define TEXT_HELP_SUPPLEMENTARY "\

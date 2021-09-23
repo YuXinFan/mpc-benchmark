@@ -9,6 +9,7 @@
 
 #include "test_generic.h"
 #include "line_insect.oh"
+#include "staticutil.h" 
 
 
 #define TEXT_HELP_SUPPLEMENTARY "\

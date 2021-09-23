@@ -6,7 +6,6 @@
 #include "oram.oh"
 #include <obliv_common.h>
 #include <copy.oh>
-#include "staticutil.h" 
 
 typedef obliv int (* block_cmp_function)(OcCopy *, void * a, void * b) obliv;
 
