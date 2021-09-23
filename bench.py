@@ -7,8 +7,12 @@ import pandas as pd
 log = ""
 
 def clean_csv():
-    os.remove("Party-0.csv")
-    os.remove("Party-1.csv")
+    p0 = "Party-0.csv"
+    p1 = "Party-1.csv"
+    if os.path.exists(p0):
+        os.remove(p0)
+    if os.path.exists(p1):
+        os.remove(p1)
 
 def make_csv():
     p0=pd.read_csv("Party-0.csv", names=['Name', 'InSize', 'Type', 'Val', "Repeat"])
