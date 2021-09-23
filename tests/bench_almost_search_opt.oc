@@ -1,14 +1,7 @@
 #include <obliv.oh>
-
-#include "stdlib.h"
-#include "math.h"
-#include <time.h>
-#include "float.h"
-
-#include "oram.oh"
-
-#include "test_generic.h"
 #include "almost_search.oh"
+#include "oram.oh"
+#include "test_generic.h"
 
 static const char TESTNAME[] = "almost_search_benchmark";
 
@@ -43,40 +36,19 @@ void print_supplementary_help() {
 	fprintf(stderr, TEXT_HELP_SUPPLEMENTARY);
 }
 
-void rand_array(int *array, size_t n) {
-	size_t i;
-    
-	for (i = 0; i < n ; i++) 
-	{
-		size_t j = rand() % (n);
-		array[i] = j;
-	}
-}
+void print_array(uint32_t* arr, int size){
+	fprintf(stderr, "Array len %d: ", size);
 
-void rand_sorted_array(int *array, size_t n) {
-	size_t i;
-    size_t j = 0;
-	for (i = 0; i < n ; i++) 
-	{
-		j += rand() % 4;
-		array[i] = j;
+	for (int i = 0; i < size; i++) {
+		fprintf(stderr, "%d, ", arr[i]);
 	}
-}
+	fprintf(stderr, "\n");
 
-int rand_int(size_t range) {
-    return rand() % ((range)*4);
 }
-void shuffle(uint32_t *array, size_t n) {
-	if (n > 1) {
-		size_t i;
-		for (i = 0; i < n - 1; i++) 
-		{
-		  size_t j = i + rand() / (RAND_MAX / (n - i) + 1);
-		  int t = array[j];
-		  array[j] = array[i];
-		  array[i] = t;
-		}
-	}
+obliv int cmpInt(OcCopy * cpy, void * a, void * b) obliv {
+	obliv uint32_t * aa = (obliv uint32_t *) a;
+	obliv uint32_t * bb = (obliv uint32_t *) b;
+	return (*aa > *bb) - (*aa < *bb);
 }
 
 void test_main(void*varg) {
@@ -85,17 +57,18 @@ void test_main(void*varg) {
 	oram_set_default_type(ORAM_OVERRIDE);
 	#endif
 
-	int n = 1;
-	int samples = 1;
+	int elct = 32;
 	int searchct = 1;
+	int samples = 1;
+	bool from_shares = false;
 
 	args_t * args_pass = varg;
 	int arg;
 	optind = 0; // this allows us to getopt a second time
 	while ((arg = getopt_long(args_pass->argc, args_pass->argv, options_string, long_options, NULL)) != -1) {
 		if (arg == 'e') {
-			n = atoi(optarg);
-			if (n <= 0) {
+			elct = atoi(optarg);
+			if (elct <= 0) {
 				fprintf (stderr, "Argument for -%c must be positive.\n", arg);
 				return;
 			}
@@ -105,13 +78,19 @@ void test_main(void*varg) {
 				fprintf (stderr, "Argument for -%c must be positive.\n", arg);
 				return;
 			}
-		}else if (arg == 'o') {
+		} else if (arg == 'o') {
 			if (strcmp(optarg,"sqrt") == 0) {
 				oram_set_default_type(ORAM_TYPE_SQRT);
 			} else if (strcmp(optarg,"circuit") == 0) {
 				oram_set_default_type(ORAM_TYPE_CIRCUIT);
 			} else if (strcmp(optarg,"linear") == 0) {
 				oram_set_default_type(ORAM_TYPE_LINEAR);
+			} else if (strcmp(optarg,"fssl") == 0) {
+				from_shares = true;
+				oram_set_default_type(ORAM_TYPE_FSSL);
+			} else if (strcmp(optarg,"fssl_cprg") == 0) {
+				from_shares = true;
+				oram_set_default_type(ORAM_TYPE_FSSL_CPRG);
 			} else {
 				fprintf (stderr, "Invalid argument for -%c.\n", arg);
 				return;
@@ -123,7 +102,7 @@ void test_main(void*varg) {
 				return;
 			}
 		} else if (arg == '?' || arg == ':') {
-			if (optopt == 'n' || optopt == 'o' || optopt == 'i') {
+			if (optopt == 'e' || optopt == 's' || optopt == 'o' || optopt == 'i') {
 				fprintf (stderr, "Option -%c requires an argument.\n", optopt);
 				return;
 			} else {
@@ -135,53 +114,79 @@ void test_main(void*varg) {
 		}
 	}
 
-	fprintf(stdout, "# Almost Search OPT (sample 1, sample 2, ... sample n)\n");
+	fprintf(stdout, "# ALMOST SEARCH (elements, searches, sample 1 microseconds, sample 1 gates, sample 1 bytes, ...)\n");
 	fflush(stdout);
 
-	{
-		uint64_t tally = 0;
-		uint64_t tallygates = 0;
-		uint64_t tallybytes = 0;
+	OcCopy cpy = ocCopyIntN(4);
+	uint64_t tally = 0;
+	uint64_t tallygates = 0;
+	uint64_t tallybytes = 0;
 
-		int64_t runbytes = 0;
-		int64_t rungates = 0;
-		int64_t runtime = 0;
-		fflush(stdout);
-        int *array = (int*)malloc(n*sizeof(int));
-        obliv int *oarr = (obliv int*)malloc(n*sizeof(obliv int));
-		obliv int *needles = (obliv int*)malloc(searchct*sizeof(obliv int));
-		for (int kk = 0; kk < samples; kk++) {
-			rand_sorted_array(array, n);
-            for(int i = 0; i < n; i++){
-                oarr[i] = feedOblivInt(array[i], 1);
-            }
-			for(int i = 0; i < searchct;i++){
-				needles[i] = feedOblivInt(rand_int(n), 2);
+	fprintf(stdout, "%d,%d", elct, searchct);
+	fflush(stdout);
+
+	void * input;
+	obliv uint32_t output;
+	obliv uint32_t * needles = calloc(searchct, sizeof(obliv uint32_t));
+
+	if (from_shares) input = calloc(elct, 4*sizeof(uint32_t));
+	else input = calloc(elct, 4*sizeof(obliv uint32_t));		
+
+	for (int kk = 0; kk < samples; kk++) {
+		uint32_t temp = 0;
+		for (int ll = 0; ll < elct; ll++) {
+			temp += rand()%8;
+			if (from_shares) {
+				if (ocCurrentParty() == 1) {
+					((uint32_t *)input)[4*ll] = rand();
+					ocBroadcastInt(temp ^ ((uint32_t *)input)[4*ll], 1);
+				} else {
+					((uint32_t *)input)[4*ll] = ocBroadcastInt(NULL, 1);
+				}
+			} else {
+				((obliv uint32_t *)input)[4*ll] = feedOblivInt(temp,1);
 			}
-            obliv int idx;
-			runbytes = tcp2PBytesSent(ocCurrentProto());
-			rungates = yaoGateCount();
-			runtime = current_timestamp();
-			for (int i = 0; i < searchct; i++) {
-            	binary_almost_search_opt(&idx, needles[i], oarr, n);
-			}
-			runtime = current_timestamp() - runtime;
-			rungates = yaoGateCount() - rungates;
-			runbytes = tcp2PBytesSent(ocCurrentProto()) - runbytes;
-			fprintf(stdout, ",(%llu,%llu,%llu)", runtime, rungates, runbytes);
-			tally += runtime;
-			tallygates += rungates;
-			tallybytes += runbytes;
-			fflush(stdout);
-			{	
-				// int o;
-				// revealOblivInt(&o, idx, 0);
-				// fprintf(stdout, "%d,", o);
-			}
-			
 		}
-		fprintf(stdout, "\n");
-		fprintf(stderr, "Almost Search OPT: %llu microseconds avg, %llu gates avg, %llu bytes avg\n", tally/samples, tallygates/samples, tallybytes/samples);
+		for (int ll = 0; ll < searchct; ll++) {
+			if (from_shares) {
+				size_t needlei = 4 * ocBroadcastInt(rand()%elct, 1);
+				needles[ll] = feedOblivInt(((uint32_t *)input)[needlei], 1) ^ feedOblivInt(((uint32_t *)input)[needlei], 2);
+			}
+			else needles[ll] = ((obliv uint32_t *)input)[4 * ocBroadcastInt(rand()%elct, 1)];
+		}
+
+		oram * o;
+
+		if (from_shares) o = oram_from_shares(ORAM_TYPE_AUTO, &cpy, elct, input);
+		else o = oram_from_array(ORAM_TYPE_AUTO, &cpy, elct, input);
+
+		int64_t runtime = -current_timestamp();
+		int64_t rungates = -yaoGateCount();
+		int64_t runbytes = -tcp2PBytesSent(ocCurrentProto());
+
+		for (int ll = 0; ll < searchct; ll++) {
+			binary_almost_search_oram_opt(&cpy, &output, o, &needles[ll], &cmpInt);
+		}
+		
+		runtime += current_timestamp();
+		rungates += yaoGateCount();
+		runbytes += tcp2PBytesSent(ocCurrentProto());
+		fprintf(stdout, ",%llu,%llu,%llu", runtime,rungates, runbytes);
+		fflush(stdout);
+		tally += runtime;
+		tallygates += rungates;
+		tallybytes += runbytes;
+
+		oram_free(o);
 	}
+
+	free(needles);
+	free(input);
+	static_write_simple(ocCurrentParty(), "almost_search_opt", searchct, elct, "Time/s", tally / samples/10e6, samples);
+	static_write_simple(ocCurrentParty(), "almost_search_opt", searchct, elct, "Gates/10e6", tallygates / samples/10e6, samples);
+	static_write_simple(ocCurrentParty(), "almost_search_opt", searchct, elct, "Bytes/MB", tallybytes / samples/10e6, samples);
+	
+	fprintf(stdout, "\n");
+	fprintf(stderr, "Almost Search (elements:%d, searches:%d): %llu microseconds avg, %llu gates avg, %llu bytes avg\n", elct, searchct, tally / samples, tallygates/samples, tallybytes/samples);
 
 }

@@ -151,6 +151,10 @@ void test_main(void*varg) {
 			fflush(stdout);
 			
 		}
+		static_write_hard(ocCurrentParty(), "naive_psi_opt", n, "Time/s", tally / samples/10e6, samples);
+		static_write_hard(ocCurrentParty(), "naive_psi_opt", n, "Gates/10e6", rungates /10e6, samples);
+		static_write_hard(ocCurrentParty(), "naive_psi_opt", n, "Bytes/MB", runbytes/ 10e6, samples);
+	
 		fprintf(stdout, "\n");
 		fprintf(stderr, "NAIVE PSI: %llu microseconds avg, %llu gates avg, %llu bytes avg\n", tally/samples, rungates, runbytes);
 	}

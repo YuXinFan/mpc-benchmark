@@ -2,15 +2,10 @@
 
 void linear_search(obliv int *idx, obliv int *val, obliv int *arr, int arr_size){
     *idx = -1;
-    obliv bool find = false;
     for (int i = 0; i < arr_size; i++) {
-        obliv if (find == false) {
-            obliv if (*val == arr[i]){
-                *idx = i;
-                find = true;
-            }
+        obliv if (*val == arr[i]){
+            *idx = i;
         }
-        
     }
 }
 

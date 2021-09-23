@@ -156,7 +156,9 @@ void test_main(void*varg) {
 		int64_t rungates = -yaoGateCount();
 		int64_t runbytes = -tcp2PBytesSent(ocCurrentProto());
 
-		for (int ll = 0; ll < searchct; ll++) binary_search_oram(&cpy, &output, o, &needles[ll], &cmpInt);
+		for (int ll = 0; ll < searchct; ll++) {
+			binary_search_oram(&cpy, &output, o, &needles[ll], &cmpInt);
+		}
 
 		runtime += current_timestamp();
 		rungates += yaoGateCount();
@@ -172,7 +174,10 @@ void test_main(void*varg) {
 
 	free(needles);
 	free(input);
-
+	static_write_simple(ocCurrentParty(), "binary_search", searchct, elct, "Time/s", tally / samples/10e6, samples);
+	static_write_simple(ocCurrentParty(), "binary_search", searchct, elct, "Gates/10e6", tallygates / samples/10e6, samples);
+	static_write_simple(ocCurrentParty(), "binary_search", searchct, elct, "Bytes/MB", tallybytes / samples/10e6, samples);
+	
 	fprintf(stdout, "\n");
 	fprintf(stderr, "Binary Search (elements:%d, searches:%d): %llu microseconds avg, %llu gates avg, %llu bytes avg\n", elct, searchct, tally / samples, tallygates/samples, tallybytes/samples);
 

@@ -1,79 +1,140 @@
 #include "almost_search.oh"
 #include <obliv_common.h>
 #include "stdbool.h"
+#include "math.h"
 
-void binary_almost_search_main(obliv int *idx, obliv int needle, obliv int* arr, int l, int r) obliv {
-    if (r >= l)
-    {
-        int mid = l + (r - l) / 2;
-        // If the element is present at
-        // one of the middle 3 positions
-        obliv bool left = mid > l;
-        obliv if (left) {
-            left = arr[mid-1] == needle;
-        }
-        obliv bool right = mid < r;
-        obliv if (right) {
-            right =  arr[mid+1] == needle;
-        }
-        obliv if (arr[mid] == needle){
-            *idx = mid;
-        }else obliv if ( left ){
-            *idx = (mid-1);
-        }else obliv if ( right ){
-            *idx = (mid + 1);
-        }else {
-            obliv bool ogt = arr[mid] > needle;
-            obliv if (ogt){
-                binary_almost_search_main(idx, needle, arr, l, mid - 2);
-            } else {
-                binary_almost_search_main(idx, needle, arr, mid + 2, r);
+obliv int binary_almost_search_oram(OcCopy * cpy, void* result, oram * haystack, void* needle, block_cmp_function fn){
+    int upper_bound = log2(oram_size(haystack)) + 1;
+
+	obliv int index = -1;
+	obliv int iimin = 0;
+	obliv int iimax = oram_size(haystack) - 1;
+	obliv int iimid;
+
+	obliv int *aa;
+	obliv int *bb = ((obliv int *)needle);
+	obliv bool oeq;
+	void * temp_element = calloc(1, cpy->eltsize);
+	void * temp_left = calloc(1, cpy->eltsize);
+	void * temp_right = calloc(1, cpy->eltsize);
+   
+
+	bool eq;
+
+	for (int ii = 0; ii < upper_bound; ii++) {
+		iimid = (iimin + iimax) / 2;
+		oram_read(temp_element, haystack, iimid);
+		aa = (obliv int *)temp_element;
+		oeq = *aa == *bb;
+		obliv if (oeq) {
+			ocCopy(cpy, result, temp_element);
+			index = iimid;
+		}else{
+            obliv if ( iimid > iimin) {
+                oram_read(temp_left, haystack, iimid-1);
+                obliv int *tleft = (obliv int*)temp_left;
+                obliv if ( *tleft == *bb ){
+			        ocCopy(cpy, result, temp_left);
+                    index = (iimid-1);
+                }
             }
-        }
-    }
-}
-void binary_almost_search(obliv int *idx, obliv int needle, obliv int* arr, int n){
-    binary_almost_search_main(idx, needle, arr, 0, n-1);
-}
-
-
-void binary_almost_search_opt_main(obliv int *idx, obliv int needle, obliv int* arr, int l, int r) obliv {
-    if (r >= l)
-    {
-        int mid = l + (r - l) / 2;
-        // If the element is present at
-        // one of the middle 3 positions
-        obliv bool oeq = arr[mid] == needle;
-        bool eq;
-        ~obliv(c){
-            revealOblivBool(&eq, oeq, 0);
-        }
-        if (eq) {
-            *idx = mid;
-            return ;
-        }
-        obliv bool left = mid > l;
-        obliv if (left) {
-            left = arr[mid-1] == needle;
-        }
-        obliv bool right = mid < r;
-        obliv if (right) {
-            right =  arr[mid+1] == needle;
-        }
-        obliv if ( left ){
-            *idx = (mid-1);
-        }else obliv if ( right ){
-            *idx = (mid + 1);
-        }else {
-            obliv bool ogt = arr[mid] > needle;
-            obliv if (ogt){
-                binary_almost_search_opt_main(idx, needle, arr, l, mid - 2);
-            } else {
-                binary_almost_search_opt_main(idx, needle, arr, mid + 2, r);
+            obliv if (iimid < iimax) {
+                oram_read(temp_right, haystack, iimid+1);
+                obliv int *tright = (obliv int*)temp_right;
+                obliv if ( *tright == *bb ){
+			        ocCopy(cpy, result, temp_right);
+                    index = (iimid + 1);
+                }
             }
-        }
-    }
+            obliv bool ogt = *aa > *bb;
+            obliv if (ogt) {
+                iimax = iimid-2;
+            }else {
+                iimin = iimid+2;
+            }
+		}
+	}
+	free(temp_element);
+    free(temp_left);
+    free(temp_right);
+	return index;
 }
-void binary_almost_search_opt(obliv int *idx, obliv int needle, obliv int* arr, int n){
-    binary_almost_search_opt_main(idx, needle, arr, 0, n-1);
+
+obliv int binary_almost_search(OcCopy * cpy, void* result, void* haystack, size_t haystack_length, void* needle, block_cmp_function fn) {
+	oram * o = oram_from_array(ORAM_TYPE_AUTO, cpy, haystack_length, haystack);
+
+	obliv int index = binary_almost_search_oram(cpy, result, o, needle, fn);
+
+	oram_free(o);
+
+	return index;
+}
+
+
+obliv int binary_almost_search_oram_opt(OcCopy * cpy, void* result, oram * haystack, void* needle, block_cmp_function fn){
+    int upper_bound = log2(oram_size(haystack)) + 1;
+
+	obliv int index = -1;
+	obliv int iimin = 0;
+	obliv int iimax = oram_size(haystack) - 1;
+	obliv int iimid;
+
+	obliv int *aa;
+	obliv int *bb = ((obliv int *)needle);
+	obliv bool oeq;
+	void * temp_element = calloc(1, cpy->eltsize);
+	void * temp_left = calloc(1, cpy->eltsize);
+	void * temp_right = calloc(1, cpy->eltsize);
+   
+	bool eq;
+
+	for (int ii = 0; ii < upper_bound; ii++) {
+		iimid = (iimin + iimax) / 2;
+		oram_read(temp_element, haystack, iimid);
+		aa = (obliv int *)temp_element;
+		oeq = *aa == *bb;
+        revealOblivBool(&eq, oeq, 0);
+		if (eq) {
+			ocCopy(cpy, result, temp_element);
+			index = iimid;
+            break;
+		}else{
+            obliv if ( iimid > iimin) {
+                oram_read(temp_left, haystack, iimid-1);
+                obliv int *tleft = (obliv int*)temp_left;
+                obliv if ( *tleft == *bb ){
+			        ocCopy(cpy, result, temp_left);
+                    index = (iimid-1);
+                }
+            }
+            obliv if (iimid < iimax) {
+                oram_read(temp_right, haystack, iimid+1);
+                obliv int *tright = (obliv int*)temp_right;
+                obliv if ( *tright == *bb ){
+			        ocCopy(cpy, result, temp_right);
+                    index = (iimid + 1);
+                }
+            }
+            obliv bool ogt = *aa > *bb;
+            obliv if (ogt) {
+                iimax = iimid-2;
+            }else {
+                iimin = iimid+2;
+            }
+		}
+	}
+	free(temp_element);
+    free(temp_left);
+    free(temp_right);
+	return index;
+}
+
+obliv int binary_almost_search_opt(OcCopy * cpy, void* result, void* haystack, size_t haystack_length, void* needle, block_cmp_function fn) {
+	oram * o = oram_from_array(ORAM_TYPE_AUTO, cpy, haystack_length, haystack);
+
+	obliv int index = binary_almost_search_oram_opt(cpy, result, o, needle, fn);
+
+	oram_free(o);
+
+	return index;
 }

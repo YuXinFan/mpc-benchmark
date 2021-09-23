@@ -12,3 +12,4 @@ raw/*.bc
 log/
 temp.txt
 __pycache__/
+*.csv

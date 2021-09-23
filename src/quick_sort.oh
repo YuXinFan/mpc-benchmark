@@ -3,6 +3,8 @@
 
 #include <obliv.oh>
 #include <copy.oh>
+#include <obliv_common.h>
+#include "staticutil.h" 
 
 typedef obliv char (* osort_cmp_function)(OcCopy *, void * el1, void * el2);
 

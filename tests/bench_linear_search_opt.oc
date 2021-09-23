@@ -10,7 +10,7 @@
 #include "test_generic.h"
 #include "linear_search.oh"
 
-static const char TESTNAME[] = "linear_search_benchmark";
+static const char TESTNAME[] = "linear_search_opt_benchmark";
 
 #define TEXT_HELP_SUPPLEMENTARY "\
   -e \x1b[4mNUMBER\x1b[0m, --elements=\x1b[4mNUMBER\x1b[0m \n\t\tsearch through \x1b[4mNUMBER\x1b[0m elements\n\n\
@@ -48,7 +48,7 @@ void rand_array(int *array, size_t n) {
     
 	for (i = 0; i < n ; i++) 
 	{
-		size_t j = rand() % (n);
+		size_t j = rand() % (2*n);
 		array[i] = j;
 	}
 }
@@ -125,7 +125,7 @@ void test_main(void*varg) {
 		}
 	}
 
-	fprintf(stdout, "# Linear Search (sample 1, sample 2, ... sample n)\n");
+	fprintf(stdout, "# Linear Search Opt(sample 1, sample 2, ... sample n)\n");
 	fflush(stdout);
 
 	{
@@ -143,10 +143,10 @@ void test_main(void*varg) {
 		for (int kk = 0; kk < samples; kk++) {
 			rand_array(array, n);
             for(int i = 0; i < n; i++){
-                oarr[i] = feedOblivInt(array[i], 1);
+                oarr[i] = feedOblivInt(array[i], 2);
             }
 			for(int i = 0; i < searchct;i++){
-				needles[i] = feedOblivInt(rand_int(n), 2);
+				needles[i] = feedOblivInt(array[rand()%n],1);
 			}
             obliv int idx;
 			runbytes = tcp2PBytesSent(ocCurrentProto());
@@ -163,15 +163,14 @@ void test_main(void*varg) {
 			tallygates += rungates;
 			tallybytes += runbytes;
 			fflush(stdout);
-			{	
-				// int o;
-				// revealOblivInt(&o, idx, 0);
-				// fprintf(stdout, "%d,", o);
-			}
 			
 		}
+		static_write_simple(ocCurrentParty(), "linear_search_opt", searchct, n, "Time/s", tally / samples/10e6, samples);
+		static_write_simple(ocCurrentParty(), "linear_search_opt", searchct, n, "Gates/10e6", tallygates / samples/10e6, samples);
+		static_write_simple(ocCurrentParty(), "linear_search_opt", searchct, n, "Bytes/MB", tallybytes / samples/10e6, samples);
+	
 		fprintf(stdout, "\n");
-		fprintf(stderr, "Linear Search: %llu microseconds avg, %llu gates avg, %llu bytes avg\n", tally/samples, tallygates/samples, tallybytes/samples);
+		fprintf(stderr, "Linear Search Opt: %llu microseconds avg, %llu gates avg, %llu bytes avg\n", tally/samples, tallygates/samples, tallybytes/samples);
 	}
 
 }

@@ -10,7 +10,7 @@ LDFLAGS += -lm -lgomp -lgcrypt
 SRC_PATH=src/
 LIB_OUT_PATH=build/lib/
 ACKLIB = $(LIB_OUT_PATH)/liback.a
-DEPS=ackutil.o endian.oo shuffle.oo waksman.o
+DEPS=ackutil.o endian.oo shuffle.oo waksman.o 
 SQRT_ORAM_DEPS=decoder.oo sqrtoram.oo
 CKT_ORAM_DEPS=block.oo circuit_oram.oo linear_scan_oram.oo nonrecursive_oram.oo utils.oo
 FSSL_ORAM_DEPS=fss.oo fss.o fss_cprg.oo fss_cprg.o floram_util.oo floram_util.o scanrom.oo scanrom.o floram.oo\
@@ -29,8 +29,8 @@ OBJS=$(DEPS) $(ORAM_DEPS) obig.oo ochacha.oo ograph.oo omatch.oo omatch_textbook
 
 TEST_PATH=tests/
 TEST_OUT_PATH=build/tests/
-TEST_DEPS=test_main.o
-TEST_BINS = test_obig test_osha256 test_osha512 test_osalsa test_ochacha test_oaes\
+TEST_DEPS=test_main.o 
+TEST_BINS =test_obig test_osha256 test_osha512 test_osalsa test_ochacha test_oaes\
 		test_oqueue test_oram test_oscrypt test_ograph test_omatch \
 		bench_oram_write bench_oram_read bench_oram_init bench_oscrypt bench_bfs bench_bs\
 		bench_gs bench_gs_textbook bench_rp bench_oaes bench_oqueue bench_waksman\
