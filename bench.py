@@ -28,6 +28,17 @@ def make_csv():
         val.append(max(v1,v2))
     pp["Val"] = val 
     pp["Repeat"] = p0["Repeat"]
+    ## compute performace improve 
+    im = []
+    for i in range(int(len(l0)/3/2)):
+        im.append(0)
+        im.append(0)
+        im.append(0)
+        im.append((pp["Val"][i*6]-pp["Val"][i*6+3])/pp["Val"][i*6])
+        im.append((pp["Val"][i*6+1]-pp["Val"][i*6+1+3])/pp["Val"][i*6+1])
+        im.append((pp["Val"][i*6+2]-pp["Val"][i*6+2+3])/pp["Val"][i*6+2])
+
+    pp["Reduce"] = im
     df = pd.DataFrame(pp)
     df.to_csv("./Party.csv", index=False)
     print(df)
