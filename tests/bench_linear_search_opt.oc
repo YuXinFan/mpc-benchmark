@@ -143,10 +143,10 @@ void test_main(void*varg) {
 		for (int kk = 0; kk < samples; kk++) {
 			rand_array(array, n);
             for(int i = 0; i < n; i++){
-                oarr[i] = feedOblivInt(array[i], 2);
+                oarr[i] = feedOblivInt(array[i], 1);
             }
 			for(int i = 0; i < searchct;i++){
-				needles[i] = feedOblivInt(array[rand()%n],1);
+				needles[i] = feedOblivInt(array[rand()%n],2);
 			}
             obliv int idx;
 			runbytes = tcp2PBytesSent(ocCurrentProto());
