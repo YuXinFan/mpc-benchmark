@@ -2,7 +2,6 @@ import pandas as pd
 
 p0=pd.read_csv("Party-0.csv", names=['Name', 'InSize', 'Type', 'Val', "Repeat"])
 p1=pd.read_csv("Party-1.csv", names=['Name', 'InSize', 'Type', 'Val', "Repeat"])
-print(p0)
 pp ={"Name": p0["Name"], "InSize": p0["InSize"],"Type": p0["Type"]}
 val = []
 l0 = p0["Val"].to_list()
@@ -16,3 +15,4 @@ pp["Val"] = val
 pp["Repeat"] = p0["Repeat"]
 df = pd.DataFrame(pp)
 df.to_csv("./Party.csv", index=False)
+print(df)
