@@ -34,9 +34,18 @@ def make_csv():
         im.append(0)
         im.append(0)
         im.append(0)
-        im.append((pp["Val"][i*6]-pp["Val"][i*6+3])/pp["Val"][i*6])
-        im.append((pp["Val"][i*6+1]-pp["Val"][i*6+1+3])/pp["Val"][i*6+1])
-        im.append((pp["Val"][i*6+2]-pp["Val"][i*6+2+3])/pp["Val"][i*6+2])
+        if (pp["Val"][i*6] == 0.0):
+            im.append(0)
+        else:
+            im.append((pp["Val"][i*6]-pp["Val"][i*6+3])/pp["Val"][i*6])
+        if (pp["Val"][i*6+1] == 0.0):
+            im.append(0)
+        else:
+            im.append((pp["Val"][i*6+1]-pp["Val"][i*6+1+3])/pp["Val"][i*6+1])
+        if (pp["Val"][i*6+2] == 0.0):
+            im.append(0)
+        else:
+            im.append((pp["Val"][i*6+2]-pp["Val"][i*6+2+3])/pp["Val"][i*6+2])
 
     pp["Reduce"] = im
     df = pd.DataFrame(pp)
@@ -58,34 +67,58 @@ def bench_test():
         cmd = "./build/tests/bench_%s  %s & ./build/tests/bench_%s  %s -c localhost" % (cases[i][0], params[i], cases[i][0], params[i])
         exit_code = subprocess.call(cmd, shell=True)
         if (exit_code != 0):
-            log = log + "Failed:" + cmd + "\n"
+            os.error("Failed:" + cmd + "\n")
 
         cmd = "./build/tests/bench_%s  %s & ./build/tests/bench_%s  %s -c localhost" % (cases[i][1], params[i], cases[i][1], params[i])
         exit_code = subprocess.call(cmd, shell=True)
         if (exit_code != 0):
-            log = log + "Failed:" + cmd + "\n"
+            os.error("Failed:" + cmd + "\n")
 
-def bench_one():
-    cases = [("batcher_sort", "quick_sort"),
-            ("linear_search", "linear_search_opt"),
-            ("binary_search", "binary_search_opt"),
-            ("almost_search", "almost_search_opt"),
-            ("naive_psi", "naive_psi_opt")]
-    params = ["-n 100 -i 2", 
-        "-e 100 -s 30 -i 2", 
-        "-e 100 -s 30 -i 2", 
-        "-e 100 -s 30 -i 2",
-        "-n 100 -i 2"]
-    for i in range(len(cases)):
-        cmd = "./build/tests/bench_%s  %s & ./build/tests/bench_%s  %s -c localhost" % (cases[i][0], params[i], cases[i][0], params[i])
+
+def bench_one(btype, bname):
+    tdic = {}
+    tdic["sort"] = ["-n 10 -i 2",
+            "-n 100 -i 2",
+            "-n 1000 -i 2",
+            "-n 10000 -i 2"]
+    tdic["search"] = ["-e 10 -s 5 -i 2",
+            "-e 100 -s 50 -i 2",
+            "-e 1000 -s 500 -i 2",
+            "-e 10000 -s 5000 -i 2"]
+    tdic["psi"] = ["-n 10 -i 2",
+            "-n 100 -i 2",
+            "-n 1000 -i 2",
+            "-n 10000 -i 2"]
+    for i in tdic[btype]:        
+        cmd = "./build/tests/bench_%s  %s & ./build/tests/bench_%s  %s -c localhost" % (bname, i, bname, i)
         exit_code = subprocess.call(cmd, shell=True)
         if (exit_code != 0):
-            log = log + "Failed:" + cmd + "\n"
+            os.error("Failed:" + cmd + "\n")
 
-        cmd = "./build/tests/bench_%s  %s & ./build/tests/bench_%s  %s -c localhost" % (cases[i][1], params[i], cases[i][1], params[i])
+def bench_pair(btype, bname):
+    tdic = {}
+    tdic["sort"] = ["-n 10 -i 2",
+            "-n 100 -i 2",
+            "-n 1000 -i 2",
+            "-n 10000 -i 2"]
+    tdic["search"] = ["-e 10 -s 5 -i 2",
+            "-e 100 -s 50 -i 2",
+            "-e 1000 -s 500 -i 2",
+            "-e 10000 -s 5000 -i 2"]
+    tdic["psi"] = ["-n 10 -i 2",
+            "-n 100 -i 2",
+            "-n 1000 -i 2",
+            "-n 10000 -i 2"]
+    for i in tdic[btype]:        
+        cmd = "./build/tests/bench_%s  %s & ./build/tests/bench_%s  %s -c localhost" % (bname, i, bname, i)
         exit_code = subprocess.call(cmd, shell=True)
         if (exit_code != 0):
-            log = log + "Failed:" + cmd + "\n"
+            os.error("Failed:" + cmd + "\n")
+        cmd = "./build/tests/bench_%s_opt  %s & ./build/tests/bench_%s_opt  %s -c localhost" % (bname, i, bname, i)
+        exit_code = subprocess.call(cmd, shell=True)
+        if (exit_code != 0):
+            os.error("Failed:" + cmd + "\n")
+        
 def bench_all():
     cases = [("batcher_sort", "quick_sort"),
             ("linear_search", "linear_search_opt"),
@@ -111,20 +144,29 @@ def bench_all():
 def main():
 
     parser = argparse.ArgumentParser()
-    # parser.add_argument('--input', type=str)
+    parser.add_argument('--type', type=str)
+    parser.add_argument('--name', type=str)
     parser.add_argument('--all', action='store_true')
     parser.add_argument('--test', action='store_true')
     parser.add_argument('--one', action='store_true')
     parser.add_argument('--pair', action='store_true')
+    parser.add_argument('--csv', action="store_true")
 
     args = parser.parse_args()
 
-    clean_csv()
-    if (args.test):
-        bench_test()
-    elif (args.bench_all):
-        bench_all()
-    
-    make_csv()
-    print(log)
+    if (args.csv):
+        make_csv()
+    else:
+        clean_csv()
+        if (args.test):
+            bench_test()
+        elif (args.all):
+            bench_all()
+        elif (args.one):
+            bench_one(args.type, args.name)
+        elif (args.pair):
+            bench_pair(args.type, args.name)
+        
+        make_csv()
+        print(log)
 main()
