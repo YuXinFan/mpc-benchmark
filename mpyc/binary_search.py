@@ -75,7 +75,7 @@ def bench(isopt = False, arraySize=10, searchSize = 1, samples=1):
     print("start benchmark binary search %s, %d times repeat:" % ("opt" if isopt else "", samples))
     for kk in range(samples):
         cleartext = gen_sorted_array(arraySize)
-        eles = [cleartext[random.randint(0,arraySize-1)] for _ in range(arraySize)]
+        eles = [cleartext[random.randint(0,arraySize-1)] for _ in range(searchSize)]
         x = list(map(secint, cleartext))
         x = seclist(x)
         for jj in range(searchSize):

@@ -142,10 +142,10 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--opt', action='store_true')
     parser.add_argument('-n', type=int)
-    parser.add_argument('-r', type=int)
+    parser.add_argument('-i', type=int)
 
 
     args = parser.parse_args()
 
-    bench(args.opt, args.n, args.r)
+    bench(args.opt, args.n, args.i)
 main()
