@@ -105,21 +105,21 @@ def bench_one(btype, bname):
 
 def bench_pair(btype, bname):
     tdic = {}
-    tdic["sort"] = ["-n 10 -i 10",
-            "-n 100 -i 10",
-            "-n 1000 -i 10",
-            "-n 10000 -i 10"]
-    tdic["search"] = ["-e 10 -s 100 -i 10",
-            "-e 100 -s 100 -i 10",
-            "-e 1000 -s 100 -i 10",
-            "-e 10000 -s 100 -i 10"]
-    tdic["psi"] = ["-n 10 -i 10",
-            "-n 100 -i 10",
-            "-n 1000 -i 10",
-            "-n 10000 -i 10"]
-    tdic["line_insect"] = ["-n 10 -i 10",
-            "-n 100 -i 10",
-            "-n 1000 -i 10"]
+    tdic["sort"] = ["-n 10 -i 10",]
+            #"-n 100 -i 10",
+            #"-n 1000 -i 10",
+            #"-n 10000 -i 10"]
+    tdic["search"] = ["-e 10 -s 100 -i 10",]
+            #"-e 100 -s 100 -i 10",
+            #"-e 1000 -s 100 -i 10",
+            #"-e 10000 -s 100 -i 10"]
+    tdic["psi"] = ["-n 10 -i 10",]
+            #"-n 100 -i 10",
+            #"-n 1000 -i 10",
+            #"-n 10000 -i 10"]
+    tdic["line_insect"] = ["-n 10 -i 10",]
+            #"-n 100 -i 10",
+            #"-n 1000 -i 10"]
     for i in tdic[btype]:        
         cmd = "python %s.py  %s " % (bname, i)
         exit_code = subprocess.call(cmd, shell=True)
@@ -176,10 +176,13 @@ def main():
 
     if args.man:
         clean_csv()
-        bench_pair("search", "linear_search", "linear_search_opt")
-        bench_pair("search", "binary_search", "binary_search_opt")
-        bench_pair("search", "almost_search", "almost_search_opt")
-        make_csv()
+        bench_pair("search", "linear_search")
+        bench_pair("search", "binary_search")
+        bench_pair("search", "almost_search")
+        bench_pair("psi", "naive_psi")
+        bench_pair("line_insect", "line_intersect")
+        bench_pair("sort", "sort")
+
         return 
 
     if (args.csv):
