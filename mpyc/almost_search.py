@@ -74,16 +74,23 @@ async def binary_almost_search_opt_main(haystack, haystack_length, needle):
 def binary_almost_search_opt(arr, n, needle):
     return binary_almost_search_opt_main(arr, n, needle)
 
-
-
-def testOpt(arraySize=10, searchSize = 1, samples=1):
+def bench(isopt = False, arraySize=10, searchSize = 1, samples=1):
     import random
     import time
+    MIN = 0
+    repeat = samples
+    MAX = 2*arraySize
+
+    func = None 
+    if isopt :
+        func = binary_almost_search_opt
+    else:
+        func = binary_almost_search
 
     mpc.run(mpc.start())            # required only when run with multiple parties
 
     totalTime = 0
-    print("start benchmark binary search opt, %d times repeat:" % samples)
+    print("start benchmark almost search %s, %d times repeat:" % ("opt" if isopt else "", samples))
     for kk in range(samples):
         cleartext = gen_sorted_array(arraySize)
         eles = [cleartext[random.randint(0,arraySize-1)] for _ in range(arraySize)]
@@ -93,42 +100,21 @@ def testOpt(arraySize=10, searchSize = 1, samples=1):
             e = secint(eles[jj])
             # print(x)
             timeS = time.perf_counter()
-            oy = binary_almost_search_opt(x, arraySize, e)
+            oy = func(x, arraySize, e)
             #y=mpc.run(mpc.output(oy))
             timeE = time.perf_counter()
 
             timeDiff = timeE-timeS 
             #print("%.3f, " % timeDiff, end="")
             totalTime += timeDiff
+        print("Sample %d cost %.3f" % (kk, timeDiff))
     print("Total repeat %d times. Average execution time is %.3fs." % (samples, totalTime/samples))
+
     mpc.run(mpc.shutdown())
-
-def testRaw(arraySize=10, searchSize = 1, samples=1):
-    import random
-    import time
-
-    mpc.run(mpc.start())            # required only when run with multiple parties
-
-    totalTime = 0
-    print("start benchmark binary search raw, %d times repeat:" % samples)
-    for kk in range(samples):
-        cleartext = gen_sorted_array(arraySize)
-        eles = [cleartext[random.randint(0,arraySize-1)] for _ in range(arraySize)]
-        x = list(map(secint, cleartext))
-        x = seclist(x)
-        for jj in range(searchSize):
-            e = secint(eles[jj])
-            # print(x)
-            timeS = time.perf_counter()
-            oy = binary_almost_search(x, arraySize, e)
-            #y=mpc.run(mpc.output(oy))
-            timeE = time.perf_counter()
-
-            timeDiff = timeE-timeS 
-            #print("%.3f, " % timeDiff, end="")
-            totalTime += timeDiff
-    print("Total repeat %d times. Average execution time is %.3fs." % (samples, totalTime/samples))
-    mpc.run(mpc.shutdown())
+    f = open("Party.csv", "a+")
+    f.write("%s, %d, Time/s, %.3f,%d\n" 
+    % ("almost_search_opt" if isopt else "almost_search", arraySize, totalTime/samples, samples))
+    f.close()
 
 def main():
     import argparse
@@ -141,10 +127,7 @@ def main():
 
     args = parser.parse_args()
 
-    if args.opt == True:
-        testOpt(args.e, args.s, args.i)
-    else:
-        testRaw(args.e, args.s, args.i)
+    bench(args.opt, args.e, args.s, args.i)
 main()
 
 

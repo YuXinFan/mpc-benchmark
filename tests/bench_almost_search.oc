@@ -174,9 +174,9 @@ void test_main(void*varg) {
 
 	free(needles);
 	free(input);
-	static_write_simple(ocCurrentParty(), "almost_search", searchct, elct, "Time/s", tally / samples/10e6, samples);
-	static_write_simple(ocCurrentParty(), "almost_search", searchct, elct, "Gates/10e6", tallygates / samples/10e6, samples);
-	static_write_simple(ocCurrentParty(), "almost_search", searchct, elct, "Bytes/MB", tallybytes / samples/10e6, samples);
+	static_write_simple(ocCurrentParty(), "almost_search", searchct, elct, "Time/s", tally / samples/1e6, samples);
+	static_write_simple(ocCurrentParty(), "almost_search", searchct, elct, "Gates/10e6", tallygates / samples/1e6, samples);
+	static_write_simple(ocCurrentParty(), "almost_search", searchct, elct, "Bytes/MB", tallybytes / samples/1e6, samples);
 	
 	fprintf(stdout, "\n");
 	fprintf(stderr, "Almost Search (elements:%d, searches:%d): %llu microseconds avg, %llu gates avg, %llu bytes avg\n", elct, searchct, tally / samples, tallygates/samples, tallybytes/samples);

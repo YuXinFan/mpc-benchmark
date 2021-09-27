@@ -1,3 +1,4 @@
+from random import sample
 from mpyc.runtime import mpc    # load MPyC
 secint = mpc.SecInt()           # 32-bit secure MPyC integers
 mpc.run(mpc.start())            # required only when run with multiple parties
@@ -21,88 +22,53 @@ async def linear_search_opt(val, arr, size):
             break 
     return idx 
 
-
-def testOpt(samples=1, n=10):
+def bench(isopt = False, arraySize=10, searchSize = 1, samples=1):
     import random
     import time
     MIN = 0
-    repeat = n
-    MAX = 2*n 
+    repeat = samples
+    MAX = 2*arraySize
+
+    func = None 
+    if isopt :
+        func = linear_search_opt 
+    else:
+        func = linear_search
 
     mpc.run(mpc.start())            # required only when run with multiple parties
 
     totalTime = 0
-    print("start benchmark binary search opt, %d times repeat:" % samples)
+    print("start benchmark binary search %s, %d times repeat:" % ("opt" if isopt else "", samples))
     for kk in range(samples):
-        cleartext = random.sample(range(MIN, MAX), n)
+        cleartext = random.sample(range(MIN, MAX), arraySize)
+        eles = [cleartext[random.randint(0,arraySize-1)] for _ in range(arraySize)]
         x = list(map(secint, cleartext))
-        for jj in range(repeat):
-            ele = random.randrange(MIN,MAX)
-            e = secint(ele)
+        for jj in range(searchSize):
+            e = secint(eles[jj])
             # print(x)
             timeS = time.perf_counter()
-            oy = linear_search_opt(e, x, n)
-            #y=mpc.run(mpc.output(oy))
+            oy = func(e, x, arraySize)
             timeE = time.perf_counter()
-
-            # if (y != -1):
-            #     print("In:",cleartext[y]==ele)
-            # else:
-            #     print("Not-in:", cleartext.count(ele)==0)
-
             timeDiff = timeE-timeS 
             #print("%.3f, " % timeDiff, end="")
             totalTime += timeDiff
-    print("Total repeat %d times. Average execution time is %.3fs." % (samples, totalTime/samples/repeat))
+        print("Sample %d cost %.3f" % (kk, timeDiff))
+    print("Total repeat %d times. Average execution time is %.3fs." % (samples, totalTime/samples))
 
     mpc.run(mpc.shutdown())
-
-def testRaw(samples=1, n=10):
-    import random
-    import time
-    
-    MIN = 0
-    repeat = n
-    MAX = 2*n 
-
-    mpc.run(mpc.start())            # required only when run with multiple parties
-
-    totalTime = 0
-    print("start benchmark binary search raw, %d times repeat:" % samples)
-    for kk in range(samples):
-        cleartext = random.sample(range(MIN, MAX), n)
-        x = list(map(secint, cleartext))
-        for jj in range(repeat):
-            ele = random.randrange(MIN,MAX)
-            e = secint(ele)
-            # print(x)
-            timeS = time.perf_counter()
-            oy = linear_search(e, x, n)
-            #y=mpc.run(mpc.output(oy))
-            timeE = time.perf_counter()
-
-            # if (y != -1):
-            #     print("In:",cleartext[y]==ele)
-            # else:
-            #     print("Not-in:", cleartext.count(ele)==0)
-
-            timeDiff = timeE-timeS 
-            #print("%.3f, " % timeDiff, end="")
-            totalTime += timeDiff
-    print("Total repeat %d times. Average execution time is %.3fs." % (samples, totalTime/samples/repeat))
-    mpc.run(mpc.shutdown())
+    f = open("Party.csv", "a+")
+    f.write("%s, %d, Time/s, %.3f,%d\n" % ("linear_search_opt" if isopt else "linear_search", arraySize,totalTime/samples, samples))
+    f.close()
 
 def main():
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--opt', action='store_true')
-    parser.add_argument('-n', type=int)
-    parser.add_argument('-r', type=int)
+    parser.add_argument('-e', type=int)
+    parser.add_argument('-s', type=int)
+    parser.add_argument('-i', type=int)
 
     args = parser.parse_args()
 
-    if args.opt == True:
-        testOpt(args.r, args.n)
-    else:
-        testRaw(args.r, args.n)
+    bench(args.opt, args.e, args.s, args.i )
 main()

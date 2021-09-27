@@ -166,9 +166,9 @@ void test_main(void*varg) {
 			fflush(stdout);
 			
 		}
-		static_write_simple(ocCurrentParty(), "linear_search_opt", searchct, n, "Time/s", tally / samples/10e6, samples);
-		static_write_simple(ocCurrentParty(), "linear_search_opt", searchct, n, "Gates/10e6", tallygates / samples/10e6, samples);
-		static_write_simple(ocCurrentParty(), "linear_search_opt", searchct, n, "Bytes/MB", tallybytes / samples/10e6, samples);
+		static_write_simple(ocCurrentParty(), "linear_search_opt", searchct, n, "Time/s", tally / samples/1e6, samples);
+		static_write_simple(ocCurrentParty(), "linear_search_opt", searchct, n, "Gates/10e6", tallygates / samples/1e6, samples);
+		static_write_simple(ocCurrentParty(), "linear_search_opt", searchct, n, "Bytes/MB", tallybytes / samples/1e6, samples);
 	
 		fprintf(stdout, "\n");
 		fprintf(stderr, "Linear Search Opt: %llu microseconds avg, %llu gates avg, %llu bytes avg\n", tally/samples, tallygates/samples, tallybytes/samples);

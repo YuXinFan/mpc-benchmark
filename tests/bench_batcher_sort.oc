@@ -191,9 +191,9 @@ void test_main(void*varg) {
 
 		free(perm);
 		free(input);
-		static_write_hard(ocCurrentParty(), "batcher_sort", size, "Time/s", tally / samples/10e6, samples);
-		static_write_hard(ocCurrentParty(), "batcher_sort", size, "Gates/10e6", rungates / 10e6, samples);
-		static_write_hard(ocCurrentParty(), "batcher_sort", size, "Bytes/MB", runbytes / 10e6, samples);
+		static_write_hard(ocCurrentParty(), "batcher_sort", size, "Time/s", tally / samples/1e6, samples);
+		static_write_hard(ocCurrentParty(), "batcher_sort", size, "Gates/10e6", rungates / 1e6, samples);
+		static_write_hard(ocCurrentParty(), "batcher_sort", size, "Bytes/MB", runbytes / 1e6, samples);
 
 		fprintf(stdout, "\n");
 		fprintf(stderr, "Batcher Sort (size:%d): %llu microseconds avg, %llu gates avg, %llu bytes avg\n", size, tally/samples, rungates, runbytes);

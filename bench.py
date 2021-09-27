@@ -3,7 +3,7 @@ import re
 import os
 import argparse
 import pandas as pd 
-
+import time
 log = ""
 
 def clean_csv():
@@ -52,6 +52,17 @@ def make_csv():
     df.to_csv("./Party.csv", index=False)
     print(df)
 
+def bench_single(braw, bopt, params):
+    cmd = "./build/tests/bench_%s  %s & ./build/tests/bench_%s  %s -c localhost" % (braw, params, braw, params)
+    exit_code = subprocess.call(cmd, shell=True)
+    if (exit_code != 0):
+        os.error("Failed:" + cmd + "\n")
+    time.sleep(1)
+    cmd = "./build/tests/bench_%s  %s & ./build/tests/bench_%s  %s -c localhost" % (bopt, params, bopt, params)
+    exit_code = subprocess.call(cmd, shell=True)
+    if (exit_code != 0):
+        os.error("Failed:" + cmd + "\n")
+
 def bench_test():
     cases = [("batcher_sort", "quick_sort"),
             ("linear_search", "linear_search_opt"),
@@ -95,29 +106,35 @@ def bench_one(btype, bname):
         if (exit_code != 0):
             os.error("Failed:" + cmd + "\n")
 
-def bench_pair(btype, bname):
+def bench_pair(btype, braw, bopt):
     tdic = {}
-    tdic["sort"] = ["-n 10 -i 2",
-            "-n 100 -i 2",
-            "-n 1000 -i 2",
-            "-n 10000 -i 2"]
-    tdic["search"] = ["-e 10 -s 5 -i 2",
-            "-e 100 -s 50 -i 2",
-            "-e 1000 -s 500 -i 2",
-            "-e 10000 -s 5000 -i 2"]
-    tdic["psi"] = ["-n 10 -i 2",
-            "-n 100 -i 2",
-            "-n 1000 -i 2",
-            "-n 10000 -i 2"]
+    tdic["sort"] = ["-n 10 -i 10",
+            "-n 100 -i 10",
+            "-n 1000 -i 10",
+            "-n 10000 -i 10"]
+    tdic["search"] = ["-e 10 -s 100 -i 10",
+            "-e 100 -s 100 -i 10",
+            "-e 1000 -s 100 -i 10",
+            "-e 10000 -s 100 -i 10"]
+    tdic["psi"] = ["-n 10 -i 10",
+            "-n 100 -i 10",
+            "-n 1000 -i 10",
+            "-n 10000 -i 10"]
+    tdic["line_insect"] = ["-n 10 -i 10",
+            "-n 100 -i 10",
+            "-n 1000 -i 10"]
     for i in tdic[btype]:        
-        cmd = "./build/tests/bench_%s  %s & ./build/tests/bench_%s  %s -c localhost" % (bname, i, bname, i)
+        cmd = "./build/tests/bench_%s  %s & ./build/tests/bench_%s  %s -c localhost" % (braw, i, braw, i)
         exit_code = subprocess.call(cmd, shell=True)
         if (exit_code != 0):
             os.error("Failed:" + cmd + "\n")
-        cmd = "./build/tests/bench_%s_opt  %s & ./build/tests/bench_%s_opt  %s -c localhost" % (bname, i, bname, i)
+        time.sleep(1)
+        cmd = "./build/tests/bench_%s  %s & ./build/tests/bench_%s  %s -c localhost" % (bopt, i, bopt, i)
         exit_code = subprocess.call(cmd, shell=True)
         if (exit_code != 0):
             os.error("Failed:" + cmd + "\n")
+        time.sleep(1)
+        
         
 def bench_all():
     cases = [("batcher_sort", "quick_sort"),
@@ -145,14 +162,29 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--type', type=str)
-    parser.add_argument('--name', type=str)
+    parser.add_argument('--raw', type=str)
+    parser.add_argument('--opt', type=str)
+
     parser.add_argument('--all', action='store_true')
     parser.add_argument('--test', action='store_true')
     parser.add_argument('--one', action='store_true')
+    parser.add_argument('--single', action='store_true')
+    parser.add_argument('--params', type=str)
+
+
     parser.add_argument('--pair', action='store_true')
     parser.add_argument('--csv', action="store_true")
+    parser.add_argument("--man", action="store_true")
 
     args = parser.parse_args()
+
+    if args.man:
+        clean_csv()
+        bench_pair("search", "linear_search", "linear_search_opt")
+        bench_pair("search", "binary_search", "binary_search_opt")
+        bench_pair("search", "almost_search", "almost_search_opt")
+        make_csv()
+        return 
 
     if (args.csv):
         make_csv()
@@ -162,11 +194,13 @@ def main():
             bench_test()
         elif (args.all):
             bench_all()
+        elif args.single:
+            bench_single(args.raw, args.opt, args.params)
         elif (args.one):
             bench_one(args.type, args.name)
         elif (args.pair):
-            bench_pair(args.type, args.name)
-        
+            bench_pair(args.type, args.raw, args.opt)
         make_csv()
         print(log)
+
 main()

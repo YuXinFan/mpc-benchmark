@@ -46,37 +46,58 @@ async def line_intersect_opt(a,b,c,d):
     p = [a[0] + dx, a[1] + dy]
     return p
 
+def bench(isopt = False, arraySize=10, samples=1):
+    import random
+    import time
+    MIN = 0
+    repeat = samples
+    MAX = 2*arraySize
+
+    func = None 
+    if isopt :
+        func = line_intersect_opt
+    else:
+        func = line_intersect
+
+    mpc.run(mpc.start())            # required only when run with multiple parties
+
+    totalTime = 0
+    print("start benchmark line_insect %s, %d times repeat:" % ("opt" if isopt else "", samples))
+    for kk in range(samples):
+        for jj in range(arraySize):
+            clear_a = [random.uniform(0, 1000), random.uniform(0, 1000)]
+            clear_b = [random.uniform(0, 1000), random.uniform(0, 1000)]
+            clear_c = [random.uniform(0, 1000), random.uniform(0, 1000)]
+            clear_d = [random.uniform(0, 1000), random.uniform(0, 1000)]
+            sec_a = list(map(secflt, clear_a))
+            sec_b = list(map(secflt, clear_b))
+            sec_c = list(map(secflt, clear_c))
+            sec_d = list(map(secflt, clear_d))
+
+            timeS = time.perf_counter()
+            func(sec_a,sec_b,sec_c,sec_d)
+            #mpc.run(mpc.output(p))
+            timeE = time.perf_counter()
+            timeDiff = timeE-timeS 
+            # print("%.3f, " % timeDiff, end="")
+            totalTime += timeDiff
+        print("Sample %d cost %.3f" % (kk, timeDiff))
+    print("Total repeat %d times. Average execution time is %.3fs." % (samples, totalTime/samples))
+
+    mpc.run(mpc.shutdown())
+    f = open("Party.csv", "a+")
+    f.write("%s, %d, Time/s, %.3f,%d\n" 
+    % ("line_insect_opt" if isopt else "line_search", arraySize, totalTime/samples, samples))
+    f.close()
+
 def main():
-    samples = 100
-    import time 
-    totalTime=0
-    print("start benchmark Batcher Sort, %d times repeat:" % samples)
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--opt', action='store_true')
+    parser.add_argument('-n', type=int)
+    parser.add_argument('-r', type=int)
 
-    for i in range(samples):
-        clear_a = [random.uniform(0, 1000), random.uniform(0, 1000)]
-        clear_b = [random.uniform(0, 1000), random.uniform(0, 1000)]
-        clear_c = [random.uniform(0, 1000), random.uniform(0, 1000)]
-        clear_d = [random.uniform(0, 1000), random.uniform(0, 1000)]
-        sec_a = list(map(secflt, clear_a))
-        sec_b = list(map(secflt, clear_b))
-        sec_c = list(map(secflt, clear_c))
-        sec_d = list(map(secflt, clear_d))
+    args = parser.parse_args()
 
-        timeS = time.perf_counter()
-        p = line_intersect(sec_a,sec_b,sec_c,sec_d)
-        #mpc.run(mpc.output(p))
-        timeE = time.perf_counter()
-        timeDiff = timeE-timeS 
-        # print("%.3f, " % timeDiff, end="")
-        totalTime += timeDiff
-        print(p)
-        # if mpc.output(p[0]):
-        #     print("cross: ", p)
-        #     pass
-        # else:
-        #     print("not cross: ", p)
-        #     pass
-    print()
-    print("Total repeat %d times. Total execution time is %.3fs." % (samples, totalTime))
+    bench(args.opt, args.n, args.r)
 main()
-mpc.run(mpc.shutdown())

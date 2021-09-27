@@ -178,9 +178,9 @@ void test_main(void*varg) {
 			}
 			
 		}
-		static_write_hard(ocCurrentParty(), "line_insect", n, "Time/s", tally / samples/10e6, samples);
-		static_write_hard(ocCurrentParty(), "line_insect", n, "Gates/10e6", tallygates / samples/10e6, samples);
-		static_write_hard(ocCurrentParty(), "line_insect", n, "Bytes/MB", tallybytes / samples/10e6, samples);
+		static_write_hard(ocCurrentParty(), "line_insect", n, "Time/s", tally / samples/1e6, samples);
+		static_write_hard(ocCurrentParty(), "line_insect", n, "Gates/10e6", tallygates / samples/1e6, samples);
+		static_write_hard(ocCurrentParty(), "line_insect", n, "Bytes/MB", tallybytes / samples/1e6, samples);
 	
 		fprintf(stdout, "\n");
 		fprintf(stderr, "Line Insection (% times): %llu microseconds avg, %llu gates avg, %llu bytes avg\n", n, tally/samples, tallygates/samples, tallygates/samples);
