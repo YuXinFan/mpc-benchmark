@@ -1,4 +1,4 @@
-#include "checker.h"
+#include "../src/checker.h"
 
 void max_three_opt(int *o, int *a, int *b, int *c){
     *o = 0;
