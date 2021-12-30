@@ -23,7 +23,7 @@ def main():
 
     if (args.all or args.sym or args.clang):
 
-        exit_code = subprocess.call("clang-9 -I ~/mine/klee/include -emit-llvm -c -g -O0 -Xclang -disable-O0-optnone " + cfile, shell=True)
+        exit_code = subprocess.call("clang-9 -I ~/mine/klee/include -emit-llvm -c -g -O0 -Xclang -disable-O0-optnone  -o ../build/" + bcfile + " ../example/" + cfile, shell=True)
         if exit_code != 0:
             print("[Checker] Compiler %s failed, exit code %d." % (cfile, exit_code))
             exit(exit_code)
@@ -33,10 +33,10 @@ def main():
 
     if (args.all or args.sym):
         #klee 
-        folder = "./log"
+        folder = "../log"
         if not os.path.isdir(folder):
             os.mkdir(folder)
-        outfile = open("./log/"+ofile, "w+")
+        outfile = open("../log/"+ofile, "w+")
         # exit_code = subprocess.call("klee --disable-verify \
         #     --use-query-log=solver:kquery \
         #     --external-calls=all \
@@ -51,7 +51,7 @@ def main():
             --posix-runtime \
             --write-kqueries \
             --write-no-tests \
-            " + bcfile , shell=True, stderr=outfile)
+            ../build/" + bcfile , shell=True, stderr=outfile)
         outfile.close()
         # check klee states
         if exit_code != 0:
@@ -62,13 +62,13 @@ def main():
 
     if (args.all or args.gen):
         #construct query
-        gen_query.main("./log/"+ofile,qfile)
+        gen_query.main("../log/"+ofile,qfile)
         print("[Checker] Generate solver query done.")
         # check query states
 
     if (args.all or args.solve):
     # run kleaver 
-        exit_code = subprocess.call("kleaver ./log/%s" % qfile, shell=True)
+        exit_code = subprocess.call("kleaver ../log/%s" % qfile, shell=True)
         # checker kleaver states
         if exit_code != 0:
             print("[Checker] Solver failed to solve, exit code %d." % exit_code)

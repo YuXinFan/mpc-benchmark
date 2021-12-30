@@ -3,7 +3,7 @@
 *.o
 *.a
 *.oo
-build
+*build
 .vscode/
 raw/klee-*
 raw/klee-*/*

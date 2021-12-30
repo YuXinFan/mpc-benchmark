@@ -147,7 +147,7 @@ def make_constraints(partB, partC, asize):
 
 
 def make_query(file_name, decls, assumes, constraints):
-    folder = "./log"
+    folder = "../log"
     if not os.path.isdir(folder):
         os.mkdir(folder)
     kquery = decls 
@@ -176,7 +176,7 @@ def main(ofile,qfile):
     content = "".join(content)
     content = " ".join(content.split())
 
-    file2 = open("./log/temp.out", "w+")
+    file2 = open("../log/temp.out", "w+")
     file2.write(content)
     file1.close()
     file2.close()
@@ -201,6 +201,6 @@ def main(ofile,qfile):
     constraints = make_constraints(partB, partC, arraySize)
     # decls, assumes, constraints
 
-    decls = make_decls("./klee-last/solver-queries.kquery")
+    decls = make_decls("../build/klee-last/solver-queries.kquery")
 
     make_query(qfile, decls, assumes, constraints)
