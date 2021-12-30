@@ -42,3 +42,14 @@ naive_psi, 100, Time/s, 4.800,10
 naive_psi_opt, 100, Time/s, 0.310,10
 naive_psi, 1000, Time/s, 475.423,10
 naive_psi_opt, 1000, Time/s, 29.610,10
+
+linear_search, 100, Time/s, 0.108,10
+linear_search, 100, Time/s, 0.107,10
+linear_search, 1000, Time/s, 1.281,10
+linear_search, 1000, Time/s, 1.276,10
+linear_search, 10, Time/s, 0.012,10
+linear_search, 10, Time/s, 0.012,10
+linear_search, 10000, Time/s, 20.802,10
+linear_search, 10000, Time/s, 20.523,10
+linear_search, 100000, Time/s, 230.262,10
+linear_search, 100000, Time/s, 209.519,10

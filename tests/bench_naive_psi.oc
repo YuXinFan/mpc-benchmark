@@ -151,7 +151,7 @@ void test_main(void*varg) {
 			
 		}
 		static_write_hard(ocCurrentParty(), "naive_psi", n, "Time/s", tally / samples/1e6, samples);
-		static_write_hard(ocCurrentParty(), "naive_psi", n, "Gates/10e6", rungates /1e6, samples);
+		static_write_hard(ocCurrentParty(), "naive_psi", n, "Gates/1e6", rungates /1e6, samples);
 		static_write_hard(ocCurrentParty(), "naive_psi", n, "Bytes/MB", runbytes/ 1e6, samples);
 	
 		fprintf(stdout, "\n");

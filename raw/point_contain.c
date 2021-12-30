@@ -32,7 +32,7 @@ void point_contain_opt(int *out, OPoint *p, OVector *v, int size){
             *out = 0;
             break;
         } else {
-            bool diff_direct = first_d != next_d;
+            bool diff_direct = first_d != ncdext_d;
             revealOblivBool(&findout, diff_direct, 0);
             if (findout) {
                 *out = -1;

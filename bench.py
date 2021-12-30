@@ -52,7 +52,7 @@ def make_csv():
     df.to_csv("./Party.csv", index=False)
     print(df)
 
-def bench_single(braw, bopt, params):
+def bench_pair_single(braw, bopt, params):
     cmd = "./build/tests/bench_%s  %s & ./build/tests/bench_%s  %s -c localhost" % (braw, params, braw, params)
     exit_code = subprocess.call(cmd, shell=True)
     if (exit_code != 0):
@@ -85,26 +85,12 @@ def bench_test():
         if (exit_code != 0):
             os.error("Failed:" + cmd + "\n")
 
-
-def bench_one(btype, bname):
-    tdic = {}
-    tdic["sort"] = ["-n 10 -i 2",
-            "-n 100 -i 2",
-            "-n 1000 -i 2",
-            "-n 10000 -i 2"]
-    tdic["search"] = ["-e 10 -s 5 -i 2",
-            "-e 100 -s 50 -i 2",
-            "-e 1000 -s 500 -i 2",
-            "-e 10000 -s 5000 -i 2"]
-    tdic["psi"] = ["-n 10 -i 2",
-            "-n 100 -i 2",
-            "-n 1000 -i 2",
-            "-n 10000 -i 2"]
-    for i in tdic[btype]:        
-        cmd = "./build/tests/bench_%s  %s & ./build/tests/bench_%s  %s -c localhost" % (bname, i, bname, i)
-        exit_code = subprocess.call(cmd, shell=True)
-        if (exit_code != 0):
-            os.error("Failed:" + cmd + "\n")
+def bench_single(bname, bparams):
+    cmd = "./build/tests/bench_%s  %s & ./build/tests/bench_%s  %s -c localhost" % (bname, bparams, bname, bparams)
+    exit_code = subprocess.call(cmd, shell=True)
+    if (exit_code != 0):
+        os.error("Failed:" + cmd + "\n")
+    time.sleep(1)
 
 def bench_pair(btype, braw, bopt):
     tdic = {}
@@ -180,9 +166,31 @@ def main():
 
     if args.man:
         clean_csv()
-        bench_pair("search", "linear_search", "linear_search_opt")
-        bench_pair("search", "binary_search", "binary_search_opt")
-        bench_pair("search", "almost_search", "almost_search_opt")
+        #bench_single("batcher_sort", "-n 100000 -i 10")
+        #bench_single("quick_sort", "-n 100000 -i 10")
+        bench_single("binary_search","-e 100000 -s 100 -i 10")
+        bench_single("binary_search_opt","-e 100000 -s 100 -i 10")
+        
+        bench_single("naive_psi","-n 10000 -i 10")
+        bench_single("naive_psi_opt","-n 10000 -i 10")
+        
+        bench_single("line_insect","-n 10000  -i 10")
+        bench_single("line_insect_opt","-n 10000 -i 10")
+
+        bench_single("almost_search","-e 100000 -s 100 -i 1")
+        bench_single("almost_search_opt","-e 100000 -s 100 -i 1")
+        
+        bench_single("linear_search","-e 100000 -s 100 -i 10")
+        bench_single("linear_search_opt","-e 100000 -s 100 -i 10")
+
+
+
+
+
+
+        #bench_pair("search", "linear_search", "linear_search_opt")
+        #bench_pair("search", "binary_search", "binary_search_opt")
+        #bench_pair("search", "almost_search", "almost_search_opt")
         make_csv()
         return 
 

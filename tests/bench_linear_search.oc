@@ -167,7 +167,7 @@ void test_main(void*varg) {
 			
 		}
 		static_write_simple(ocCurrentParty(), "linear_search", searchct, n, "Time/s", tally / samples/1e6, samples);
-		static_write_simple(ocCurrentParty(), "linear_search", searchct, n, "Gates/10e6", tallygates / samples/1e6, samples);
+		static_write_simple(ocCurrentParty(), "linear_search", searchct, n, "Gates/1e6", tallygates / samples/1e6, samples);
 		static_write_simple(ocCurrentParty(), "linear_search", searchct, n, "Bytes/MB", tallybytes / samples/1e6, samples);
 	
 		fprintf(stdout, "\n");

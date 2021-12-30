@@ -49,16 +49,12 @@ def make_csv():
     df.to_csv("./Party.csv", index=False)
     print(df)
 
-def bench_single(braw, bopt, params):
-    cmd = "python %s  %s & ./build/tests/bench_%s  %s -c localhost" % (braw, params, braw, params)
+def bench_single(bname, params, opt):
+    cmd = "python %s.py  %s %s" % (bname, params,opt)
     exit_code = subprocess.call(cmd, shell=True)
     if (exit_code != 0):
         os.error("Failed:" + cmd + "\n")
     time.sleep(1)
-    cmd = "./build/tests/bench_%s  %s & ./build/tests/bench_%s  %s -c localhost" % (bopt, params, bopt, params)
-    exit_code = subprocess.call(cmd, shell=True)
-    if (exit_code != 0):
-        os.error("Failed:" + cmd + "\n")
 
 def bench_test():
     cases = [("batcher_sort", "quick_sort"),
@@ -109,10 +105,11 @@ def bench_pair(btype, bname):
             "-n 100 -i 10",
             "-n 1000 -i 10",
             "-n 10000 -i 10"]
-    tdic["search"] = ["-e 10 -s 100 -i 10",
-            "-e 100 -s 100 -i 10",
-            "-e 1000 -s 100 -i 10",
-            "-e 10000 -s 100 -i 10"]
+    tdic["search"] = ["-e 10 -s 1 -i 10",
+            "-e 100 -s 1 -i 10",
+            "-e 1000 -s 1 -i 10",
+            "-e 10000 -s 1 -i 10",
+            "-e 100000 -s 1 -i 10"]
     tdic["psi"] = ["-n 10 -i 10",
             "-n 100 -i 10",
             "-n 1000 -i 10",
@@ -176,12 +173,20 @@ def main():
 
     if args.man:
         clean_csv()
-        #bench_pair("search", "linear_search")
+        bench_pair("search", "linear_search")
         #bench_pair("search", "binary_search")
         #bench_pair("search", "almost_search")
         #bench_pair("psi", "naive_psi")
-        bench_pair("sort", "sort")
-        bench_pair("line_insect", "line_intersect")
+        #bench_single("sort", "-n 100000 -i 10", "--opt")
+        #bench_single("linear_search", "-e 100000 -s 100 -i 10", "--opt")
+        #bench_single("binary_search", "-e 100000 -s 100 -i 2", "--opt")
+        #bench_single("binary_search", "-e 100000 -s 100 -i 2", "")
+        #bench_single("almost_search", "-e 100000 -s 100 -i 1", "--opt")
+        #bench_single("almost_search", "-e 100000 -s 100 -i 1", "")
+        #bench_single("naive_psi", "-n 10000 -i 2", "--opt")
+
+        #bench_pair("sort", "sort")
+        #bench_pair("line_insect", "line_intersect")
 
         return 
 

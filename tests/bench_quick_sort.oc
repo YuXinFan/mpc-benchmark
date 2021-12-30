@@ -188,7 +188,7 @@ void test_main(void*varg) {
 		free(input);
 		free(output);
 		static_write_hard(ocCurrentParty(), "quick_sort", size, "Time/s", tally / samples/1e6, samples);
-		static_write_hard(ocCurrentParty(), "quick_sort", size, "Gates/10e6", rungates / 1e6, samples);
+		static_write_hard(ocCurrentParty(), "quick_sort", size, "Gates/1e6", rungates / 1e6, samples);
 		static_write_hard(ocCurrentParty(), "quick_sort", size, "Bytes/MB", runbytes / 1e6, samples);
 
 		fprintf(stdout, "\n");
