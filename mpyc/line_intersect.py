@@ -1,65 +1,65 @@
 import random 
 from mpyc.runtime import mpc    # load MPyC
 secflt = mpc.SecFlt()
-mpc.run(mpc.start())  
 
-@mpc.coroutine  
-async def line_intersect(a,b,c,d):
-    
+def line_intersect(a,b,c,d):
+    mpc.run(mpc.start())
+    shared_a = mpc.input(a, senders=[0])[0]
+    shared_b = mpc.input(b, senders=[0])[0]
+    shared_c = mpc.input(c, senders=[1])[0]
+    shared_d = mpc.input(d, senders=[1])[0]
+
     p = []
-    area_abc = (a[0] - c[0]) * (b[1] - c[1]) - (a[1] - c[1]) * (b[0] - c[0])
-    area_abd = (a[0] - d[0]) * (b[1] - d[1]) - (a[1] - d[1]) * (b[0] - d[0])
+    area_abc = (shared_a[0] - shared_c[0]) * (shared_b[1] - shared_c[1]) - (shared_a[1] - shared_c[1]) * (shared_b[0] - shared_c[0])
+    area_abd = (shared_a[0] - shared_d[0]) * (shared_b[1] - shared_d[1]) - (shared_a[1] - shared_d[1]) * (shared_b[0] - shared_d[0])
     
 
-    area_cda = (c[0] - a[0]) * (d[1] - a[1]) - (c[1] - a[1]) * (d[0] - a[0])
+    area_cda = (shared_c[0] - shared_a[0]) * (shared_d[1] - shared_a[1]) - (shared_c[1] - shared_a[1]) * (shared_d[0] - shared_a[0])
     area_cdb = area_cda + area_abc - area_abd 
 
     t = area_cda / ( area_abd - area_abc )
-    dx= t * (b[0] - a[0])
-    dy= t * (b[1] - a[1])
-    p = [a[0] + dx, a[1] + dy]
+    dx= t * (shared_b[0] - shared_a[0])
+    dy= t * (shared_b[1] - shared_a[1])
+    p = [shared_a[0] + dx, shared_a[1] + dy]
     false1 = (area_cda * area_cdb) >= 0.0
     false2 = (area_abc * area_abd) >= 0.0
     is_cross = 1-(false1 | false2)
     #p = p*false 
-    return (is_cross, p)
+    ois_cross = mpc.run(mpc.output(is_cross))
+    op = mpc.run(mpc.output(p))
 
-@mpc.coroutine  
-async def line_intersect_opt(a,b,c,d):
+    return (ois_cross, op)
+
+def line_intersect_opt(a,b,c,d):
+    mpc.run(mpc.start())
+    shared_a = mpc.input(a, senders=[0])[0]
+    shared_b = mpc.input(b, senders=[0])[0]
+    shared_c = mpc.input(c, senders=[1])[0]
+    shared_d = mpc.input(d, senders=[1])[0]
     
     p = []
-    area_abc = (a[0] - c[0]) * (b[1] - c[1]) - (a[1] - c[1]) * (b[0] - c[0])
-    area_abd = (a[0] - d[0]) * (b[1] - d[1]) - (a[1] - d[1]) * (b[0] - d[0])
+    area_abc = (shared_a[0] - shared_c[0]) * (shared_b[1] - shared_c[1]) - (shared_a[1] - shared_c[1]) * (shared_b[0] - shared_c[0])
+
+    area_abd = (shared_a[0] - shared_d[0]) * (shared_b[1] - shared_d[1]) - (shared_a[1] - shared_d[1]) * (shared_b[0] - shared_d[0])
     is_cd_same_side_of_ab = (area_abc * area_abd) >= 0.0
 
-    area_cda = (c[0] - a[0]) * (d[1] - a[1]) - (c[1] - a[1]) * (d[0] - a[0])
-    area_cdb = area_cda + area_abc - area_abd 
+    area_cda = (shared_c[0] - shared_a[0]) * (shared_d[1] - shared_a[1]) - (shared_c[1] - shared_a[1]) * (shared_d[0] - shared_a[0])
+    area_cdb = area_cda + area_abc - area_abd
     is_ab_same_side_of_cd = (area_cda * area_cdb) >= 0.0
     onot_insect = is_ab_same_side_of_cd | is_cd_same_side_of_ab 
-    not_insect = await mpc.eq_public(onot_insect, 1)
+    not_insect = mpc.run(mpc.eq_public(onot_insect, 1))
     if ( not_insect ):
         return p
     
     t = area_cda / ( area_abd - area_abc )
-    dx= t * (b[0] - a[0])
-    dy= t * (b[1] - a[1])
-    p = [a[0] + dx, a[1] + dy]
+    dx= t * (shared_b[0] - shared_a[0])
+    dy= t * (shared_b[1] - shared_a[1])
+    p = [shared_a[0] + dx, shared_a[1] + dy]
     return p
 
 def bench(isopt = False, arraySize=10, samples=1):
     import random
     import time
-    MIN = 0
-    repeat = samples
-    MAX = 2*arraySize
-
-    func = None 
-    if isopt :
-        func = line_intersect_opt
-    else:
-        func = line_intersect
-
-    mpc.run(mpc.start())            # required only when run with multiple parties
 
     totalTime = 0
     print("start benchmark line_insect %s, %d times repeat:" % ("opt" if isopt else "", samples))
@@ -74,17 +74,22 @@ def bench(isopt = False, arraySize=10, samples=1):
             sec_c = list(map(secflt, clear_c))
             sec_d = list(map(secflt, clear_d))
 
-            timeS = time.perf_counter()
-            func(sec_a,sec_b,sec_c,sec_d)
-            #mpc.run(mpc.output(p))
-            timeE = time.perf_counter()
+            if isopt:
+                timeS = time.perf_counter()
+                line_intersect_opt(sec_a,sec_b,sec_c,sec_d)
+                #mpc.run(mpc.output(p))
+                timeE = time.perf_counter()
+            else:
+                timeS = time.perf_counter()
+                line_intersect(sec_a,sec_b,sec_c,sec_d)
+                #mpc.run(mpc.output(p))
+                timeE = time.perf_counter()
             timeDiff = timeE-timeS 
             # print("%.3f, " % timeDiff, end="")
             totalTime += timeDiff
         print("Sample %d cost %.3f" % (kk, timeDiff))
     print("Total repeat %d times. Average execution time is %.3fs." % (samples, totalTime/samples))
 
-    mpc.run(mpc.shutdown())
     f = open("Party.csv", "a+")
     f.write("%s, %d, Time/s, %.3f,%d\n" 
     % ("line_insect_opt" if isopt else "line_search", arraySize, totalTime/samples, samples))
