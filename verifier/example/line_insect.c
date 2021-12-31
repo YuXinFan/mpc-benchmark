@@ -1,4 +1,4 @@
-#include "checker.h"
+#include "../src/checker.h"
 #include "limits.h"
 
 #define a0 A->S.x

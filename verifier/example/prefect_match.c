@@ -1,4 +1,5 @@
-#include "checker.h"
+#include "../src/checker.h"
+
 
 #define N  2
 

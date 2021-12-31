@@ -1,4 +1,5 @@
-#include "checker.h"
+#include "../src/checker.h"
+
 #define SYMINT8(x,s) int8_t x; \
     checker_make_symbolic(&x, sizeof(x),s); \
     checker_assume(x>0); 

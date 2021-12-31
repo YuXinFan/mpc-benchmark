@@ -8,45 +8,54 @@ def gen_sorted_array(n):
     l = []
     v = 0
     for i in range(n):
-        v = v + random.randrange(0,8)
+        v = v + random.randrange(1,3)
         l.append(v)
 
     return l 
 
 
-@mpc.coroutine
-async def obinary_search(haystack, haystack_length, needle):
+def obinary_search(haystack, haystack_length, needle):
+    mpc.run(mpc.start())
+
+    shared_haystack = seclist(mpc.input(haystack, senders=[0])[0])
+    shared_needle = mpc.input(needle, senders=[1])[0]
+
     upper_bound = int(math.log2(haystack_length)) + 1
     index = secint(-1)
     iimin = secint(0)
     iimax = secint(haystack_length - 1)
-    bb = needle
+    bb = shared_needle
     for _ in range(upper_bound):
         ii = iimin + iimax
         cc =  ii % 2
         iimid = mpc.if_else( cc, mpc.div(iimax+iimin-1, 2), mpc.div(iimax+iimin, 2) )
-        aa = haystack[iimid] # oram_read(haystack, haystack_length, iimid)
+        aa = shared_haystack[iimid] 
         oeq = aa == bb 
         index = mpc.if_else(oeq, iimid, index)
         olt = aa < bb
         iimin = mpc.if_else(olt, iimid+1, iimin)
         iimax = mpc.if_else(olt, iimax, iimid)
-    return index
+    oindex = mpc.run(mpc.output(index))
+    mpc.run(mpc.shutdown())
+    return oindex
 
 
-@mpc.coroutine
-async def obinary_search_opt(haystack, haystack_length, needle):
+def obinary_search_opt(haystack, haystack_length, needle):
+    mpc.run(mpc.start())
+    shared_haystack = seclist(mpc.input(haystack, senders=[0])[0])
+    shared_needle = mpc.input(needle, senders=[1])[0]
+
     upper_bound = int(math.log2(haystack_length)) + 1
     index = secint(-1)
     iimin = secint(0)
     iimax = secint(haystack_length - 1)
-    bb = needle
+    bb = shared_needle
     for _ in range(upper_bound):
         ii = iimin + iimax
         cc =  ii % 2
         iimid = mpc.if_else( cc, mpc.div(iimax+iimin-1, 2), mpc.div(iimax+iimin, 2) )
-        aa = haystack[iimid] # oram_read(haystack, haystack_length, iimid)
-        eq = await mpc.eq_public(aa, bb)
+        aa = shared_haystack[iimid] # oram_read(haystack, haystack_length, iimid)
+        eq = mpc.run(mpc.eq_public(aa, bb))
         if eq :
             index = iimid
             break
@@ -54,7 +63,9 @@ async def obinary_search_opt(haystack, haystack_length, needle):
             olt = aa < bb
             iimin = mpc.if_else(olt, iimid+1, iimin)
             iimax = mpc.if_else(olt, iimax, iimid)
-    return index
+    oindex = mpc.run(mpc.output(index))
+    mpc.run(mpc.shutdown())
+    return oindex
 
 def bench(isopt = False, arraySize=10, searchSize = 1, samples=1):
     import random
@@ -63,36 +74,31 @@ def bench(isopt = False, arraySize=10, searchSize = 1, samples=1):
     repeat = samples
     MAX = 2*arraySize
 
-    func = None 
-    if isopt :
-        func = obinary_search_opt
-    else:
-        func = obinary_search
-
-    mpc.run(mpc.start())            # required only when run with multiple parties
-
     totalTime = 0
     print("start benchmark binary search %s, %d times repeat:" % ("opt" if isopt else "", samples))
     for kk in range(samples):
         cleartext = gen_sorted_array(arraySize)
         eles = [cleartext[random.randint(0,arraySize-1)] for _ in range(searchSize)]
         x = list(map(secint, cleartext))
-        x = seclist(x)
         for jj in range(searchSize):
             e = secint(eles[jj])
-            # print(x)
-            timeS = time.perf_counter()
-            oy = func(x, arraySize, e)
-            #y=mpc.run(mpc.output(oy))
-            timeE = time.perf_counter()
-
+            if isopt:
+                timeS = time.perf_counter()
+                oy = obinary_search_opt(x, arraySize, e)
+                print(oy)
+                #y=mpc.run(mpc.output(oy))
+                timeE = time.perf_counter()
+            else:
+                timeS = time.perf_counter()
+                oy = obinary_search(x, arraySize, e)
+                print(oy)
+                timeE = time.perf_counter()
             timeDiff = timeE-timeS 
             #print("%.3f, " % timeDiff, end="")
             totalTime += timeDiff
         print("Sample %d cost %.3f" % (kk, timeDiff))
     print("Total repeat %d times. Average execution time is %.3fs." % (samples, totalTime/samples))
 
-    mpc.run(mpc.shutdown())
     f = open("Party.csv", "a+")
     f.write("%s, %d, Time/s, %.3f,%d\n" 
     % ("binary_search_opt" if isopt else "binary_search", arraySize,totalTime/samples, samples))

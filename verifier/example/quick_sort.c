@@ -1,4 +1,5 @@
-#include "checker.h"
+#include "../src/checker.h"
+
 
 void swap(int8_t* a, int8_t* b, int8_t* t) {
   *t = *a;
@@ -57,7 +58,7 @@ int main(){
     int8_t arr[size];
     checker_make_symbolic(arr, sizeof(arr), "arr");
     oqsort(arr, size);
-    checker_check_int8_array(arr, size);
+    checker_check_int8_array(arr, size,false);
 
     return 0;
 }

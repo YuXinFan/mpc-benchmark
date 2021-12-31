@@ -1,4 +1,4 @@
-#include "checker.h"
+#include "../src/checker.h"
 
 void linear_search_opt(int *idx, int *val, int *arr, int arr_size){
     *idx = -1;
@@ -15,7 +15,7 @@ void linear_search_opt(int *idx, int *val, int *arr, int arr_size){
 }
 
 int main(){
-    int arr_size = 10;
+    int arr_size = 100;
     int arr[arr_size];
     int val;
     int idx;

@@ -1,4 +1,5 @@
-#include "checker.h"
+#include "../src/checker.h"
+
 
 void binary_almost_search_opt_main(int *idx, int needle, int* arr, int l, int r) {
     if (r >= l)
