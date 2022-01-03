@@ -299,3 +299,9 @@ naive_psi,100, Bytes/MB,20.16,10,0.0
 naive_psi_opt,100, Time/s,0.195,10,0.2804428044280443
 naive_psi_opt,100, Gates/1e6,0.159,10,0.7476190476190476
 naive_psi_opt,100, Bytes/MB,5.092,10,0.7474206349206349
+
+line_intersect
+30718 microseconds avg, 61479 gates avg, 61479 bytes avg
+line_intersect_opt
+
+26075 microseconds avg, 50241 gates avg, 50241 bytes avg

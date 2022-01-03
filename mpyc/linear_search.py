@@ -63,9 +63,9 @@ def bench(isopt = False, arraySize=10, searchSize = 1, samples=1):
         print("Sample %d cost %.3f" % (kk, timeSample))
     print("Total repeat %d times. Average execution time is %.3fs." % (samples, totalTime/samples))
     
-    # f = open("Party.csv", "a+")
-    # f.write("%s, %d, Time/s, %.3f,%d\n" % ("linear_search_opt" if isopt else "linear_search", arraySize,totalTime/samples, samples))
-    # f.close()
+    f = open("Party.csv", "a+")
+    f.write("%s, %d, Time/s, %.3f,%d\n" % ("linear_search_opt" if isopt else "linear_search", arraySize,totalTime/samples, samples))
+    f.close()
 
 def main():
     import argparse
