@@ -1,26 +1,34 @@
 from mpyc.runtime import mpc    # load MPyC
 secint = mpc.SecInt()           # 32-bit secure MPyC integers
-mpc.run(mpc.start())            # required only when run with multiple parties
 import traceback     
 
-@mpc.coroutine
-async def naive_psi(aarr, barr, size):
+def naive_psi(aarr, barr, size):
+    mpc.run(mpc.start())
+    shared_a = mpc.input(aarr, senders=[0])[0]
+    shared_b = mpc.input(barr, senders=[1])[0]
+
     intersect = [secint(-1)]*size
     for i in range(size):
         for j in range(size):
-            intersect[i] = mpc.if_else(aarr[i]==barr[j], barr[j], intersect[i])
+            intersect[i] = mpc.if_else(shared_a[i]==shared_b[j], j, intersect[i])
+    #output = mpc.run(mpc.output(intersect))
+    mpc.run(mpc.shutdown())
     return intersect
 
-@mpc.coroutine
-async def naive_psi_opt(aarr, barr, size):
+def naive_psi_opt(aarr, barr, size):
+    mpc.run(mpc.start())
+    shared_a = mpc.input(aarr, senders=[0])[0]
+    shared_b = mpc.input(barr, senders=[1])[0]
+
     intersect = [secint(-1)]*size
     for i in range(size):
         for j in range(size):
-            match = mpc.eq_public(aarr[i],barr[j])
-            if await(match):
-                intersect[i] = barr[j]
+            match = mpc.run(mpc.eq_public(shared_a[i], shared_b[j]))
+            if match:
+                intersect[i] = j
                 break
-
+    #mpc.run(mpc.output(intersect))
+    mpc.run(mpc.shutdown())
     return intersect
 
 def bench(isopt = False, arraySize=10, samples=1):
@@ -28,14 +36,6 @@ def bench(isopt = False, arraySize=10, samples=1):
     import time
     MIN = 0
     MAX = 2*arraySize
-
-    func = None 
-    if isopt :
-        func = naive_psi_opt
-    else:
-        func = naive_psi
-
-    mpc.run(mpc.start())            # required only when run with multiple parties
 
     totalTime = 0
     print("start benchmark naive_psi %s, %d times repeat:" % ("opt" if isopt else "", samples))
@@ -46,16 +46,19 @@ def bench(isopt = False, arraySize=10, samples=1):
         saarr = list(map(secint, caarr))
         sbarr = list(map(secint, cbarr))
 
-        timeS = time.perf_counter()
-        idx = func(saarr, sbarr, arraySize)
-        mpc.run(mpc.output(idx))
-        timeE = time.perf_counter()
+        if isopt:
+            timeS = time.perf_counter()
+            idx = naive_psi_opt(saarr, sbarr, arraySize)
+            timeE = time.perf_counter()
+        else:
+            timeS = time.perf_counter()
+            idx = naive_psi(saarr, sbarr, arraySize)
+            timeE = time.perf_counter()
         timeDiff = timeE-timeS 
         totalTime += timeDiff
         print("Sample %d cost %.3f" % (kk, timeDiff))
     print("Total repeat %d times. Average execution time is %.3fs." % (samples, totalTime/samples))
 
-    mpc.run(mpc.shutdown())
     f = open("Party.csv", "a+")
     f.write("%s, %d, Time/s, %.3f,%d\n" 
     % ("naive_psi_opt" if isopt else "naive_psi", arraySize, totalTime/samples, samples))
