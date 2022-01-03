@@ -1,11 +1,5 @@
 #include "../src/checker.h"
 
-#define SYMINT8(x,s) int8_t x; \
-    checker_make_symbolic(&x, sizeof(x),s); \
-    checker_assume(x>0); 
-
-#define ASSUME(x) checker_assume(x);
-
 void naive_psi_opt(int8_t *int8_tersection, int8_t *aarr, int8_t *barr, int8_t size){
     for (int8_t i = 0; i < size; i++) {
         for (int8_t j = 0; j < size; j++) {
@@ -13,7 +7,7 @@ void naive_psi_opt(int8_t *int8_tersection, int8_t *aarr, int8_t *barr, int8_t s
             bool match;
             revealOblivBool(&match, omatch, 0);
             if ( match ) {
-                int8_tersection[i] = barr[j];
+                int8_tersection[i] = j;
                 break;
             }
         } 

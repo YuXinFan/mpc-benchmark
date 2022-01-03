@@ -1,7 +1,6 @@
 #include "../src/checker.h"
-
-#define N 16
-
+#define N 100
+#define LOG2N 6
 void oram_read(void *t, void* s, int idx) {
     *(int *)t = ((int *)s)[idx];
 }
@@ -13,7 +12,7 @@ void ocCopy(void* r, void* t) {
 int obinary_search_oram(void* result, int *haystack, void* needle) {
 
 	// upper bound = logN + 1;
-	int upper_bound = 4 + 1;
+	int upper_bound = LOG2N + 1;
 
 	int index = -1;
 	int iimin = 0;
@@ -53,7 +52,7 @@ int obinary_search_oram(void* result, int *haystack, void* needle) {
 }
 
 int main(){
-    int arr_size = 16;
+    int arr_size = N;
     int arr[arr_size];
     int val;
     int result;

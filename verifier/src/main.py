@@ -21,7 +21,7 @@ def main():
     qfile = (cfile.split("/")[-1]).replace(".c", ".kquery")
     ofile = (cfile.split("/")[-1]).replace(".c", ".out")
 
-    if (args.all or args.sym or args.clang):
+    if (args.all or args.clang):
 
         exit_code = subprocess.call("clang-9 -I ~/mine/klee/include -emit-llvm -c -g -O0 -Xclang -disable-O0-optnone  -o ../build/" + bcfile + " ../example/" + cfile, shell=True)
         if exit_code != 0:

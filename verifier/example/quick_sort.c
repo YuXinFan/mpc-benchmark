@@ -7,11 +7,6 @@ void swap(int8_t* a, int8_t* b, int8_t* t) {
   *b = *t;
 }
 
-static bool cmp(int8_t* a, int8_t* b) {
-  bool c = *a <= *b;
-  return c;
-}
-
 int8_t partition(int8_t * data, int8_t * temp, int8_t n){
   int8_t i = -1;
   int8_t *pi = data + n -1;
@@ -54,7 +49,7 @@ void oqsort(int8_t * data, size_t end){
 
 
 int main(){
-    int size = 4;
+    int size = 10;
     int8_t arr[size];
     checker_make_symbolic(arr, sizeof(arr), "arr");
     oqsort(arr, size);
