@@ -39,8 +39,7 @@ void checker_assume(uintptr_t condition) {
 }
 
 void checker_check_int8_array(int8_t *o, int size, bool range ){
-    klee_print_expr("[Array] Size", size);
-    char *label = (char *)malloc(sizeof(char)*256);
+   
     srand(time(0));
     int l = rand();
     srand(ChecherIDX);
@@ -49,15 +48,18 @@ void checker_check_int8_array(int8_t *o, int size, bool range ){
     l = l + rand();
     srand(ChecherIDX);
     l = l + rand();
+    srand(time(0));
+    l = l + rand();
+    srand(ChecherIDX);
+    l = l + rand();
+    srand(time(0));
+    l = l + rand();
+    srand(ChecherIDX);
+    l = l + rand();
+    klee_print_expr("[Array] Size", size);
+    char *label = (char *)malloc(sizeof(char)*256);
     char *ll = (char *)malloc(sizeof(char)*65);
-    srand(time(0));
-    l = l + rand();
-    srand(ChecherIDX);
-    l = l + rand();
-    srand(time(0));
-    l = l + rand();
-    srand(ChecherIDX);
-    l = l + rand();
+
     #pragma clang loop unroll(full)
     for (int ii = 0; ii < size; ii++) {
         snprintf(ll, 64, "[Part-B] id %d, array idx %d", l, ii);
@@ -67,6 +69,8 @@ void checker_check_int8_array(int8_t *o, int size, bool range ){
             klee_print_expr(ll, o[ii]);
         }
     }
+
+    klee_print_expr("[CheckerIdx] ", ChecherIDX);
     #pragma clang loop unroll(full)
     for (int j = 0; j < ChecherIDX; j++) {
         sprintf(label, "[Part-C] id %d, total %d, now %d-th", l, ChecherIDX, j+1);

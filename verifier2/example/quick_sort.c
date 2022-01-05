@@ -14,15 +14,21 @@ int8_t partition(int8_t * data, int8_t * temp, int8_t n){
   for (int8_t j = 0; j < n-1; j++){
     oleq = *(data+j) <= *pi;
     bool leq;
-    revealOblivBool(&leq, oleq,0);
+    revealOblivBool(&leq, oleq, 0);
     if (oleq) {
-      if ( i!=j ) {
+      bool oneq = i!=j;
+      bool neq;
+      revealOblivBool(&neq, oneq, 1);
+      if ( neq ) {
         swap(data+i, data+j, temp);
       }
       i = i + 1;
     }
   }
-  if ( i != n-1 ) {
+  bool oneq = i != n-1;
+  bool neq;
+  revealOblivBool(&neq, oneq, 2);
+  if ( neq ) {
     swap(data+i, pi, temp);
   }
 
@@ -55,9 +61,9 @@ void oqsort(int8_t * data, size_t end){
 int main(){
     int size = 5;
     int8_t arr[size];
+    checker_init(3);
     checker_make_symbolic(arr, sizeof(arr), "arr");
     oqsort(arr, size);
-    checker_check_int8_array(arr, size, false);
-
+    checker_check_int8_array(arr, size);
     return 0;
 }

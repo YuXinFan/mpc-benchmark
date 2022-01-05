@@ -1,0 +1,2 @@
+clang-9 -I ~/mine/klee/include -emit-llvm -c -g -O0 -Xclang -disable-O0-optnone max_three.c
+klee --disable-verify --write-kqueries -write-sym-paths -write-smt2s --libc=uclibc  --external-calls=all --posix-runtime --write-test-info max_three.bc &> klee-out.txt
