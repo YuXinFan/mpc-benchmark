@@ -1,15 +1,11 @@
 #include "../src/checker.h"
-#define N 10
-#define LOG2N 3
+#define N 100
+#define LOG2N 6
 void oram_read(void *t, void* s, int idx) {
     *(int *)t = ((int *)s)[idx];
 }
 
-void ocCopy(void* r, void* t) {
-    *(int *)r = *(int *)t;
-}
-
-int obinary_search_oram(void* result, int *haystack, void* needle) {
+int obinary_search_oram(int *haystack, void* needle) {
 
 	// upper bound = logN + 1;
 	int upper_bound = LOG2N + 1;
@@ -34,7 +30,6 @@ int obinary_search_oram(void* result, int *haystack, void* needle) {
         bool eq;
         revealOblivBool(&eq, oeq, 0);
 		if (eq) {
-			ocCopy(result, temp_element);
 			index = iimid;
             break;
 		}else{
@@ -55,14 +50,13 @@ int main(){
     int arr_size = N;
     int arr[arr_size];
     int val;
-    int result;
 	checker_init(1);
     checker_make_symbolic(&arr, sizeof(arr), "arr");
     for (int i = 1; i < arr_size; i++) {
         checker_assume(arr[i-1] < arr[i]);
     }
     checker_make_symbolic(&val, sizeof(val), "val");
-    int idx = obinary_search_oram(&result, arr, &val);
+    int idx = obinary_search_oram(arr, &val);
     checker_check_int(idx);
     return 0;
 }

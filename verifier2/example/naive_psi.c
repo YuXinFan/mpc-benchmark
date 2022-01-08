@@ -51,8 +51,8 @@ int main(){
     for (int i = 0; i < size; i++){
         intersection[i] = -1;
     }
-
+    checker_init(1);
     naive_psi_opt(intersection, aarr, barr, size);
-    checker_check_int8_array(intersection, size, false);
+    checker_check_int8_array(intersection, size);
     return 0;
 }
