@@ -1,6 +1,6 @@
 #include "../src/checker.h"
-#define N 100
-#define LOG2N 6
+#define N 10
+#define LOG2N 3
 void oram_read(void *t, void* s, int idx) {
     *(int *)t = ((int *)s)[idx];
 }
@@ -56,6 +56,7 @@ int main(){
     int arr[arr_size];
     int val;
     int result;
+	checker_init(1);
     checker_make_symbolic(&arr, sizeof(arr), "arr");
     for (int i = 1; i < arr_size; i++) {
         checker_assume(arr[i-1] < arr[i]);

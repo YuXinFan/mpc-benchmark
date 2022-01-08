@@ -15,10 +15,11 @@ void linear_search_opt(int *idx, int *val, int *arr, int arr_size){
 }
 
 int main(){
-    int arr_size = 100;
+    int arr_size = 10;
     int arr[arr_size];
     int val;
     int idx;
+    checker_init(1);
     checker_make_symbolic(&arr, sizeof(arr), "arr");
     checker_make_symbolic(&val, sizeof(val), "val");
 

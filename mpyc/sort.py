@@ -1,5 +1,6 @@
 from random import randrange
 from mpyc.runtime import mpc    # load MPyC
+from mpyc.seclists import seclist, secindex
 secint = mpc.SecInt()           # 32-bit secure MPyC integers
 import traceback                # to show some suppressed error messages
 import math 
@@ -106,6 +107,50 @@ def quick_sort(arr1, arr2):
     quickSort(shared_arr, 0, len(shared_arr)-1)
     mpc.run(mpc.shutdown())
 
+def partition_std(arr, low, high):
+    i = (low)         # index of smaller element
+    pivot = arr[high-1]     # pivot
+    
+    for ii in range(len(arr)):
+        in_range =  mpc.and_((ii >= low), (ii < high)) 
+        oleq = mpc.if_else(in_range, arr[ii] <= pivot, False)
+        # leq = mpc.run(mpc.eq_public(oleq, 1))
+        arr[i] = mpc.if_else(oleq, arr[ii], arr[i])
+        arr[ii] = mpc.if_else(oleq, arr[i], arr[ii])
+        i = mpc.if_else(oleq, i+1, i)
+
+  
+    arr[i], arr[high-1] = arr[high-1], arr[i]
+    return (i)
+  
+# The main function that implements QuickSort
+# arr[] --> Array to be sorted,
+# low  --> Starting index,
+# high  --> Ending index
+  
+# Function to do Quick sort
+def quickSort_std(arr, low, high):
+    if len(arr) == 1:
+        return arr
+    ogt = (high - low) > 1
+    gt = mpc.run(mpc.eq_public(1,ogt))
+    if gt:
+        # pi is partitioning index, arr[p] is now
+        # at right place
+        pi = partition_std(arr, low, high)
+  
+        # Separately sort elements before
+        # partition and after partition
+        quickSort_std(arr, low, pi)
+        quickSort_std(arr, pi+1, high)
+
+def quick_sort_std(arr1, arr2):
+    mpc.run(mpc.start())
+    shared_arr1 = mpc.input(arr1, senders=[0])[0]
+    shared_arr2 = mpc.input(arr2, senders=[1])[0]
+    shared_arr =  seclist(shared_arr1 + shared_arr2)
+    quickSort_std(shared_arr, secint(0), secint(len(shared_arr)))
+    mpc.run(mpc.shutdown())
 
 def bench(isopt = False, arraySize=10,  samples=1):
     import random
@@ -128,7 +173,7 @@ def bench(isopt = False, arraySize=10,  samples=1):
             timeE = time.perf_counter()
         else:
             timeS = time.perf_counter()
-            batcher_sort(x1, x2)
+            quick_sort_std(x1, x2)
             timeE = time.perf_counter()
         timeDiff = timeE-timeS 
             #print("%.3f, " % timeDiff, end="")

@@ -1,5 +1,7 @@
 #include "quick_sort.oh"
 #include <obliv.h>
+#include <copy.oh>
+#include "oram.oh"
 
 void swap(obliv int* a, obliv int* b, obliv int* t) {
   *t = *a;
@@ -51,3 +53,60 @@ void oqsort(obliv int * data, size_t end, osort_cmp_function cmpFn){
 
   free(temp);
 }
+
+
+obliv int partition_std(oram * data, obliv int * temp, obliv int left, obliv int right, int len)  {
+  obliv int i = left;
+  obliv int pi;
+  oram_read(&pi, data, right - 1);
+  obliv bool oleq = true;
+  obliv int ee;
+  obliv int aa;
+  obliv int bb;
+
+  for (int j = 0; j < len; j++){
+    obliv bool in = (j >= left) & ( j < right);
+    obliv if ( in ){
+      oram_read(&ee, data, j);
+      oleq = ee < pi;
+      obliv if (oleq) {
+        oram_read(&aa, data, i);
+        oram_read(&bb, data, j);
+        oram_write(data, &aa, j);
+        oram_write(data, &bb, i);
+        i = i + 1;
+      }
+    }
+  }
+  oram_read(&bb, data, i);
+
+  oram_write(data, &pi, i);
+  oram_write(data, &bb, right-1);
+  return i;
+}
+
+void oqsort_std_main(oram * data, obliv int * temp, obliv int left, obliv int right, int len)  {
+  obliv bool oend = 1 < (right - left);
+  bool end;
+  revealOblivBool(&end, oend, 0);
+  if (end) {
+    // p is the index of pivot
+    obliv int p = partition_std(data, temp, left, right, len);
+    //int p = 1;
+    // sort first p value
+    oqsort_std_main(data, temp, left, p, len);
+    // sort last n-p-1 value
+    oqsort_std_main(data, temp, p+1, right,len);
+  }
+}
+
+void oqsort_std(oram *data, size_t end, osort_cmp_function cmpFn){
+  
+  obliv int * temp = malloc(sizeof(obliv int));
+  
+  oqsort_std_main(data, temp, 0, end, end);
+  //fprintf(stdout, "qsort main \n");
+
+  free(temp);
+}
+

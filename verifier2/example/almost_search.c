@@ -4,9 +4,6 @@
 #define LOG2N 6
    
    
-	bool eq;
-
-	
 void binary_almost_search_opt(int *idx, int needle, int* arr, int n){
     int upper_bound = LOG2N + 1;
 

@@ -59,7 +59,7 @@ void oqsort(int8_t * data, size_t end){
 
 
 int main(){
-    int size = 5;
+    int size = 4;
     int8_t arr[size];
     checker_init(3);
     checker_make_symbolic(arr, sizeof(arr), "arr");

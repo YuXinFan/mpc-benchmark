@@ -168,12 +168,15 @@ void test_main(void*varg) {
             for (int jj = size/2; jj < size; jj++) {
                 input[jj] = feedOblivInt(perm[jj], 2);
             }
-
+			OcCopy cpy = ocCopyIntN(1);
+			oram * o = oram_from_array(ORAM_TYPE_SQRT, &cpy, size, input);
 			rungates = yaoGateCount();
 			runbytes = tcp2PBytesSent(ocCurrentProto());
 			runtime = current_timestamp();
 
-			oqsort(input, size, cmpInt);
+			//oqsort(input, size, cmpInt);
+			
+			oqsort_std(o, size, cmpInt);
 
 			runtime = current_timestamp() - runtime;
 			rungates = yaoGateCount() -rungates;

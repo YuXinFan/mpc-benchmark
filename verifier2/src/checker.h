@@ -16,7 +16,9 @@ int NUM_Checker;
 
 void checker_make_symbolic(void *addr, size_t nbytes, const char *name){
     klee_make_symbolic(addr, nbytes, name);
-    printf("[Checker] Make symbolic %s\n", name);
+    char *ll = (char *)malloc(sizeof(char)*256);
+    sprintf(ll, "[~Make Symbolic] %s", name);
+    klee_print_expr(ll, (int *)addr);
 }
 
 int8_t checker_int8(const char *name){
@@ -33,7 +35,7 @@ int checker_int(const char *name){
 
 void checker_assume(uintptr_t condition) {
     klee_assume(condition);
-    klee_print_expr("[Part-A] Assume", condition);
+    klee_print_expr("[~Assume]", condition);
 }
 
 void checker_check_int8_array(int8_t *o, int size){
@@ -65,13 +67,28 @@ void checker_check_float_array(int o){
     
 } 
 void checker_check_int(int o){
-    // char *label = (char *)malloc(sizeof(char)*256);
-    // #pragma clang loop unroll(full)
-    // for (int j = 0; j < CheckerIDX; j++) {
-    //     sprintf(label, "[Part-C] id %d, total %d, now %d-th", o, ChecherIDX, j+1);
-    //     const char *const_res =  label;
-    //     klee_print_range(const_res, A[j].expr);
-    // }
+    klee_print_expr("[Array] Size", 1);
+    klee_print_expr("[PathCond]", NULL);
+
+    char *label = (char *)malloc(sizeof(char)*256);
+    char *ll = (char *)malloc(sizeof(char)*256);
+
+    #pragma clang loop unroll(full)
+    for (int ii = 0; ii < 1; ii++) {
+        sprintf(ll, "[State ID] [Array IDX][%d] Expr=", ii);
+        const char *const_res =  ll;
+        klee_print_expr(const_res, o);
+    }
+
+    #pragma clang loop unroll(full)
+    for (int ii = 0; ii < NUM_Checker; ii++){
+        int num_loop = CheckerIDX[ii];
+        for (int kk = 0; kk < num_loop; kk++){
+            sprintf(label, "[State ID] [Declassified][%d] [%d/%d] %d==", ii, kk+1, num_loop, klee_get_value_i32(Checker[ii][kk]));
+            const char *const_res =  label;
+            klee_print_expr(const_res, Checker[ii][kk]);
+        }
+    }
 }
 
 void checker_init(int num){
