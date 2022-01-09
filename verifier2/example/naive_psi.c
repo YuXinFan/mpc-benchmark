@@ -25,19 +25,19 @@ char **gen_labels(const char *prefix, int nums){
 }
 
 int main(){
-    int8_t size = 3;
+    int8_t size = 10;
     int8_t aarr[size];
     int8_t barr[size];
-    char **la = gen_labels("aarr", size);
-    char **lb = gen_labels("barr", size);
+    //char **la = gen_labels("aarr", size);
+    //char **lb = gen_labels("barr", size);
+    checker_make_symbolic(&aarr, sizeof(aarr), "aarr");
+    checker_make_symbolic(&barr, sizeof(barr), "barr");
 
-    #pragma clang loop unroll(full)
-	for (int i = 0; i < size; i++) {
-		aarr[i] = checker_int8(la[i]);
-		checker_assume(aarr[i] >=0 );
-        barr[i] = checker_int8(lb[i]);
-		checker_assume(barr[i] >=0 );
-	}
+    //#pragma clang loop unroll(full)
+	//for (int i = 0; i < size; i++) {
+	//	aarr[i] = checker_int8(la[i]);
+    //    barr[i] = checker_int8(lb[i]);
+	//}
 
     #pragma clang loop unroll(full)
 	for (int ll = 0; ll < size; ll++) {

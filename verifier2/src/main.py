@@ -3,6 +3,7 @@ import re
 import os
 import argparse
 import gen_query
+import time 
 def main():
 
     parser = argparse.ArgumentParser()
@@ -13,6 +14,8 @@ def main():
     parser.add_argument('--gen', action='store_true')
     parser.add_argument('--solve', action='store_true')
     parser.add_argument('--pos', type=int)
+    parser.add_argument('--postfix', type=int)
+
 
 
     args = parser.parse_args()
@@ -38,7 +41,7 @@ def main():
         folder = "../log"
         if not os.path.isdir(folder):
             os.mkdir(folder)
-        outfile = open("../log/"+ofile, "w+")
+        outfile = open("../log/"+ofile + str(args.postfix) if args.postfix != 0 else "", "w+")
         # exit_code = subprocess.call("klee --disable-verify \
         #     --use-query-log=solver:kquery \
         #     --external-calls=all \
