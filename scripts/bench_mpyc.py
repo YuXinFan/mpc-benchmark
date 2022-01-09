@@ -68,10 +68,10 @@ def main():
     # parser.add_argument("--man", action="store_true")
 
     # args = parser.parse_args()
-    for bname in [cases[0]]:
+    for bname in [cases[1], cases[2], cases[3]]:
         for i in range(10, 101, 10):
-            param = gen_param(bname, i, 10)
-            bench_single(bname, param)
-            #bench_single(bname, param + " --opt ")
+            param = gen_param(bname, i, 40)
+            #bench_single(bname, param)
+            bench_single(bname, param + " --opt ")
 
 main()
