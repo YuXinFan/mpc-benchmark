@@ -1,7 +1,7 @@
 #include "../src/checker.h"
 #include "math.h"
-#define N 100
-#define LOG2N 6
+#define N 20
+#define LOG2N 4
    
    
 void binary_almost_search_opt(int *idx, int needle, int* arr, int n){
@@ -49,9 +49,10 @@ int main(){
     int arr[arr_size];
     int val;
     int idx = -1;
+    checker_init(1);
     checker_make_symbolic(&arr, sizeof(arr), "arr");
-    for (int i = 2; i < arr_size; i++) {
-        checker_assume(arr[i-2] < arr[i]);
+    for (int i = 1; i < arr_size; i++) {
+        checker_assume(arr[i-1] < arr[i]);
     }
     checker_make_symbolic(&val, sizeof(val), "val");
 

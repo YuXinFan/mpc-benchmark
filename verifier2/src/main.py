@@ -12,6 +12,8 @@ def main():
     parser.add_argument('--sym', action='store_true')
     parser.add_argument('--gen', action='store_true')
     parser.add_argument('--solve', action='store_true')
+    parser.add_argument('--pos', type=int)
+
 
     args = parser.parse_args()
 
@@ -59,22 +61,23 @@ def main():
             exit(exit_code)
         else:
             print("[Checker] Symbolic %s done." % bcfile)
-
+    num_declassified = 0
     if (args.all or args.gen):
         #construct query
-        gen_query.main("../log/"+ofile,qfile)
+        num_declassified=gen_query.main("../log/"+ofile,qfile)
         print("[Checker] Generate solver query done.")
         # check query states
-
+    num_declassified = args.pos if num_declassified == 0 else num_declassified
     if (args.all or args.solve):
     # run kleaver 
-        exit_code = subprocess.call("kleaver ../log/%s" % qfile, shell=True)
-        # checker kleaver states
-        if exit_code != 0:
-            print("[Checker] Solver failed to solve, exit code %d." % exit_code)
-            exit(exit_code)
-        else:
-            print("[Checker] Solver done.")
+        for i in range(num_declassified):
+            exit_code = subprocess.call("kleaver ../log/%s%d" % (qfile, i), shell=True)
+            # checker kleaver states
+            if exit_code != 0:
+                print("[Checker] Solver failed to solve, exit code %d." % exit_code)
+                exit(exit_code)
+            else:
+                print("[Checker] Solver %d-th declassified variable done." % (i+1))
 
         #analyze solver result
         kquery = ""

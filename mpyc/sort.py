@@ -118,7 +118,6 @@ def partition_std(arr, low, high):
         arr[i] = mpc.if_else(oleq, arr[ii], arr[i])
         arr[ii] = mpc.if_else(oleq, arr[i], arr[ii])
         i = mpc.if_else(oleq, i+1, i)
-
   
     arr[i], arr[high-1] = arr[high-1], arr[i]
     return (i)
@@ -138,7 +137,7 @@ def quickSort_std(arr, low, high):
         # pi is partitioning index, arr[p] is now
         # at right place
         pi = partition_std(arr, low, high)
-  
+        #print(mpc.run(mpc.output(pi)))
         # Separately sort elements before
         # partition and after partition
         quickSort_std(arr, low, pi-1)

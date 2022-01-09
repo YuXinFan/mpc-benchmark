@@ -1,6 +1,6 @@
 import re
 import os
-
+import timeit
 EXPR=r"\([\[\(0-9a-zA-Z\:\@\_\ \,\)\]]*\)"
 def load_decls():
     # find klee-last folder
@@ -88,13 +88,13 @@ def make_decls(path, symbolics):
     print(decl_prime)
     return decl + decl_prime
 def make_assumes(part):
-    l = []
-    for x in part:
-        if "N0:(ReadLSB w32 0 arr) N1:" in x:
-            print(x)
-        m = find_and_replace_label_def(x)
-        l.append("(Eq 1  %s)\n" % m)
-    return l 
+    l = ["(Eq 1 %s)" % m for m in part]
+    # for x in part:
+    #     if "N0:(ReadLSB w32 0 arr) N1:" in x:
+    #         print(x)
+    #     #m = find_and_replace_label_def(x)
+    #     l.append("(Eq 1  %s)\n" % m)
+    return "\n".join(l) 
 
 def make_path_conds(path_conds_split):
     def cmp_id(l):
@@ -131,16 +131,17 @@ def make_results(results_split, arr_size):
         return int(l[1])
 
     results_split = sorted(results_split, key = cmp_id)
-
+    print(results_split)
+    print(arr_size)
     results_pathIDs_map = {}
     for i in range(0, int(len(results_split)/arr_size)):
         result_split = sorted(results_split[i*arr_size:(i+1)*arr_size], key = cmp_idx)
-        result = [i[2] for i in result_split]
+        result = [j[2] for j in result_split]
         result_str = " ".join(result)
         if result_str in results_pathIDs_map.keys():
-            temp = results_pathIDs_map[result_str]
-            temp["path_id"] += [result_split[0][0]]
-            results_pathIDs_map[result_str]["path_id"] += temp["path_id"]
+            temp = results_pathIDs_map[result_str]["path_id"]
+            temp += [result_split[0][0]]
+            results_pathIDs_map[result_str]["path_id"] = temp
         else:
             temp = {}
             temp["raw"] = result
@@ -194,7 +195,6 @@ def make_trace(results_ids_map, path_conds, declassifieds):
             else:
                 trace[path_id][key] = [("true", "false")]
     
-    print("Trace: ", trace.keys())
     return trace 
 
 def ListAndCat(list):
@@ -264,16 +264,15 @@ def make_query(file_name, decls, assumes, const):
     if not os.path.isdir(folder):
         os.mkdir(folder)
     kquery = decls 
-    assumes = " ".join(assumes)
     for i in range(len(const)):
-        qIdx = 0
-        for expr in const[i]:
-            kquery = kquery + "\n# query %d\n" % qIdx \
-                + "(query [ " + assumes + " ]\n" \
-                + expr + " )" 
-            qIdx = qIdx + 1
         w = open(folder+"/"+file_name+str(i), "w+")
-        w.write(kquery)
+        w.write(decls)
+        qIdx = 0
+        print("Making %d-th Kquery file" % i)
+        for expr in const[i]:
+            qIdx = qIdx + 1
+            qLine = "\n# query %d\n" % qIdx + "(query [ " + assumes + " ]\n" + expr + " )"
+            w.write(qLine)
         w.close()
         kquery = decls
 
@@ -294,7 +293,8 @@ def main(ofile,qfile):
     file1.close()
     file2.close()
 
-    assumes = []
+    assumes_split = re.findall(r"\[\~Assume\]:(\([\[\(0-9a-zA-Z\:\=\_\@\,\ \)\]]*\)|-?\d+)", content)
+    print("%d Assumes" % len(assumes_split))
 
     symbolics = re.findall(r"\[\~Make Symbolic\] ([0-9a-zA-Z\_]*)\:", content)
     for i in symbolics:
@@ -311,26 +311,21 @@ def main(ofile,qfile):
     print("Total Declassified Split: ", len(declassifieds_split))
     
     arraySize = re.findall(r"\[Array\] Size:(\d+)", content)
-    # assumes = make_assumes(partA)
-    # print("%d Assumes" % len(assumes))
+    assumes = make_assumes(assumes_split)
     if arraySize == [] :
-        arraySize = 0
+        arraySize = 1
     else:
         arraySize = int(arraySize[0])
-    # print("%d Result Expr" %  (len(partB) if arraySize==0 else len(partB)/arraySize) )
-    # print("%d Constraints" % len(partC))
 
     path_conds = make_path_conds(path_conds_split)
-    for i in path_conds:
-        for j in i["path_conds"]:
-            print(j)
-        print()
 
     results_ids_map = make_results(results_split, arraySize)
 
     declassifieds = make_declassifieds(declassifieds_split)
 
     traces = make_trace(results_ids_map, path_conds, declassifieds)
+    print("Numer of Trace: ", traces.keys())
+
     # # decls, assumes, constraints
 
     const = make_constraints(traces, symbolics)
@@ -338,5 +333,7 @@ def main(ofile,qfile):
     for i in const:
         print("Number of query of deciassified ", len(i))
     decls = make_decls("../build/klee-last/solver-queries.kquery", symbolics)
+    print("Make Decl Done")
 
     make_query(qfile, decls, assumes, const)
+    return len(const)
