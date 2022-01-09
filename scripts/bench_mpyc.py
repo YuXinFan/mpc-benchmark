@@ -69,9 +69,9 @@ def main():
 
     # args = parser.parse_args()
     for bname in [cases[0]]:
-        for i in range(3, 4, 1):
-            param = gen_param(bname, i, 1)
+        for i in range(10, 101, 10):
+            param = gen_param(bname, i, 10)
             bench_single(bname, param)
-            bench_single(bname, param + " --opt ")
+            #bench_single(bname, param + " --opt ")
 
 main()

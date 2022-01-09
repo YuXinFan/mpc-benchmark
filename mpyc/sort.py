@@ -141,7 +141,7 @@ def quickSort_std(arr, low, high):
   
         # Separately sort elements before
         # partition and after partition
-        quickSort_std(arr, low, pi)
+        quickSort_std(arr, low, pi-1)
         quickSort_std(arr, pi+1, high)
 
 def quick_sort_std(arr1, arr2):
