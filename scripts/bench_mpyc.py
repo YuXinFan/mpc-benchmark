@@ -72,6 +72,6 @@ def main():
         for i in range(10, 101, 10):
             param = gen_param(bname, i, 10)
             bench_single(bname, param)
-            bench_single(bname, param + " --opt ")
+            #bench_single(bname, param + " --opt ")
 
 main()
