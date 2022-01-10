@@ -239,6 +239,13 @@ def make_constraints(trace, symbolics):
             path_cond2_prime = trace_prime[path_id2]["path_cond"]
             path_cond2_andcat_prime = ListAndCat(path_cond2_prime)
             result2_prime = trace_prime[path_id2]["result"]
+            result_const = []
+            filted = False
+            for x,y in zip(result1, result2_prime):
+                if (x.isdigit() and y.isdigit()) and (x != y):
+                    filted = True 
+            if filted:
+                continue
             result_const = ["(Eq w32 (w32 %s) (w32 %s))" % (x, y) if x.isdigit() and y.isdigit() else "(Eq %s %s )" % (x,y) for x,y in zip(result1,result2_prime)]
             result_andcat = ListAndCat(result_const)
             left_const = ListAndCat([path_cond1_andcat, path_cond2_andcat_prime,  result_andcat])

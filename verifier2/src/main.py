@@ -35,13 +35,13 @@ def main():
         else:
             print("[Checker] Compiler %s done." % cfile)
         # check compiler states
-
+    print(args.postfix)
     if (args.all or args.sym):
         #klee 
         folder = "../log"
         if not os.path.isdir(folder):
             os.mkdir(folder)
-        outfile = open("../log/"+ofile + str(args.postfix) if args.postfix != 0 else "", "w+")
+        outfile = open("../log/"+ofile + "" if args.postfix == None else str(args.postfix), "w+")
         # exit_code = subprocess.call("klee --disable-verify \
         #     --use-query-log=solver:kquery \
         #     --external-calls=all \
@@ -69,6 +69,8 @@ def main():
         #construct query
         num_declassified=gen_query.main("../log/"+ofile,qfile)
         print("[Checker] Generate solver query done.")
+        if (num_declassified == 0):
+            print("[Checker] Filter all constraints. Solver Done")
         # check query states
     num_declassified = args.pos if num_declassified == 0 else num_declassified
     if (args.all or args.solve):
