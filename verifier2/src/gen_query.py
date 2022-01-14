@@ -88,7 +88,7 @@ def make_decls(path, symbolics):
     print(decl_prime)
     return decl + decl_prime
 def make_assumes(part):
-    l = ["(Eq 1 %s)" % m for m in part]
+    l = ["(Eq 1 %s)" % find_and_replace_label_def(m) for m in part]
     # for x in part:
     #     if "N0:(ReadLSB w32 0 arr) N1:" in x:
     #         print(x)
@@ -108,6 +108,7 @@ def make_path_conds(path_conds_split):
     #print(path_conds_split[-1])
     for path_cond_split in path_conds_split:
         path_cond_split_ = path_cond_split[1]
+        path_cond_split_ = find_and_replace_label_def(path_cond_split_)
         if "model_version" in path_cond_split_:
             path_cond_split_ = "true"
         if path_cond_split[0] == str(cur_idx):

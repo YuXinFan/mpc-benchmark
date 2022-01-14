@@ -95,8 +95,14 @@ void checker_init(int num){
     NUM_Checker = num;
 }
 
-static inline void revealOblivBool(bool *a, bool aa, int idx){
-    *a = aa;
+// static inline void revealOblivBool(bool *a, bool aa, int idx){
+//     *a = aa;
+//     Checker[idx][CheckerIDX[idx]] = aa;
+//     CheckerIDX[idx] += 1;
+// }
+
+static inline bool revealOblivBool(bool aa, int idx){
     Checker[idx][CheckerIDX[idx]] = aa;
     CheckerIDX[idx] += 1;
+    return aa;
 }

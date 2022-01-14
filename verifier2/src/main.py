@@ -84,9 +84,5 @@ def main():
             else:
                 print("[Checker] Solver %d-th declassified variable done." % (i+1))
 
-        #analyze solver result
-        kquery = ""
-        re.findall(r"# query (\d+), ret expr (\[?[\(0-9a-zA-Z\_\ \)]*\]?)", kquery)
-        #kret = re.findall(r"")
 
 main()
