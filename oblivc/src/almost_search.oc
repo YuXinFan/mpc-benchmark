@@ -93,34 +93,36 @@ obliv int binary_almost_search_oram_opt(OcCopy * cpy, void* result, oram * hayst
 		oram_read(temp_element, haystack, iimid);
 		aa = (obliv int *)temp_element;
 		oeq = *aa == *bb;
-        revealOblivBool(&eq, oeq, 0);
-		if (eq) {
+		obliv if (oeq) {
 			ocCopy(cpy, result, temp_element);
 			index = iimid;
-            break;
-		}else{
-            obliv if ( iimid > iimin) {
-                oram_read(temp_left, haystack, iimid-1);
-                obliv int *tleft = (obliv int*)temp_left;
-                obliv if ( *tleft == *bb ){
-			        ocCopy(cpy, result, temp_left);
-                    index = (iimid-1);
-                }
-            }
-            obliv if (iimid < iimax) {
-                oram_read(temp_right, haystack, iimid+1);
-                obliv int *tright = (obliv int*)temp_right;
-                obliv if ( *tright == *bb ){
-			        ocCopy(cpy, result, temp_right);
-                    index = (iimid + 1);
-                }
-            }
-            obliv bool ogt = *aa > *bb;
-            obliv if (ogt) {
-                iimax = iimid-2;
-            }else {
-                iimin = iimid+2;
-            }
+		}
+		obliv bool ogt = iimid > iimin;
+		bool gt;
+		revealOblivBool(&gt, ogt, 0);
+		if ( gt) {
+			oram_read(temp_left, haystack, iimid-1);
+			obliv int *tleft = (obliv int*)temp_left;
+			obliv if ( *tleft == *bb ){
+				ocCopy(cpy, result, temp_left);
+				index = (iimid-1);
+			}
+		}
+		ogt = iimid < iimax;
+		revealOblivBool(&gt, ogt, 0);
+		if (gt) {
+			oram_read(temp_right, haystack, iimid+1);
+			obliv int *tright = (obliv int*)temp_right;
+			obliv if ( *tright == *bb ){
+				ocCopy(cpy, result, temp_right);
+				index = (iimid + 1);
+			}
+		}
+		ogt = *aa > *bb;
+		obliv if (ogt) {
+			iimax = iimid-2;
+		}else {
+			iimin = iimid+2;
 		}
 	}
 	free(temp_element);
