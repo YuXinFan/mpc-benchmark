@@ -32,10 +32,13 @@ def binary_almost_search(haystack, haystack_length, needle):
         aa = shared_haystack[iimid] # oram_read(haystack, haystack_length, iimid)
         oeq = aa == bb 
         index = mpc.if_else(oeq, iimid, index)
-        left = shared_haystack[iimid-1]
+
+        hasleft = iimid > iimin
+        left = mpc.if_else(hasleft,shared_haystack[iimid-1], -1) 
         index = mpc.if_else(aa==left, iimid-1, index)
 
-        right = shared_haystack[iimid+1]
+        hasright = iimid < iimax 
+        right = mpc.if_else(hasright,shared_haystack[iimid+1], -1)
         index = mpc.if_else(aa==right, iimid+1, index)
 
         ogt = aa > bb
@@ -60,14 +63,18 @@ def binary_almost_search_opt(haystack, haystack_length, needle):
         cc =  ii % 2
         iimid = mpc.if_else( cc, mpc.div(iimax+iimin-1, 2), mpc.div(iimax+iimin, 2) )
         aa = shared_haystack[iimid] # oram_read(haystack, haystack_length, iimid)
-        eq = mpc.run(mpc.eq_public(aa, bb))
-        if eq:
-            index = iimid 
-            break  
-        left = shared_haystack[iimid-1]
+        eq = aa == bb 
+        index = mpc.if_else(eq, iimid, index)
+        # eq = mpc.run(mpc.eq_public(aa, bb))
+        # if eq:
+        #     index = iimid 
+        #     break  
+        hasleft = mpc.run(mpc.output(iimid > iimin)) 
+        left = shared_haystack[iimid-1] if hasleft else -1
         index = mpc.if_else(aa==left, iimid-1, index)
 
-        right = shared_haystack[iimid+1]
+        hasright = mpc.run(mpc.output(iimid < iimax))
+        right = shared_haystack[iimid+1] if hasright else -1
         index = mpc.if_else(aa==right, iimid+1, index)
 
         ogt = aa > bb
